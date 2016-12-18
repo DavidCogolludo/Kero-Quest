@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title></title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+
+
+  <!-- <link rel="stylesheet" href="../shared/lib/reveal/../tabzilla/css/tabzilla.css"/> -->
+  <link rel="stylesheet" href="../shared/lib/reveal/css/reveal.css"/>
+  <link rel="stylesheet" href="../shared/lib/reveal/css/theme/mozilla-devrel-light.css"/>
+  <link rel="stylesheet" href="../shared/lib/reveal/lib/css/solarized-light.css" />
+
+
+
+
+  <!-- <link rel="stylesheet" href="../shared/lib/reveal/css/reveal.css"> -->
+
+  <style type="text/css">code{white-space: pre;}</style>
+<!--  -->
+<!--   <link rel="stylesheet" href="../shared/lib/reveal/css/theme/black.css" id="theme"> -->
+<!--  -->
+<!--  -->
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? '../shared/lib/reveal/css/print/pdf.css' : '../shared/lib/reveal/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="../shared/lib/reveal/lib/js/html5shiv.js"></script>
+  <![endif]-->
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+
+
+<!-- FIXME megahack because `pandoc` only generates h1's. -->
+<!-- <style type="text/css"> -->
+
+
+<!-- .inner { -->
+<!--     width: 100%; -->
+<!--     margin: 0 auto; --> 
+<!-- } -->
+
+<!--     h1{ --> 
+<!--     } -->
+
+<!--     .level2 h1 { -->
+        
+<!--     border-top: 0.1em solid #484848; -->
+<!--     border-bottom: 0.1em solid #484848; -->
+    
+<!--     padding: 1em 0; -->
+<!--     margin-bottom: 1em; -->
+<!--     font-size: 1.6em; -->
+<!--     margin: 0 0 20px 0; -->
+<!--     color: #484848; -->
+<!--     font-family: "Fira Sans", Helvetica, sans-serif; -->
+<!--     font-weight: 600; -->
+<!--     line-height: 1.2; -->
+<!--     letter-spacing: normal; -->
+<!--     text-transform: uppercase; -->
+<!--     text-shadow: none; -->
+<!--     word-wrap: break-word; -->
+<!-- } -->
+
+<!-- </style> -->
+
+
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+
+<section><section id="prácticas-sobre-phaser-carga-de-recursos." class="titleslide slide level1"><h1>Prácticas sobre Phaser: Carga de recursos.</h1></section><section id="descripción-general-del-juego" class="slide level2">
+<h1>Descripción general del juego</h1>
+<p>El juego está basado en la plantilla de Phaser proporcionada en clase y consta de los siguientes ficheros:</p>
+<ul>
+<li class="fragment"><strong>index.html</strong>: página de inicio del juego.</li>
+<li class="fragment"><strong>raw.html</strong>: iframe que carga la página index con el juego.</li>
+<li class="fragment"><strong>js/main.js</strong>: En el fichero javascript que se carga en raw.html. Crea el objeto de Phaser y lanza el primer state denominado BootScene. BootScene es la escena de inicio del juego. Piensa en ella como el típico <strong>splash screen</strong> de un juego donde se cargan los primeros elementos necesarios para poder lanzarlo. En este fichero también está implementado la escena de carga del juego tal y como aparece en la plantilla. Aunque la primera escena a cargar después del BootScene es el <strong>MenuScene</strong> que se encuentra en el fichero menu_scene.js.</li>
+<li class="fragment"><strong>js/menu_scene.js</strong>: Es el primer state con interaccion con le usuario donde mostramos el logo de phaser y un boton de inicio. Al pulsar el botón de inicio, el juego pasará a la pantalla de carga <strong>PreloaderScene</strong> definida en el main.js.</li>
+<li class="fragment"><strong>js/play_scene.js</strong>: Aquí está desarrollado el state del juego. En dicho state cargamos un tilemap con el mundo que tiene tres capas.
+<ul>
+<li class="fragment"><em>Blackground</em>: El fondo de la escena con la que el personaje no colisiona.</li>
+<li class="fragment"><em>ground</em>: El escenario colisionable con el personaje.</li>
+<li class="fragment"><em>deathZone</em>: Zonas de muerte donde si cae el player, muere. Al morir se muestra el state <strong>GameOver</strong> que está en el fichero gameover_scene.js.</li>
+</ul></li>
+<li class="fragment"><strong>js/gameover_scene.js</strong>: Escena donde se muestra el texto de GameOver y un botón para reiniciar el nivel.</li>
+</ul>
+</section><section id="instalación" class="slide level2">
+<h1>Instalación</h1>
+<p>Para instalar ejecutar desde la consola:</p>
+<p>$ npm install</p>
+</section><section id="ejecución" class="slide level2">
+<h1>Ejecución</h1>
+<p>Desde dentro de la carpeta del enunciado ejecutar:</p>
+<p>$ node ./node_modules/gulp/bin/gulp run</p>
+</section><section id="ejercicio-1-configurar-game-con-los-diferentes-states-del-juego." class="slide level2">
+<h1>Ejercicio 1: Configurar game con los diferentes States del juego.</h1>
+<p>En el fichero Main, completar los TODOS 1.1, 1.2 y 1.3 sobre la gestión de states en el juego y cómo ejecutar el state de inicio.</p>
+</section><section id="ejercicio-2-pantalla-de-carga." class="slide level2">
+<h1>Ejercicio 2: Pantalla de carga.</h1>
+<p>Realizar el TODO 2.1 y 2.2 sobre la carga en la escena de carga. Debemos cargar:</p>
+<ul>
+<li class="fragment">La imagen ‘images/simples_pimples.png’ con el nombre de la cache ‘tiles’</li>
+<li class="fragment">El atlasJSONHash con ‘images/rush_spritesheet.png’ como imagen y ‘images/rush_spritesheet.json’</li>
+<li class="fragment">Escuchar el evento onLoadComplete (TODO a) y esperar el callback loadComplete() para cargar la escena ‘play’. Hay que implementar también el método (TODO b).</li>
+</ul>
+</section><section id="ejercicio-3-carga-de-la-google-font." class="slide level2">
+<h1>Ejercicio 3: Carga de la Google Font.</h1>
+<ul>
+<li class="fragment">Cargar en raw.htm el Google Font usando //ajax.googleapis.com/ajax/libs/webfont/1.5.18/webfont.js (TODO 3.1)</li>
+<li class="fragment">Usars WebFont.load() con el objeto wfconfig ya creado, para solicitar la fuente a Google. Nótese que el método <strong>active</strong> invoca a un método init() no definido que es el que verdaderamente crea el juego en Phaser que ahora mismo está siendo creado en el <strong>onload</strong>. Sin embargo, el método onload realmente debe ser utilziado para iniciar la carga de la fuente. (TODOS 3.2, 3.3 )</li>
+</ul>
+</section><section id="ejercicio-4-crear-el-tilemap-en-el-state-de-juego." class="slide level2">
+<h1>Ejercicio 4: Crear el Tilemap en el state de juego.</h1>
+<p>Crear el Tilemap ‘tilemap’ y guardarlo en el attributo <strong>map</strong> como miembro de la clase PlayScene en el archivo play_scene.js (Notese que la variable ya se usa mas adelante en el código con ese mismo nombre. Si, no peta, esto es javascript :P) y asignarle al tileset ‘patrones’ la imagen de sprites llamada ‘tiles’ cargada en la state <strong>PreloaderScene</strong>.</p>
+</section><section id="ejercicio-5-crear-el-sprite-de-rush-el-avatar-del-player." class="slide level2">
+<h1>Ejercicio 5: Crear el sprite de Rush, el avatar del player.</h1>
+<p>Creamos a <strong>rush</strong> con el sprite ‘rush’ previamente cargado en la cache en la posición (10, 10) con el frame por defecto ‘rush_idle01’</p>
+</section><section id="ejercicio-6-cargar-gameover-y-descargar-los-recursos-del-juego." class="slide level2">
+<h1>Ejercicio 6: Cargar GameOver y descargar los recursos del juego.</h1>
+<p>Cuando el personaje colisione con el plano de muerte dibujado en la capa <strong>Death</strong>, invocará a onPlayerFell. En ese momento, hay que poner la pantalla de GameOver.</p>
+</section><section id="ejercicio-7-recargar-el-juego-al-perder-pulsando-el-boton-reset-game-del-state-gameover." class="slide level2">
+<h1>Ejercicio 7: Recargar el juego al perder pulsando el boton Reset Game del state GameOver.</h1>
+<p>Implementar el TODO 7 de gameover_scene con el callback del botón <strong>var button</strong></p>
+</section><section id="ejercicio-8-crear-un-botón-que-nos-devuelva-al-menú-de-juego-en-la-ventana-de-gameover." class="slide level2">
+<h1>Ejercicio 8: Crear un botón que nos devuelva al menú de juego en la ventana de GameOver.</h1>
+<p>Implementa el TODO 8 creando el botón ‘Return Main Menu’ que cargue el menú de inicio.</p>
+</section><section id="ejercicio-9-destruir-los-recursos-tilemap-tiles-y-logo-al-terminar-el-state-playscene." class="slide level2">
+<h1>Ejercicio 9: Destruir los recursos ‘Tilemap’, ‘tiles’ y <del>‘logo’</del> al terminar el state PlayScene.</h1>
+<p>(Update: No hay que elimnar el logo porque se necesita en el ejercicio anterior (return main menu). Y hay que reestablecer el tamaño del mundo al ambiar el state usando **this.game.world.setBounds(0,0,800,600); para reestablecer el tamaño del mundo.</p>
+</section></section>
+    </div>
+  </div>
+
+  <script src="../shared/lib/reveal/lib/js/head.min.js"></script>
+  <script src="../shared/lib/reveal/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: '../shared/lib/reveal/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: '../shared/lib/reveal/plugin/zoom-js/zoom.js', async: true },
+          { src: '../shared/lib/reveal/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
