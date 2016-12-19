@@ -11,6 +11,7 @@ var GameOver = {
         var text = this.game.add.text(0, 0, "Reset Game");
         var text2 = this.game.add.text(0, 0, "Return Menu");
         text.anchor.set(0.5);
+        goText.fill = '#43d637';
         goText.anchor.set(0.5);
         text2.anchor.set(0.5);
         goText.anchor.set(0.5);
@@ -60,8 +61,8 @@ var BootScene = {
   },
 
   create: function () {
-    //this.game.state.start('preloader');
-      this.game.state.start('preloader');
+    this.game.state.start('preloader');
+    //this.game.state.start('menu');
   }
 };
 
@@ -174,7 +175,6 @@ module.exports = MenuScene;
 //mover el player.
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
-var numJumps = 0;
 //Scena de juego.
 var PlayScene = {
     _rush: {},
@@ -184,23 +184,29 @@ var PlayScene = {
     _jumpHight: 150, //altura máxima del salto.
     _playerState: PlayerState.STOP, //estado del player
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
-
+    _numJumps: 0,
     //Método constructor...
   create: function () {
 
   	//Crear player:
-  	this._player= this.game.add.sprite(96,1472, 'player_01');
+  	this._player= this.game.add.sprite(129,1472, 'player_01');
   	//Crear mapa
   	this.map = this.game.add.tilemap('level_01');
   	this.map.addTilesetImage('patrones','tiles');
   	//Creación de layers
   	this.groundLayer = this.map.createLayer('Ground');
+  	this.deathLayer = this.map.createLayer('Death');
   	this.map.setCollisionBetween(0,5000, true, 'Ground');
+  	this.map.setCollisionBetween(0,5000, true, 'Death');
 
   	this.configure();
   	// Crear cursores
   	this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+   	//Funciones del player.
+   	this._player.jump= function(y){this.body.velocity.y = -y;}
+   	this._player.moveLeft = function(x){ this.body.velocity.x = -x;}
+   	this._player.moveRight = function(x){this.body.velocity.x = x;}
     this.jumpTimer = 0;
     
   },
@@ -208,37 +214,33 @@ var PlayScene = {
     //IS called one per frame.
     update: function () {
         var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
+       
         this._player.body.velocity.x = 0; 
-
-        if (this.cursors.left.isDown)
-        {
-           this._player.body.velocity.x = -150;
-        }
-        else if (this.cursors.right.isDown)
-        {
-           this._player.body.velocity.x = 150;
-        }
-        if (this.jumpButton.isDown && this._player.body.onFloor()&& this.game.time.now > this.jumpTimer)
-        {
-          this._player.body.velocity.y = -500;
-          this.jumpTimer = this.game.time.now + 750;
-        }
+        if(this._player.body.onFloor()) this._numJumps=0;
+        this.movement(150);
+         this.checkPlayerDeath();
+        this.jumpButton.onDown.add(this.jumpCheck, this);
     },
     
-    
+    jumpCheck: function (){
+    	if(this._numJumps < 2){ 
+    		this._player.jump(500);
+    		this._numJumps++;
+    	}
+    },
     canJump: function(collisionWithTilemap){
         return this.isStanding() && collisionWithTilemap || this._jamping;
     },
     
-    onPlayerFell: function(){
+    onPlayerDeath: function(){
         //TODO 6 Carga de 'gameOver';
         this.destroy();
         this.game.state.start('gameOver');
     },
     
-    checkPlayerFell: function(){
-        if(this.game.physics.arcade.collide(this._player, this.death))
-            this.onPlayerFell();
+    checkPlayerDeath: function(){
+        if(this.game.physics.arcade.collide(this._player, this.deathLayer))
+            this.onPlayerDeath();
     },
         
     isStanding: function(){
@@ -280,12 +282,9 @@ var PlayScene = {
         this.game.camera.follow(this._player);
     },
     //move the player
-    movement: function(point, xMin, xMax){
-        this._player.body.velocity = point;// * this.game.time.elapseTime;
-        
-        if((this._player.x < xMin && point.x < 0)|| (this._player.x > xMax && point.x > 0))
-            this._player.body.velocity.x = 0;
-
+    movement: function(incrementoX){
+         if (this.cursors.left.isDown) this._player.moveLeft(incrementoX);
+        else if (this.cursors.right.isDown) this._player.moveRight(incrementoX);
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
