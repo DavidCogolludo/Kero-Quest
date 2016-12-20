@@ -1,4 +1,5 @@
 var MenuScene = {
+  perro: 98,
     create: function () {
         
         var logo = this.game.add.sprite(this.game.world.centerX, 

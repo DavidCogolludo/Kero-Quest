@@ -4,10 +4,8 @@
 var PlayScene = require('./play_scene.js');
 var GameOver = require('./gameover_scene.js');
 var MenuScene = require('./menu_scene.js');
+var SelectPlayer = require ('./select_player.js');
 //  The Google WebFont Loader will look for this object, so create it before loading the script.
-
-
-
 
 var BootScene = {
   preload: function () {
@@ -18,8 +16,8 @@ var BootScene = {
   },
 
   create: function () {
-    this.game.state.start('preloader');
-    //this.game.state.start('menu');
+    //this.game.state.start('preloader');
+    this.game.state.start('menu');
   }
 };
 
@@ -42,6 +40,7 @@ var PreloaderScene = {
        this.game.load.tilemap('level_02', 'images/prueb.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.image('tiles', 'images/TileSet.png');
        this.game.load.image('player_01', 'images/player.png');
+       this.game.load.image('player_02', 'images/player2.png');
        this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
@@ -57,7 +56,8 @@ var PreloaderScene = {
   loadComplete: function(){
     console.log("dentro");
 		//this._ready = true;
-    this.game.state.start('play');
+    //this.game.state.start('play');
+    this.game.state.start('select_player');
     },
 
   update: function(){
@@ -88,11 +88,11 @@ window.onload = function () {
 
 function init (){
   var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game');
-
 //TODO 1.2 Añadir los states 'boot' BootScene, 'menu' MenuScene, 'preloader' PreloaderScene, 'play' PlayScene, 'gameOver' GameOver.
  game.state.add('boot', BootScene);
  game.state.add('menu', MenuScene);
  game.state.add('preloader', PreloaderScene);
+ game.state.add('select_player', SelectPlayer);
  game.state.add('play', PlayScene);
  game.state.add ('gameOver', GameOver);
 

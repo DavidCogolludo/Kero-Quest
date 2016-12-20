@@ -47,10 +47,8 @@ module.exports = GameOver;
 var PlayScene = require('./play_scene.js');
 var GameOver = require('./gameover_scene.js');
 var MenuScene = require('./menu_scene.js');
+var SelectPlayer = require ('./select_player.js');
 //  The Google WebFont Loader will look for this object, so create it before loading the script.
-
-
-
 
 var BootScene = {
   preload: function () {
@@ -61,8 +59,8 @@ var BootScene = {
   },
 
   create: function () {
-    this.game.state.start('preloader');
-    //this.game.state.start('menu');
+    //this.game.state.start('preloader');
+    this.game.state.start('menu');
   }
 };
 
@@ -85,6 +83,7 @@ var PreloaderScene = {
        this.game.load.tilemap('level_02', 'images/prueb.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.image('tiles', 'images/TileSet.png');
        this.game.load.image('player_01', 'images/player.png');
+       this.game.load.image('player_02', 'images/player2.png');
        this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
@@ -100,7 +99,8 @@ var PreloaderScene = {
   loadComplete: function(){
     console.log("dentro");
 		//this._ready = true;
-    this.game.state.start('play');
+    //this.game.state.start('play');
+    this.game.state.start('select_player');
     },
 
   update: function(){
@@ -131,19 +131,20 @@ window.onload = function () {
 
 function init (){
   var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game');
-
 //TODO 1.2 Añadir los states 'boot' BootScene, 'menu' MenuScene, 'preloader' PreloaderScene, 'play' PlayScene, 'gameOver' GameOver.
  game.state.add('boot', BootScene);
  game.state.add('menu', MenuScene);
  game.state.add('preloader', PreloaderScene);
+ game.state.add('select_player', SelectPlayer);
  game.state.add('play', PlayScene);
  game.state.add ('gameOver', GameOver);
 
 //TODO 1.3 iniciar el state 'boot'. 
 game.state.start('boot');
 }
-},{"./gameover_scene.js":1,"./menu_scene.js":3,"./play_scene.js":4}],3:[function(require,module,exports){
+},{"./gameover_scene.js":1,"./menu_scene.js":3,"./play_scene.js":4,"./select_player.js":5}],3:[function(require,module,exports){
 var MenuScene = {
+  perro: 98,
     create: function () {
         
         var logo = this.game.add.sprite(this.game.world.centerX, 
@@ -175,11 +176,13 @@ module.exports = MenuScene;
 //mover el player.
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
+
 //Scena de juego.
 var PlayScene = {
     _rush: {},
     _player: {}, //player
     _speed: 300, //velocidad del player
+    _gravity: 9.8,
     _jumpSpeed: 600, //velocidad de salto
     _jumpHight: 150, //altura máxima del salto.
     _playerState: PlayerState.STOP, //estado del player
@@ -187,10 +190,10 @@ var PlayScene = {
     _numJumps: 0,
     //Método constructor...
   create: function () {
-
   	//Crear player:
-  	this._player= this.game.add.sprite(129,1472, 'player_01');
-  	//Crear mapa
+  	if(this.game.state.states['select_player'].player === 'b')this._player= this.game.add.sprite(129,1472, 'player_01');
+    else this._player= this.game.add.sprite(129,1472, 'player_02');
+  	//Crear mapa;
   	this.map = this.game.add.tilemap('level_01');
   	this.map.addTilesetImage('patrones','tiles');
   	//Creación de layers
@@ -204,7 +207,10 @@ var PlayScene = {
   	this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
    	//Funciones del player.
-   	this._player.jump= function(y){this.body.velocity.y = -y;}
+  	//this._player.body.allowGravity = false;
+   	this._player.jump= function(y){
+   		this.body.velocity.y = -y;
+   	}
    	this._player.moveLeft = function(x){ this.body.velocity.x = -x;}
    	this._player.moveRight = function(x){this.body.velocity.x = x;}
     this.jumpTimer = 0;
@@ -213,8 +219,10 @@ var PlayScene = {
     
     //IS called one per frame.
     update: function () {
+    	//cambiar la gravedad
+    	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
         var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
-       
+       	
         this._player.body.velocity.x = 0; 
         if(this._player.body.onFloor()) this._numJumps=0;
         this.movement(150);
@@ -273,11 +281,10 @@ var PlayScene = {
         //this.game.stage.backgroundColor = '#a9f0ff';
         //this.game.physics.enable(this._player, Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);
-        
+        this.game.physics.arcade.gravity.y = 2000;
+
         this._player.body.bounce.y = 0.2;
         this._player.body.collideWorldBounds = true;
-        this._player.body.gravity.y = 2000;
-        this._player.body.gravity.x = 0;
         this._player.body.velocity.x = 0;
         this.game.camera.follow(this._player);
     },
@@ -297,4 +304,50 @@ var PlayScene = {
 
 module.exports = PlayScene;
 
+},{}],5:[function(require,module,exports){
+var MenuScene = {
+  player:'',
+    create: function () {
+        
+        var p1 = this.game.add.sprite(this.game.world.centerX-32, 
+                                        this.game.world.centerY, 
+                                        'player_01');
+        p1.anchor.setTo(0.5, 0.5);
+        var p2 = this.game.add.sprite(this.game.world.centerX+32, 
+                                        this.game.world.centerY, 
+                                        'player_02');
+        p2.anchor.setTo(0.5, 0.5);
+        var buttonB = this.game.add.button(this.game.world.centerX, 
+                                               this.game.world.centerY+80, 
+                                               'button', 
+                                               this.actionOnClickB, 
+                                               this, 2, 1, 0);
+        buttonB.anchor.set(0.5);
+        var buttonO = this.game.add.button(this.game.world.centerX, 
+                                               this.game.world.centerY+160, 
+                                               'button', 
+                                               this.actionOnClickO, 
+                                               this, 2, 1, 0);
+        buttonO.anchor.set(0.5);
+        var textB = this.game.add.text(0, 0, "Blue");
+        var textO = this.game.add.text(0, 0, "Orange");
+        textB.font = 'Sniglet';
+        textB.anchor.set(0.5);
+        buttonB.addChild(textB);
+        textO.font = 'Sniglet';
+        textO.anchor.set(0.5);
+        buttonO.addChild(textO);
+    },
+    
+    actionOnClickB: function(){
+      this.player= 'b';
+        this.game.state.start('play');
+    }, 
+    actionOnClickO: function(){
+      this.player = 'o';
+        this.game.state.start('play');
+    },
+};
+
+module.exports = MenuScene;
 },{}]},{},[2]);

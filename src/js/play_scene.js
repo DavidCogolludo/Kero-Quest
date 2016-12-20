@@ -4,11 +4,13 @@
 //mover el player.
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
+
 //Scena de juego.
 var PlayScene = {
     _rush: {},
     _player: {}, //player
     _speed: 300, //velocidad del player
+    _gravity: 9.8,
     _jumpSpeed: 600, //velocidad de salto
     _jumpHight: 150, //altura máxima del salto.
     _playerState: PlayerState.STOP, //estado del player
@@ -16,10 +18,10 @@ var PlayScene = {
     _numJumps: 0,
     //Método constructor...
   create: function () {
-
   	//Crear player:
-  	this._player= this.game.add.sprite(129,1472, 'player_01');
-  	//Crear mapa
+  	if(this.game.state.states['select_player'].player === 'b')this._player= this.game.add.sprite(129,1472, 'player_01');
+    else this._player= this.game.add.sprite(129,1472, 'player_02');
+  	//Crear mapa;
   	this.map = this.game.add.tilemap('level_01');
   	this.map.addTilesetImage('patrones','tiles');
   	//Creación de layers
@@ -33,7 +35,10 @@ var PlayScene = {
   	this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
    	//Funciones del player.
-   	this._player.jump= function(y){this.body.velocity.y = -y;}
+  	//this._player.body.allowGravity = false;
+   	this._player.jump= function(y){
+   		this.body.velocity.y = -y;
+   	}
    	this._player.moveLeft = function(x){ this.body.velocity.x = -x;}
    	this._player.moveRight = function(x){this.body.velocity.x = x;}
     this.jumpTimer = 0;
@@ -42,8 +47,10 @@ var PlayScene = {
     
     //IS called one per frame.
     update: function () {
+    	//cambiar la gravedad
+    	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
         var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
-       
+       	
         this._player.body.velocity.x = 0; 
         if(this._player.body.onFloor()) this._numJumps=0;
         this.movement(150);
@@ -102,11 +109,10 @@ var PlayScene = {
         //this.game.stage.backgroundColor = '#a9f0ff';
         //this.game.physics.enable(this._player, Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);
-        
+        this.game.physics.arcade.gravity.y = 2000;
+
         this._player.body.bounce.y = 0.2;
         this._player.body.collideWorldBounds = true;
-        this._player.body.gravity.y = 2000;
-        this._player.body.gravity.x = 0;
         this._player.body.velocity.x = 0;
         this.game.camera.follow(this._player);
     },
