@@ -47,6 +47,7 @@ module.exports = GameOver;
 var PlayScene = require('./play_scene.js');
 var GameOver = require('./gameover_scene.js');
 var MenuScene = require('./menu_scene.js');
+var MenuInGame = require('./menu_in_game.js');
 var SelectPlayer = require ('./select_player.js');
 //  The Google WebFont Loader will look for this object, so create it before loading the script.
 
@@ -84,6 +85,9 @@ var PreloaderScene = {
        this.game.load.image('tiles', 'images/TileSet.png');
        this.game.load.image('player_01', 'images/player.png');
        this.game.load.image('player_02', 'images/player2.png');
+       this.game.load.image('player_03', 'images/player3.png');
+       this.game.load.image('flechaIz', 'images/flechaIz.png');
+       this.game.load.image('flechaDer', 'images/flechaDer.png');
        this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
@@ -137,12 +141,35 @@ function init (){
  game.state.add('preloader', PreloaderScene);
  game.state.add('select_player', SelectPlayer);
  game.state.add('play', PlayScene);
+ game.state.add('menu_in_game',MenuInGame);
  game.state.add ('gameOver', GameOver);
 
 //TODO 1.3 iniciar el state 'boot'. 
 game.state.start('boot');
 }
-},{"./gameover_scene.js":1,"./menu_scene.js":3,"./play_scene.js":4,"./select_player.js":5}],3:[function(require,module,exports){
+},{"./gameover_scene.js":1,"./menu_in_game.js":3,"./menu_scene.js":4,"./play_scene.js":5,"./select_player.js":6}],3:[function(require,module,exports){
+var MenuInGame = {
+    create: function () {
+
+        var button = this.game.add.button(this.game.world.centerX, 
+                                               0, 
+                                               'button', 
+                                               this.actionOnClick, 
+                                               this, 2, 1, 0);
+        button.anchor.set(0.5);
+        var text = this.game.add.text(0, 0, "RESUME");
+        text.font = 'Sniglet';
+        text.anchor.set(0.5);
+        button.addChild(text);
+    },
+    
+    actionOnClick: function(){
+        this.game.state.resume('play');
+    }, 
+};
+
+module.exports = MenuInGame;
+},{}],4:[function(require,module,exports){
 var MenuScene = {
   perro: 98,
     create: function () {
@@ -169,18 +196,19 @@ var MenuScene = {
 };
 
 module.exports = MenuScene;
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 //Enumerados: PlayerState son los estado por los que pasa el player. Directions son las direcciones a las que se puede
 //mover el player.
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
-
 //Scena de juego.
 var PlayScene = {
     _rush: {},
+    gameState: { posX: 129,posY: 0},
     _player: {}, //player
+    spritePlayer: 'player_01',
     _speed: 300, //velocidad del player
     _gravity: 9.8,
     _jumpSpeed: 600, //velocidad de salto
@@ -191,8 +219,9 @@ var PlayScene = {
     //Método constructor...
   create: function () {
   	//Crear player:
-  	if(this.game.state.states['select_player'].player === 'b')this._player= this.game.add.sprite(129,1472, 'player_01');
-    else this._player= this.game.add.sprite(129,1472, 'player_02');
+  	//this.aux = this.game.state.states['play'];
+  	//this.spritePlayer=this.game.state.states['select_player'].player;
+    this._player= this.game.add.sprite(this.gameState.posX,1472, this.spritePlayer);
   	//Crear mapa;
   	this.map = this.game.add.tilemap('level_01');
   	this.map.addTilesetImage('patrones','tiles');
@@ -206,6 +235,7 @@ var PlayScene = {
   	// Crear cursores
   	this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
    	//Funciones del player.
   	//this._player.body.allowGravity = false;
    	this._player.jump= function(y){
@@ -222,15 +252,26 @@ var PlayScene = {
     	//cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
         var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
-       	
+
         this._player.body.velocity.x = 0; 
         if(this._player.body.onFloor()) this._numJumps=0;
         this.movement(150);
          this.checkPlayerDeath();
         this.jumpButton.onDown.add(this.jumpCheck, this);
+        this.pauseButton.onDown.add(this.pauseMenu, this);
     },
     
+    init: function (spritePlayer){
+       if (!!spritePlayer)this.spritePlayer= spritePlayer;
+    },
+    pauseMenu: function (){
+    	this.gameState.posX = this._player.position.x;
+    	this.gameState.posY = this._player.position.y;
+    	this.destroy();
+       	this.game.state.start('menu_in_game');
+    },
     jumpCheck: function (){
+    	console.log(this.aux);
     	if(this._numJumps < 2){ 
     		this._player.jump(500);
     		this._numJumps++;
@@ -304,48 +345,63 @@ var PlayScene = {
 
 module.exports = PlayScene;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var MenuScene = {
   player:'',
+  cont: 0,
     create: function () {
-        
-        var p1 = this.game.add.sprite(this.game.world.centerX-32, 
-                                        this.game.world.centerY, 
-                                        'player_01');
-        p1.anchor.setTo(0.5, 0.5);
-        var p2 = this.game.add.sprite(this.game.world.centerX+32, 
-                                        this.game.world.centerY, 
-                                        'player_02');
-        p2.anchor.setTo(0.5, 0.5);
-        var buttonB = this.game.add.button(this.game.world.centerX, 
-                                               this.game.world.centerY+80, 
-                                               'button', 
-                                               this.actionOnClickB, 
-                                               this, 2, 1, 0);
-        buttonB.anchor.set(0.5);
-        var buttonO = this.game.add.button(this.game.world.centerX, 
-                                               this.game.world.centerY+160, 
-                                               'button', 
-                                               this.actionOnClickO, 
-                                               this, 2, 1, 0);
-        buttonO.anchor.set(0.5);
-        var textB = this.game.add.text(0, 0, "Blue");
-        var textO = this.game.add.text(0, 0, "Orange");
-        textB.font = 'Sniglet';
-        textB.anchor.set(0.5);
-        buttonB.addChild(textB);
-        textO.font = 'Sniglet';
-        textO.anchor.set(0.5);
-        buttonO.addChild(textO);
+      var goText = this.game.add.text(400, 100, "Select the player");
+      goText.fill = '#43d637';
+      goText.anchor.set(0.5);
+      this.flechaDer = this.game.add.sprite(this.game.world.centerX+100, this.game.world.centerY,'flechaDer');
+      this.flechaIz = this.game.add.sprite(this.game.world.centerX-100, this.game.world.centerY,'flechaIz');
+      this.flechaIz.scale.set(2.5);
+      this.flechaIz.anchor.set(0.5);
+      this.flechaDer.scale.set(2.5);
+      this.flechaDer.anchor.set(0.5);
+
+      this.players = [
+       p1= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_01'),
+       p2= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_02'),
+       p3 = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_03'),
+      ]
+      this._it=0;
+      this.selectButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+      this.cursors = this.game.input.keyboard.createCursorKeys();
+      for (var i =0; i < this.players.length; i++){
+        this.players[i].anchor.set(0.5);
+        this.players[i].scale.set(2.5);
+        this.players[i].visible=false;
+      }
     },
-    
-    actionOnClickB: function(){
-      this.player= 'b';
-        this.game.state.start('play');
-    }, 
-    actionOnClickO: function(){
-      this.player = 'o';
-        this.game.state.start('play');
+    update: function(){
+       //this.players[this._it].anchor
+       this.cont++;
+      if (this.cont == 20) {
+        this.flechaIz.scale.set(2.5);
+        this.flechaDer.scale.set(2.5);
+        this.cont = 0;
+      }
+
+       this.players[this._it].visible = true;
+       this.cursors.left.onDown.add(this.prev, this);
+       this.cursors.right.onDown.add(this.next, this);
+       this.selectButton.onDown.add(this.selectPlayer, this);
+    },
+    selectPlayer: function(){
+      var aux = this.players[this._it].key;
+      this.game.state.start('play', true, false, aux);
+    },
+    next: function(){
+      this.flechaDer.scale.set(3)
+      this.players[this._it].visible = false;
+      this._it = (this._it +1) % this.players.length;console.log(this._it);
+    },
+    prev: function(){
+       this.flechaIz.scale.set(3);
+       this.players[this._it].visible = false;
+       if (!!this._it) this._it--;
+       else this._it = this.players.length -1;
     },
 };
 

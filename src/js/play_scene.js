@@ -4,11 +4,12 @@
 //mover el player.
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
-
 //Scena de juego.
 var PlayScene = {
     _rush: {},
+    gameState: { posX: 129,posY: 0},
     _player: {}, //player
+    spritePlayer: 'player_01',
     _speed: 300, //velocidad del player
     _gravity: 9.8,
     _jumpSpeed: 600, //velocidad de salto
@@ -19,8 +20,9 @@ var PlayScene = {
     //Método constructor...
   create: function () {
   	//Crear player:
-  	if(this.game.state.states['select_player'].player === 'b')this._player= this.game.add.sprite(129,1472, 'player_01');
-    else this._player= this.game.add.sprite(129,1472, 'player_02');
+  	//this.aux = this.game.state.states['play'];
+  	//this.spritePlayer=this.game.state.states['select_player'].player;
+    this._player= this.game.add.sprite(this.gameState.posX,1472, this.spritePlayer);
   	//Crear mapa;
   	this.map = this.game.add.tilemap('level_01');
   	this.map.addTilesetImage('patrones','tiles');
@@ -34,6 +36,7 @@ var PlayScene = {
   	// Crear cursores
   	this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
    	//Funciones del player.
   	//this._player.body.allowGravity = false;
    	this._player.jump= function(y){
@@ -50,15 +53,26 @@ var PlayScene = {
     	//cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
         var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
-       	
+
         this._player.body.velocity.x = 0; 
         if(this._player.body.onFloor()) this._numJumps=0;
         this.movement(150);
          this.checkPlayerDeath();
         this.jumpButton.onDown.add(this.jumpCheck, this);
+        this.pauseButton.onDown.add(this.pauseMenu, this);
     },
     
+    init: function (spritePlayer){
+       if (!!spritePlayer)this.spritePlayer= spritePlayer;
+    },
+    pauseMenu: function (){
+    	this.gameState.posX = this._player.position.x;
+    	this.gameState.posY = this._player.position.y;
+    	this.destroy();
+       	this.game.state.start('menu_in_game');
+    },
     jumpCheck: function (){
+    	console.log(this.aux);
     	if(this._numJumps < 2){ 
     		this._player.jump(500);
     		this._numJumps++;

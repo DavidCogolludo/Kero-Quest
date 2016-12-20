@@ -4,6 +4,7 @@
 var PlayScene = require('./play_scene.js');
 var GameOver = require('./gameover_scene.js');
 var MenuScene = require('./menu_scene.js');
+var MenuInGame = require('./menu_in_game.js');
 var SelectPlayer = require ('./select_player.js');
 //  The Google WebFont Loader will look for this object, so create it before loading the script.
 
@@ -41,6 +42,9 @@ var PreloaderScene = {
        this.game.load.image('tiles', 'images/TileSet.png');
        this.game.load.image('player_01', 'images/player.png');
        this.game.load.image('player_02', 'images/player2.png');
+       this.game.load.image('player_03', 'images/player3.png');
+       this.game.load.image('flechaIz', 'images/flechaIz.png');
+       this.game.load.image('flechaDer', 'images/flechaDer.png');
        this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
@@ -94,6 +98,7 @@ function init (){
  game.state.add('preloader', PreloaderScene);
  game.state.add('select_player', SelectPlayer);
  game.state.add('play', PlayScene);
+ game.state.add('menu_in_game',MenuInGame);
  game.state.add ('gameOver', GameOver);
 
 //TODO 1.3 iniciar el state 'boot'. 

@@ -1,44 +1,59 @@
 var MenuScene = {
   player:'',
+  cont: 0,
     create: function () {
-        
-        var p1 = this.game.add.sprite(this.game.world.centerX-32, 
-                                        this.game.world.centerY, 
-                                        'player_01');
-        p1.anchor.setTo(0.5, 0.5);
-        var p2 = this.game.add.sprite(this.game.world.centerX+32, 
-                                        this.game.world.centerY, 
-                                        'player_02');
-        p2.anchor.setTo(0.5, 0.5);
-        var buttonB = this.game.add.button(this.game.world.centerX, 
-                                               this.game.world.centerY+80, 
-                                               'button', 
-                                               this.actionOnClickB, 
-                                               this, 2, 1, 0);
-        buttonB.anchor.set(0.5);
-        var buttonO = this.game.add.button(this.game.world.centerX, 
-                                               this.game.world.centerY+160, 
-                                               'button', 
-                                               this.actionOnClickO, 
-                                               this, 2, 1, 0);
-        buttonO.anchor.set(0.5);
-        var textB = this.game.add.text(0, 0, "Blue");
-        var textO = this.game.add.text(0, 0, "Orange");
-        textB.font = 'Sniglet';
-        textB.anchor.set(0.5);
-        buttonB.addChild(textB);
-        textO.font = 'Sniglet';
-        textO.anchor.set(0.5);
-        buttonO.addChild(textO);
+      var goText = this.game.add.text(400, 100, "Select the player");
+      goText.fill = '#43d637';
+      goText.anchor.set(0.5);
+      this.flechaDer = this.game.add.sprite(this.game.world.centerX+100, this.game.world.centerY,'flechaDer');
+      this.flechaIz = this.game.add.sprite(this.game.world.centerX-100, this.game.world.centerY,'flechaIz');
+      this.flechaIz.scale.set(2.5);
+      this.flechaIz.anchor.set(0.5);
+      this.flechaDer.scale.set(2.5);
+      this.flechaDer.anchor.set(0.5);
+
+      this.players = [
+       p1= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_01'),
+       p2= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_02'),
+       p3 = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_03'),
+      ]
+      this._it=0;
+      this.selectButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+      this.cursors = this.game.input.keyboard.createCursorKeys();
+      for (var i =0; i < this.players.length; i++){
+        this.players[i].anchor.set(0.5);
+        this.players[i].scale.set(2.5);
+        this.players[i].visible=false;
+      }
     },
-    
-    actionOnClickB: function(){
-      this.player= 'b';
-        this.game.state.start('play');
-    }, 
-    actionOnClickO: function(){
-      this.player = 'o';
-        this.game.state.start('play');
+    update: function(){
+       //this.players[this._it].anchor
+       this.cont++;
+      if (this.cont == 20) {
+        this.flechaIz.scale.set(2.5);
+        this.flechaDer.scale.set(2.5);
+        this.cont = 0;
+      }
+
+       this.players[this._it].visible = true;
+       this.cursors.left.onDown.add(this.prev, this);
+       this.cursors.right.onDown.add(this.next, this);
+       this.selectButton.onDown.add(this.selectPlayer, this);
+    },
+    selectPlayer: function(){
+      var aux = this.players[this._it].key;
+      this.game.state.start('play', true, false, aux);
+    },
+    next: function(){
+      this.flechaDer.scale.set(3)
+      this.players[this._it].visible = false;
+      this._it = (this._it +1) % this.players.length;console.log(this._it);
+    },
+    prev: function(){
+       this.flechaIz.scale.set(3);
+       this.players[this._it].visible = false;
+       if (!!this._it) this._it--;
+       else this._it = this.players.length -1;
     },
 };
 
