@@ -86,8 +86,10 @@ var PreloaderScene = {
        this.game.load.image('player_01', 'images/player.png');
        this.game.load.image('player_02', 'images/player2.png');
        this.game.load.image('player_03', 'images/player3.png');
+       this.game.load.image('enemy_01', 'images/enemy.png');
        this.game.load.image('flechaIz', 'images/flechaIz.png');
        this.game.load.image('flechaDer', 'images/flechaDer.png');
+       this.game.load.image('trigger', 'images/trigger.png');
        this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
@@ -203,6 +205,48 @@ module.exports = MenuScene;
 //mover el player.
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
+var enemy= function(index,game, x,y){
+		var detected = false;
+		this.enemy = game.add.sprite(x, y, 'enemy_01');
+        this.enemy.name= 'enemy_'+ index.toString();
+        this.enemy.elong = {
+        	xMax : x+96,
+            xMin : x-96,
+        };
+        this.enemy.vel = 75;
+        game.physics.arcade.enable(this.enemy);
+        this.enemy.body.collideWorldBounds = true;
+        this.enemy.move = function(colliders){
+        	//console.log(colliders);
+        	var self = this;
+        	var collision;
+        	if(!detected){
+        		colliders.forEach(function(item){
+  		        	if (self.overlap(item)){
+                  	self.vel = -self.vel;
+                  	self.body.position.x += self.vel/5;
+  		        	} 
+  	        	})
+  	        	this.body.velocity.x = this.vel;
+        	}
+        };
+        this.enemy.detected = function(target){
+        	var positionTarget = target.body.position;
+        	var positionEnemy= this.body.position;
+        	var distance= Math.abs(positionTarget.x - positionEnemy.x);
+        	if (positionTarget.y === positionEnemy.y && distance <= 128 ){
+        		detected = true;
+        		if (positionTarget.x > positionEnemy.x) this.body.velocity.x = +90;
+        		else if (positionTarget.x < positionEnemy.x) this.body.velocity.x = -90;
+        	}
+        	else{
+        		detected= false;
+        		this.body.velocity.x=0;
+        		//this.body.position.x = this.vel/2;
+        	} 
+        };
+        return this.enemy;
+    };
 //Scena de juego.
 var PlayScene = {
     _rush: {},
@@ -216,18 +260,23 @@ var PlayScene = {
     _playerState: PlayerState.STOP, //estado del player
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
     _numJumps: 0,
+    
     //Método constructor...
   create: function () {
   	//Crear player:
   	//this.aux = this.game.state.states['play'];
   	//this.spritePlayer=this.game.state.states['select_player'].player;
-    this._player= this.game.add.sprite(this.gameState.posX,1472, this.spritePlayer);
+    this._player= this.game.add.sprite(480,1184, this.spritePlayer);
   	//Crear mapa;
   	this.map = this.game.add.tilemap('level_01');
   	this.map.addTilesetImage('patrones','tiles');
   	//Creación de layers
   	this.groundLayer = this.map.createLayer('Ground');
   	this.deathLayer = this.map.createLayer('Death');
+  	this.collidersgroup = this.game.add.group();
+  	this.collidersgroup.alpha = 0;
+   	this.map.createFromObjects('Colliders',8, 'trigger',0,true,false,this.collidersgroup);
+
   	this.map.setCollisionBetween(0,5000, true, 'Ground');
   	this.map.setCollisionBetween(0,5000, true, 'Death');
 
@@ -244,7 +293,7 @@ var PlayScene = {
    	this._player.moveLeft = function(x){ this.body.velocity.x = -x;}
    	this._player.moveRight = function(x){this.body.velocity.x = x;}
     this.jumpTimer = 0;
-    
+    this._enemy = new enemy(0,this.game,320,1152);
   },
     
     //IS called one per frame.
@@ -252,6 +301,7 @@ var PlayScene = {
     	//cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
         var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
+        this.game.physics.arcade.collide(this._enemy, this.groundLayer);
 
         this._player.body.velocity.x = 0; 
         if(this._player.body.onFloor()) this._numJumps=0;
@@ -259,6 +309,9 @@ var PlayScene = {
          this.checkPlayerDeath();
         this.jumpButton.onDown.add(this.jumpCheck, this);
         this.pauseButton.onDown.add(this.pauseMenu, this);
+        //----------------------------------ENEMY------------------
+        this._enemy.detected(this._player);
+        this._enemy.move(this.collidersgroup);
     },
     
     init: function (spritePlayer){
@@ -271,7 +324,6 @@ var PlayScene = {
        	this.game.state.start('menu_in_game');
     },
     jumpCheck: function (){
-    	console.log(this.aux);
     	if(this._numJumps < 2){ 
     		this._player.jump(500);
     		this._numJumps++;
@@ -291,7 +343,7 @@ var PlayScene = {
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
     },
-        
+
     isStanding: function(){
         return this._player.body.blocked.down || this._player.body.touching.down
     },

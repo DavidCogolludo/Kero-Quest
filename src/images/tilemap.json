@@ -23,8 +23,44 @@
          "width":28,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "height":56,
+         "name":"Colliders",
+         "objects":[
+                {
+                 "gid":8,
+                 "height":32,
+                 "id":13,
+                 "name":"enemy",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":161.333333333333,
+                 "y":1244
+                }, 
+                {
+                 "gid":8,
+                 "height":32,
+                 "id":19,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":465.333333333333,
+                 "y":1248
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":28,
+         "x":0,
+         "y":0
         }],
- "nextobjectid":1,
+ "nextobjectid":20,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tileheight":32,
@@ -41,6 +77,16 @@
          "tilecount":256,
          "tileheight":32,
          "tilewidth":32
+        }, 
+        {
+         "columns":0,
+         "firstgid":257,
+         "margin":0,
+         "name":"flechaDer",
+         "spacing":0,
+         "tilecount":0,
+         "tileheight":1,
+         "tilewidth":1
         }],
  "tilewidth":32,
  "version":1,
