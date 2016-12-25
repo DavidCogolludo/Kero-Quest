@@ -72,12 +72,17 @@ var PlayScene = {
   	//Creación de layers
   	this.groundLayer = this.map.createLayer('Ground');
   	this.deathLayer = this.map.createLayer('Death');
+  	this.overLayer = {
+  		layer: this.map.createLayer('OverLayer'),
+  		vis: true,
+  	};
   	this.collidersgroup = this.game.add.group();
   	this.collidersgroup.alpha = 0;
    	this.map.createFromObjects('Colliders',8, 'trigger',0,true,false,this.collidersgroup);
 
   	this.map.setCollisionBetween(0,5000, true, 'Ground');
   	this.map.setCollisionBetween(0,5000, true, 'Death');
+  	this.map.setCollisionBetween(0,5000, true, 'OverLayer');
 
   	this.configure();
   	// Crear cursores
@@ -99,22 +104,38 @@ var PlayScene = {
     update: function () {
     	//cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
+    	this.checKPlayerTrigger();
         var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
         this.game.physics.arcade.collide(this._enemy, this.groundLayer);
 
         this._player.body.velocity.x = 0; 
         if(this._player.body.onFloor()) this._numJumps=0;
         this.movement(150);
-         this.checkPlayerDeath();
         this.jumpButton.onDown.add(this.jumpCheck, this);
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY------------------
         this._enemy.detected(this._player);
         this._enemy.move(this.collidersgroup);
+        //-----------------------------------DEATH----------------------------------
+        this.checkPlayerDeath();
     },
     
     init: function (spritePlayer){
        if (!!spritePlayer)this.spritePlayer= spritePlayer;
+    },
+    checKPlayerTrigger: function(){
+    	if(this.game.physics.arcade.collide(this._player,this.overLayer.layer)){
+    		this.overLayer.vis= false;
+    		this.overLayer.layer.kill();	
+    	}
+    	else {
+    		var self = this;
+    		this.collidersgroup.forEach(function(item){
+    			if(!self.overLayer.vis && self._player.overlap(item)){
+    				self.overLayer.layer.revive();
+       			}
+    		})
+    	}
     },
     pauseMenu: function (){
     	this.gameState.posX = this._player.position.x;
