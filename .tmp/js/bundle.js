@@ -207,6 +207,7 @@ var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
 var enemy= function(index,game, x,y){
 		var detected = false;
+		var delay = 0;
 		this.enemy = game.add.sprite(x, y, 'enemy_01');
         this.enemy.name= 'enemy_'+ index.toString();
         this.enemy.elong = {
@@ -217,9 +218,21 @@ var enemy= function(index,game, x,y){
         game.physics.arcade.enable(this.enemy);
         this.enemy.body.collideWorldBounds = true;
         this.enemy.move = function(colliders){
-        	//console.log(colliders);
         	var self = this;
         	var collision;
+        	if(!detected){
+       		  this.body.velocity.x =this.vel;
+       		  colliders.forEach(function(trigger){
+       		  	if(self.overlap(trigger) && delay === 0){
+       		  		delay++;
+       		  		setTimeout(function(){delay = 0;},1000);
+       		  		self.body.velocity.x=0;
+       		  		self.vel *= -1;
+       		  		//console.log(self.vel);
+       		  	}
+       		  })
+        	}
+        	/*
         	if(!detected){
         		colliders.forEach(function(item){
   		        	if (self.overlap(item)){
@@ -228,7 +241,7 @@ var enemy= function(index,game, x,y){
   		        	} 
   	        	})
   	        	this.body.velocity.x = this.vel;
-        	}
+        	}*/
         };
         this.enemy.detected = function(target){
         	var positionTarget = target.body.position;
@@ -308,7 +321,7 @@ var PlayScene = {
     	this.checKPlayerTrigger();
         var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
         this.game.physics.arcade.collide(this._enemy, this.groundLayer);
-
+       
         this._player.body.velocity.x = 0; 
         if(this._player.body.onFloor()) this._numJumps=0;
         this.movement(150);
