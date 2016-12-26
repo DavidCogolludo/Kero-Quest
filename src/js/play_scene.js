@@ -4,18 +4,23 @@
 //mover el player.
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
+
+//ENEMIGO
 var enemy= function(index,game, x,y){
+    //ATRIBUTOS
 		var detected = false;
 		var delay = 0;
-		this.enemy = game.add.sprite(x, y, 'enemy_01');
-        this.enemy.name= 'enemy_'+ index.toString();
-        this.enemy.elong = {
+		  this.enemy = game.add.sprite(x, y, 'enemy_01');
+      this.enemy.name= 'enemy_'+ index.toString();
+      this.enemy.elong = {
         	xMax : x+96,
             xMin : x-96,
         };
-        this.enemy.vel = 75;
-        game.physics.arcade.enable(this.enemy);
-        this.enemy.body.collideWorldBounds = true;
+      this.enemy.vel = 75;
+      game.physics.arcade.enable(this.enemy);
+      this.enemy.body.collideWorldBounds = true;
+    //FUNCIONES
+        //MOVIMIENTO
         this.enemy.move = function(colliders){
         	var self = this;
         	var collision;
@@ -32,6 +37,7 @@ var enemy= function(index,game, x,y){
        		  })
         	}
         };
+        //DETECCIÓN DEL JUGADOR
         this.enemy.detected = function(target){
         	var positionTarget = target.body.position;
         	var positionEnemy= this.body.position;
@@ -49,25 +55,29 @@ var enemy= function(index,game, x,y){
         };
         return this.enemy;
     };
-//Scena de juego.
+
+
+//Scene de juego.
 var PlayScene = {
-    _rush: {},
+    //_rush: {},  ////////////////////////////////////////////////////////////////////////BORRAR?
     gameState: { posX: 129,posY: 0},
     _player: {}, //player
     spritePlayer: 'player_01',
-    _speed: 300, //velocidad del player
-    _gravity: 9.8,
-    _jumpSpeed: 600, //velocidad de salto
-    _jumpHight: 150, //altura máxima del salto.
+    //_speed: 300, //velocidad del player
+    //_gravity: 9.8,
+    // _jumpSpeed: 600, //velocidad de salto
+    //_jumpHight: 150, //altura máxima del salto.
     _playerState: PlayerState.STOP, //estado del player
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
     _numJumps: 0,
-    //Método constructor...
+  
+  //Método constructor...
   create: function () {
-  	//Crear mapa;
+    //Crear mapa;
   	this.map = this.game.add.tilemap('level_01');
   	this.map.addTilesetImage('patrones','tiles');
-  	//Creación de layers
+  	
+    //Creación de layers
   	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
   	this.groundLayer = this.map.createLayer('Ground');
   	this.deathLayer = this.map.createLayer('Death');
@@ -75,6 +85,8 @@ var PlayScene = {
   		layer: this.map.createLayer('OverLayer'),
   		vis: true,
   	};
+
+    //Colisiones
   	this.collidersgroup = this.game.add.group();
   	this.collidersgroup.enableBody = true;
   	this.collidersgroup.alpha = 0;
@@ -88,34 +100,39 @@ var PlayScene = {
   	this.map.setCollisionBetween(0,5000, true, 'Death');
   	this.map.setCollisionBetween(0,5000, true, 'OverLayer');
   	this.map.setCollisionBetween(0,5000, true, 'JumpThrough');
+
     //Crear player:
     this._player= this.game.add.sprite(480,1184, this.spritePlayer);
-  	this.configure();
-  	// Crear cursores
+    this._player.gravityFactor = 700;
+    this._player.jump= function(y){ this.body.velocity.y = -y; }
+    this._player.moveLeft = function(x){ this.body.velocity.x = -x; }
+    this._player.moveRight = function(x){ this.body.velocity.x = x; }
+    this._player.gravity = function(){ this.body.velocity.y = gravityFactor; }
+    this._player.maxFallSpeed = -100;
+    this.jumpTimer = 0;
+    //this._player.body.allowGravity = false;
+
+  	//Crear cursores
   	this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
-   	//Funciones del player.
-  	//this._player.body.allowGravity = false;
-   	this._player.jump= function(y){
-   		this.body.velocity.y = -y;
-   	}
-   	this._player.moveLeft = function(x){ this.body.velocity.x = -x;}
-   	this._player.moveRight = function(x){this.body.velocity.x = x;}
-    this.jumpTimer = 0;
+
+   	//Crear enemigo
     this._enemy = new enemy(0,this.game,320,1152);
+    this.configure();
   },
     
     //IS called one per frame.
     update: function () {
+      var self = this;
     	//cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
     	this.checKPlayerTrigger();
     	var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
     	this.game.physics.arcade.collide(this._enemy, this.groundLayer);
-       
-        this._player.body.velocity.x = 0; 
-        if(this._player.body.onFloor())this._numJumps=0;
+        //----------------------------------PLAYER-----------------
+        this._player.body.velocity.x = 0;
+        if(!this._player.body.onFloor()) this._player.body.velocity.y += 9;   //ESCALA DE GRAVEDAD DEL PERSONAJE
         this.movement(150);
         this.jumpButton.onDown.add(this.jumpCheck, this);
         this.pauseButton.onDown.add(this.pauseMenu, this);
@@ -123,7 +140,10 @@ var PlayScene = {
         this._enemy.detected(this._player);
         this._enemy.move(this.collidersgroup);
         //-----------------------------------DEATH----------------------------------
-        this.checkPlayerDeath(); 
+        if(this._player.body.onFloor()){
+          if (this._player.body.velocity.y < this._player.maxFallSpeed) self.onPlayerDeath();  //DEFINIR AQUI VELOCIDAD DE MUERTE
+          else if (this._numJumps > 0) { console.log("Velocidad de impacto con el suelo: " + this._player.body.velocity.y); this._numJumps=0; this._player.body.velocity.y = 0; }
+        }
     },
     
     init: function (spritePlayer){
@@ -134,7 +154,7 @@ var PlayScene = {
     	self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
     },
     checKPlayerTrigger: function(){
-    	
+    	//ZONAS SECRETAS
     	if(this.game.physics.arcade.collide(this._player,this.overLayer.layer)){
     		this.overLayer.vis= false;
     		this.overLayer.layer.kill();
@@ -178,6 +198,8 @@ var PlayScene = {
     checkPlayerDeath: function(){
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
+        if(this.game.physics.arcade.collide(this._player, this.enemy))
+            this.onPlayerDeath();
     },
 
     isStanding: function(){
@@ -206,12 +228,12 @@ var PlayScene = {
         //Start the Arcade Physics systems
         this.game.world.setBounds(0, 0, 864, 1760);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
-		//this.game.physics.arcade.gravity.y = 250;
+        this.game.physics.arcade.enable(this._player);
+		    //this.game.physics.arcade.gravity.y = 250;
         //this.game.stage.backgroundColor = '#a9f0ff';
         //this.game.physics.enable(this._player, Phaser.Physics.ARCADE);
-        this.game.physics.arcade.enable(this._player);
-        this.game.physics.arcade.gravity.y = 2000;
-
+        //FISICAS DEL JUGADOR (¿DESACTIVAR?)    ////////////////////////////////////////////////////////////////////////////////////////////////
+        //this.game.physics.arcade.gravity.y = 2000;  //Eliminar esta línea
         this._player.body.bounce.y = 0.2;
         this._player.body.collideWorldBounds = true;
         this._player.body.velocity.x = 0;
