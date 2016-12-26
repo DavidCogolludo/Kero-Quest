@@ -137,13 +137,14 @@ var PlayScene = {
         this.jumpButton.onDown.add(this.jumpCheck, this);
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY------------------
+        if(!this._enemy.body.onFloor()) this._enemy.body.velocity.y += 9;
         this._enemy.detected(this._player);
         this._enemy.move(this.collidersgroup);
         //-----------------------------------DEATH----------------------------------
         if(this._player.body.onFloor()){
           if (this._player.body.velocity.y < this._player.maxFallSpeed) self.onPlayerDeath();  //DEFINIR AQUI VELOCIDAD DE MUERTE
-          else if (this._numJumps > 0) { console.log("Velocidad de impacto con el suelo: " + this._player.body.velocity.y); this._numJumps=0; this._player.body.velocity.y = 0; }
-        }
+          else if (this._numJumps > 0) { this._numJumps=0; this._player.body.velocity.y = 0; } //puede añadirse el mensaje de debug console.log("Velocidad de impacto con el suelo: " + this._player.body.velocity.y);        }
+        this.checkPlayerDeath();
     },
     
     init: function (spritePlayer){
@@ -198,7 +199,7 @@ var PlayScene = {
     checkPlayerDeath: function(){
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
-        if(this.game.physics.arcade.collide(this._player, this.enemy))
+        if(this.game.physics.arcade.collide(this._player, this._enemy))
             this.onPlayerDeath();
     },
 
