@@ -31,16 +31,6 @@ var enemy= function(index,game, x,y){
        		  	}
        		  })
         	}
-        	/*
-        	if(!detected){
-        		colliders.forEach(function(item){
-  		        	if (self.overlap(item)){
-                  	self.vel = -self.vel;
-                  	self.body.position.x += self.vel/5;
-  		        	} 
-  	        	})
-  	        	this.body.velocity.x = this.vel;
-        	}*/
         };
         this.enemy.detected = function(target){
         	var positionTarget = target.body.position;
@@ -72,17 +62,13 @@ var PlayScene = {
     _playerState: PlayerState.STOP, //estado del player
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
     _numJumps: 0,
-    
     //Método constructor...
   create: function () {
-  	//Crear player:
-  	//this.aux = this.game.state.states['play'];
-  	//this.spritePlayer=this.game.state.states['select_player'].player;
-    this._player= this.game.add.sprite(480,1184, this.spritePlayer);
   	//Crear mapa;
   	this.map = this.game.add.tilemap('level_01');
   	this.map.addTilesetImage('patrones','tiles');
   	//Creación de layers
+  	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
   	this.groundLayer = this.map.createLayer('Ground');
   	this.deathLayer = this.map.createLayer('Death');
   	this.overLayer = {
@@ -90,13 +76,20 @@ var PlayScene = {
   		vis: true,
   	};
   	this.collidersgroup = this.game.add.group();
+  	this.collidersgroup.enableBody = true;
   	this.collidersgroup.alpha = 0;
    	this.map.createFromObjects('Colliders',8, 'trigger',0,true,false,this.collidersgroup);
-
+   	var self = this;
+   	this.collidersgroup.forEach(function(obj){
+   		obj.body.allowGravity = false;
+   		obj.body.immovable = true;
+   	})
   	this.map.setCollisionBetween(0,5000, true, 'Ground');
   	this.map.setCollisionBetween(0,5000, true, 'Death');
   	this.map.setCollisionBetween(0,5000, true, 'OverLayer');
-
+  	this.map.setCollisionBetween(0,5000, true, 'JumpThrough');
+    //Crear player:
+    this._player= this.game.add.sprite(480,1184, this.spritePlayer);
   	this.configure();
   	// Crear cursores
   	this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -118,11 +111,11 @@ var PlayScene = {
     	//cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
     	this.checKPlayerTrigger();
-        var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
-        this.game.physics.arcade.collide(this._enemy, this.groundLayer);
+    	var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
+    	this.game.physics.arcade.collide(this._enemy, this.groundLayer);
        
         this._player.body.velocity.x = 0; 
-        if(this._player.body.onFloor()) this._numJumps=0;
+        if(this._player.body.onFloor())this._numJumps=0;
         this.movement(150);
         this.jumpButton.onDown.add(this.jumpCheck, this);
         this.pauseButton.onDown.add(this.pauseMenu, this);
@@ -130,22 +123,32 @@ var PlayScene = {
         this._enemy.detected(this._player);
         this._enemy.move(this.collidersgroup);
         //-----------------------------------DEATH----------------------------------
-        this.checkPlayerDeath();
+        this.checkPlayerDeath(); 
     },
     
     init: function (spritePlayer){
        if (!!spritePlayer)this.spritePlayer= spritePlayer;
     },
+    collisionWithJumpThrough: function(){
+    	var self = this;
+    	self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
+    },
     checKPlayerTrigger: function(){
+    	
     	if(this.game.physics.arcade.collide(this._player,this.overLayer.layer)){
     		this.overLayer.vis= false;
-    		this.overLayer.layer.kill();	
+    		this.overLayer.layer.kill();
     	}
     	else {
     		var self = this;
     		this.collidersgroup.forEach(function(item){
     			if(!self.overLayer.vis && self._player.overlap(item)){
+    				console.log('revive');
     				self.overLayer.layer.revive();
+       			}
+       			else if (self._player.overlap(item)){
+       				self.collisionWithJumpThrough();			
+       				
        			}
     		})
     	}
