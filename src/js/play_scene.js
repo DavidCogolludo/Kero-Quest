@@ -103,14 +103,23 @@ var PlayScene = {
 
     //Crear player:
     this._player= this.game.add.sprite(480,1184, this.spritePlayer);
-    this._player.gravityFactor = 700;
-    this._player.jump= function(y){ this.body.velocity.y = -y; }
+    this._player.maxFallSpeed = -100;
+    this._player.maxJumpSpeed = 300;
+    this._player.maxJumpReached = false;
+    this.jumpTimer = 0;
+    this._player.jump = function(y){
+      this.body.velocity.y = -y;
+    }
+    /*
+    this._player.jump= function(y){
+      if (this.body.velocity.y < this.maxJumpSpeed)
+        this.body.velocity.y += -y;
+      else this.maxJumpReached = true;
+     }
+     */
     this._player.moveLeft = function(x){ this.body.velocity.x = -x; }
     this._player.moveRight = function(x){ this.body.velocity.x = x; }
-    this._player.gravity = function(){ this.body.velocity.y = gravityFactor; }
-    this._player.maxFallSpeed = -100;
-    this.jumpTimer = 0;
-    //this._player.body.allowGravity = false;
+
 
   	//Crear cursores
   	this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -143,7 +152,8 @@ var PlayScene = {
         //-----------------------------------DEATH----------------------------------
         if(this._player.body.onFloor()){
           if (this._player.body.velocity.y < this._player.maxFallSpeed) self.onPlayerDeath();  //DEFINIR AQUI VELOCIDAD DE MUERTE
-          else if (this._numJumps > 0) { this._numJumps=0; this._player.body.velocity.y = 0; } //puede añadirse el mensaje de debug console.log("Velocidad de impacto con el suelo: " + this._player.body.velocity.y);        }
+          else if (this._numJumps > 0) { this._numJumps=0; this._player.body.velocity.y = 0; this._player.maxJumpReached = false;} //puede añadirse el mensaje de debug console.log("Velocidad de impacto con el suelo: " + this._player.body.velocity.y); 
+          }
         this.checkPlayerDeath();
     },
     
@@ -181,7 +191,7 @@ var PlayScene = {
        	this.game.state.start('menu_in_game');
     },
     jumpCheck: function (){
-    	if(this._numJumps < 2){ 
+    	if(this._numJumps < 2){ //if(this._player.maxJumpReached
     		this._player.jump(500);
     		this._numJumps++;
     	}
@@ -230,10 +240,10 @@ var PlayScene = {
         this.game.world.setBounds(0, 0, 864, 1760);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);
-		    //this.game.physics.arcade.gravity.y = 250;
         //this.game.stage.backgroundColor = '#a9f0ff';
-        //this.game.physics.enable(this._player, Phaser.Physics.ARCADE);
         //FISICAS DEL JUGADOR (¿DESACTIVAR?)    ////////////////////////////////////////////////////////////////////////////////////////////////
+        //this.game.physics.arcade.gravity.y = 250;
+        //this.game.physics.enable(this._player, Phaser.Physics.ARCADE);
         //this.game.physics.arcade.gravity.y = 2000;  //Eliminar esta línea
         this._player.body.bounce.y = 0.2;
         this._player.body.collideWorldBounds = true;
