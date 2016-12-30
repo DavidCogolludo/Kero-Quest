@@ -87,6 +87,8 @@ var PreloaderScene = {
        this.game.load.image('player_02', 'images/player2.png');
        this.game.load.image('player_03', 'images/player3.png');
        this.game.load.image('enemy_01', 'images/enemy.png');
+       this.game.load.image('cannon_01', 'images/cannon.png');
+       this.game.load.image('bullet_01', 'images/bullet.png');
        this.game.load.image('flechaIz', 'images/flechaIz.png');
        this.game.load.image('flechaDer', 'images/flechaDer.png');
        this.game.load.image('trigger', 'images/trigger.png');
@@ -204,12 +206,50 @@ module.exports = MenuScene;
 //Enumerados: PlayerState son los estado por los que pasa el player. Directions son las direcciones a las que se puede
 //mover el player.
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
-var Direction = {'LEFT':0, 'RIGHT':1, 'NONE':3}
+var Direction = {'LEFT':0, 'RIGHT':1, 'TOP':2, 'LOW':3}
 
+//CAÑONES 
+var cannon = function(index, game, x,y, dir){
+  var direction = dir || Direction.RIGHT;
+  this.cannon = game.add.sprite(x,y, 'cannon_01');
+  switch (direction){
+    case 0: this.cannon.anchor.set(1);
+            this.cannon.angle = 180;
+            break;
+    case 2: this.cannon.anchor.set(0,1);
+            this.cannon.angle = 90;
+            break;
+    case 3: this.cannon.anchor.set(1,0);
+            this.cannon.angle = -90;
+            break;
+  }
+  
+  this.cannon.name = 'cannon_'+index.toString();
+  //Funciones
+  this.cannon.shoot= function(bulletsGroup){
+    console.log('PIUM');
+    this.bullet = bulletsGroup.getFirstExists(false);
+    if(this.bullet){
+    this.bullet.reset(x,y);
+    switch (direction){
+      case 0: this.bullet.body.velocity.x = -300;
+              break;
+      case 1: this.bullet.body.velocity.x = 300;
+              break;
+      case 2: this.bullet.body.velocity.y = 300;
+              break;
+      case 3: this.bullet.body.velocity.y = -300;
+              break;
+    }
+    
+  }
+  };
+  return this.cannon;
+};
 //ENEMIGO
 var enemy= function(index,game, x,y, destructor){
     //ATRIBUTOS
-    	var destructor = destructor || false //Booleano. Si es true, el enemigo te mata con tocarte ( de un golpe);
+    var destructor = destructor || false //Booleano. Si es true, el enemigo te mata con tocarte ( de un golpe);
 		var detected = false;
 		var delay = 0;
 		  this.enemy = game.add.sprite(x, y, 'enemy_01');
@@ -327,6 +367,22 @@ var PlayScene = {
 
    	//Crear enemigo
     this._enemy = new enemy(0,this.game,320,1152);
+    //Crear cañones y balas
+    this.bulletTime = 4;
+    this.bulletGroup = this.game.add.group();
+    this.bulletGroup.enableBody = true;
+    this.bulletGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this.bulletGroup.createMultiple (20, 'bullet_01');
+    this.bulletGroup.setAll('outOfBoundsKill', true);
+    this.bulletGroup.setAll('checkWorldBounds', true);
+    this.bulletGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
+    //Hacer grupo de cañones y enemigos.
+    this._cannon = new cannon(0,this.game, 94, 992);
+    this._cannon2 = new cannon(0,this.game, 608, 1248, Direction.LOW);
+   
   },
     
     //IS called one per frame.
@@ -349,7 +405,6 @@ var PlayScene = {
         	this.timeJump++;
         } 
         if(!this.jumpButton.isDown && this.timeJump != 0){
-        	console.log('hey');
         	this.jumpCheck();
         	this.timeJump= 0;
         }
@@ -359,6 +414,13 @@ var PlayScene = {
        
         this._enemy.detected(this._player);
         this._enemy.move(this.collidersgroup);
+
+        //-----------------------------------CANNONS------------------------------
+        if(this.game.time.now > this.bulletTime){
+          this._cannon.shoot(this.bulletGroup);
+          this._cannon2.shoot(this.bulletGroup);
+          this.bulletTime = this.game.time.now + 2000;
+        }
         //-----------------------------------DEATH----------------------------------
         this.checkPlayerDeath();
     },
@@ -380,7 +442,6 @@ var PlayScene = {
     		var self = this;
     		this.collidersgroup.forEach(function(item){
     			if(!self.overLayer.vis && self._player.overlap(item)){
-    				console.log('revive');
     				self.overLayer.layer.revive();
        			}
        			else if (self._player.overlap(item)){
@@ -400,7 +461,6 @@ var PlayScene = {
     	
     	var jump = this._player._jumpSpeed*this.timeJump;
     	if( jump < this._player._maxJumpSpeed){
-    		console.log('lo es');
     		this._player.body.velocity.y=0;
     		this._player.jump(this._player._maxJumpSpeed);
     	}

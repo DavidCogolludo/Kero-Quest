@@ -44,6 +44,8 @@ var PreloaderScene = {
        this.game.load.image('player_02', 'images/player2.png');
        this.game.load.image('player_03', 'images/player3.png');
        this.game.load.image('enemy_01', 'images/enemy.png');
+       this.game.load.image('cannon_01', 'images/cannon.png');
+       this.game.load.image('bullet_01', 'images/bullet.png');
        this.game.load.image('flechaIz', 'images/flechaIz.png');
        this.game.load.image('flechaDer', 'images/flechaDer.png');
        this.game.load.image('trigger', 'images/trigger.png');
