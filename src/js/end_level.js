@@ -1,22 +1,26 @@
 var EndLevel = {
     create: function () {
-        console.log("Game Over");
-        var button = this.game.add.button(400, 300, 
+        console.log("Level Completed!");
+        var BG = this.game.add.sprite(this.game.world.centerX-80, 
+                                      this.game.world.centerY-20, 
+                                      'winBG');
+        BG.anchor.setTo(0.5, 0.5);
+        var button = this.game.add.button(533, 230, 
                                           'button', 
                                           this.actionOnClick, 
                                           this, 2, 1, 0);
         button.anchor.set(0.5);
-        var goText = this.game.add.text(400, 100, "YOU WIN!!");
+        //var goText = this.game.add.text(400, 100, "YOU WIN!!");
         var text = this.game.add.text(0, 0, "Reset Game");
         var text2 = this.game.add.text(0, 0, "Return Menu");
         text.anchor.set(0.5);
-        goText.fill = '#43d637';
-        goText.anchor.set(0.5);
+        //goText.fill = '#43d637';
+        //goText.anchor.set(0.5);
         text2.anchor.set(0.5);
-        goText.anchor.set(0.5);
+        //goText.anchor.set(0.5);
         button.addChild(text);
         //TODO 8 crear un boton con el texto 'Return Main Menu' que nos devuelva al menu del juego.
-        var button2 = this.game.add.button(400, 400, 
+        var button2 = this.game.add.button(533, 320, 
                                           'button', 
                                           this.actionOnClick2, 
                                           this, 2, 1, 0);

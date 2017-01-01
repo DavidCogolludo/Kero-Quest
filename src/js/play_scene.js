@@ -146,7 +146,7 @@ var PlayScene = {
 
     //Crear player:
     //this._player= this.game.add.sprite(480,1184, this.spritePlayer); //nivel1
-    this._player= this.game.add.sprite(32, 576, this.spritePlayer); //nivel2
+    this._player= this.game.add.sprite(480, 576, this.spritePlayer); //nivel2
     this._player.life=4;
     this._player._jumpSpeed= -80;
     this._player._maxJumpSpeed = -800;
@@ -166,8 +166,11 @@ var PlayScene = {
     this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
 
    	//Crear enemigo
-    //this._enemy = new enemy(0,this.game,320,1152); //nivel1
-    this._enemy = new enemy(0,this.game, 480, 390); //nivel2
+
+    //this._enemy = new enemy(0,this.game,320,1152);  //nivel1
+    this._enemy = new enemy(0,this.game, 480, 390);   //nivel2
+    this._enemy2 = new enemy(0,this.game, 480, 32);    //nivel2
+
 
     //Crear cañones y balas
     this.bulletTime = 4;
@@ -183,21 +186,24 @@ var PlayScene = {
     })
 
     //Hacer grupo de cañones y enemigos.
-    this._cannon = new cannon(0,this.game, 94, 992);
-    this._cannon2 = new cannon(0,this.game, 608, 1248, Direction.LOW);
+    //this._cannon = new cannon(0,this.game, 94, 992);  //nivel1
+    //this._cannon2 = new cannon(0,this.game, 608, 1248, Direction.LOW); //nivel1
+    this._cannon = new cannon(0,this.game, 128, 320);  //nivel2
+    this._cannon2 = new cannon(0,this.game, 192, 576, Direction.LOW); //nivel2
    
   },
     
     //IS called one per frame.
     update: function () {
     	//TEXTO DE DEBUG----------------------------------------------------
-    	this.game.debug.text('PLAYER HP: '+this._player.life,this.game.world.centerX-300,50);
+    	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-300,50);
         
-        //cambiar la gravedad
+      //cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
     	this.checKPlayerTrigger();
     	var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
     	this.game.physics.arcade.collide(this._enemy, this.groundLayer);
+      this.game.physics.arcade.collide(this._enemy2, this.groundLayer);
         //----------------------------------PLAYER-----------------
         this._player.body.velocity.x = 0;
         if(this._player.body.onFloor())this._numJumps=0;
@@ -217,12 +223,17 @@ var PlayScene = {
         this._enemy.detected(this._player);
         this._enemy.move(this.collidersgroup);
 
+        this._enemy2.detected(this._player);
+        this._enemy2.move(this.collidersgroup);
+
         //-----------------------------------CANNONS------------------------------
         if(this.game.time.now > this.bulletTime){
           this._cannon.shoot(this.bulletGroup);
           this._cannon2.shoot(this.bulletGroup);
           this.bulletTime = this.game.time.now + 2000;
         }
+        //-----------------------------------BULLETS-------------------------------
+
         //-----------------------------------DEATH----------------------------------
         this.checkPlayerDeath();
         this.checkPlayerEnd();
@@ -284,8 +295,17 @@ var PlayScene = {
     },
     
     checkPlayerDeath: function(){
+        self = this;
+        //Collision with bullet
+        this.bulletGroup.forEach(function(obj){
+          if(self.game.physics.arcade.collide(self._player, obj)){
+          obj.destroy();
+          self._player.life--;}
+        })
+        //Death Layer
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
+        //No HP left
         if (this._player.life<1) this.onPlayerDeath();
     },
 
