@@ -6,6 +6,7 @@ var GameOver = require('./gameover_scene.js');
 var MenuScene = require('./menu_scene.js');
 var MenuInGame = require('./menu_in_game.js');
 var SelectPlayer = require ('./select_player.js');
+var EndLevel = require ('./end_level.js');
 //  The Google WebFont Loader will look for this object, so create it before loading the script.
 
 var BootScene = {
@@ -38,7 +39,7 @@ var PreloaderScene = {
       // el atlasJSONHash con 'images/rush_spritesheet.png' como imagen y 'images/rush_spritesheet.json'
       //como descriptor de la animación.
        this.game.load.tilemap('level_01', 'images/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
-       this.game.load.tilemap('level_02', 'images/prueb.json', null, Phaser.Tilemap.TILED_JSON);
+       this.game.load.tilemap('level_02', 'images/lvl_02.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.image('tiles', 'images/TileSet.png');
        this.game.load.image('player_01', 'images/player.png');
        this.game.load.image('player_02', 'images/player2.png');
@@ -49,7 +50,7 @@ var PreloaderScene = {
        this.game.load.image('flechaIz', 'images/flechaIz.png');
        this.game.load.image('flechaDer', 'images/flechaDer.png');
        this.game.load.image('trigger', 'images/trigger.png');
-       this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
+       //this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
         this.game.load.onLoadComplete.add(this.loadComplete, this);
@@ -72,7 +73,6 @@ var PreloaderScene = {
         this._loadingBar
     }
 };
-
 
 var wfconfig = {
  
@@ -104,6 +104,7 @@ function init (){
  game.state.add('play', PlayScene);
  game.state.add('menu_in_game',MenuInGame);
  game.state.add ('gameOver', GameOver);
+ game.state.add('endLevel', EndLevel);
 
 //TODO 1.3 iniciar el state 'boot'. 
 game.state.start('boot');

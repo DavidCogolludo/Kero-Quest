@@ -20,7 +20,8 @@ var MenuScene = {
     
     actionOnClick: function(){
         this.game.state.start('preloader');
-    } 
+    }
+
 };
 
 module.exports = MenuScene;

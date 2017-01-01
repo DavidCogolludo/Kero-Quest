@@ -24,7 +24,7 @@ var cannon = function(index, game, x,y, dir){
   this.cannon.name = 'cannon_'+index.toString();
   //Funciones
   this.cannon.shoot= function(bulletsGroup){
-    console.log('PIUM');
+    //console.log('PIUM');
     this.bullet = bulletsGroup.getFirstExists(false);
     if(this.bullet){
     this.bullet.reset(x,y);
@@ -114,7 +114,8 @@ var PlayScene = {
   //Método constructor...
   create: function () {
     //Crear mapa;
-  	this.map = this.game.add.tilemap('level_01');
+  	//this.map = this.game.add.tilemap('level_01');
+    this.map = this.game.add.tilemap('level_02');
   	this.map.addTilesetImage('patrones','tiles');
   	
     //Creación de layers
@@ -125,6 +126,7 @@ var PlayScene = {
   		layer: this.map.createLayer('OverLayer'),
   		vis: true,
   	};
+    this.endLayer = this.map.createLayer('EndLvl');
 
     //Colisiones
   	this.collidersgroup = this.game.add.group();
@@ -140,9 +142,11 @@ var PlayScene = {
   	this.map.setCollisionBetween(0,5000, true, 'Death');
   	this.map.setCollisionBetween(0,5000, true, 'OverLayer');
   	this.map.setCollisionBetween(0,5000, true, 'JumpThrough');
+    this.map.setCollisionBetween(0,5000, true, 'EndLvl');
 
     //Crear player:
-    this._player= this.game.add.sprite(480,1184, this.spritePlayer);
+    //this._player= this.game.add.sprite(480,1184, this.spritePlayer); //nivel1
+    this._player= this.game.add.sprite(32, 576, this.spritePlayer); //nivel2
     this._player.life=4;
     this._player._jumpSpeed= -80;
     this._player._maxJumpSpeed = -800;
@@ -155,7 +159,6 @@ var PlayScene = {
     this._player.moveRight = function(x){ this.body.velocity.x = x; }
     this.configure();
 
-
   	//Crear cursores
   	this.timeJump = 0;
   	this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -163,7 +166,9 @@ var PlayScene = {
     this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
 
    	//Crear enemigo
-    this._enemy = new enemy(0,this.game,320,1152);
+    //this._enemy = new enemy(0,this.game,320,1152); //nivel1
+    this._enemy = new enemy(0,this.game, 480, 390); //nivel2
+
     //Crear cañones y balas
     this.bulletTime = 4;
     this.bulletGroup = this.game.add.group();
@@ -176,6 +181,7 @@ var PlayScene = {
       obj.body.allowGravity = false;
       obj.body.immovable = true;
     })
+
     //Hacer grupo de cañones y enemigos.
     this._cannon = new cannon(0,this.game, 94, 992);
     this._cannon2 = new cannon(0,this.game, 608, 1248, Direction.LOW);
@@ -185,7 +191,7 @@ var PlayScene = {
     //IS called one per frame.
     update: function () {
     	//TEXTO DE DEBUG----------------------------------------------------
-    	this.game.debug.text('PLAYER LIFE: '+this._player.life,this.game.world.centerX-300,50);
+    	this.game.debug.text('PLAYER HP: '+this._player.life,this.game.world.centerX-300,50);
         
         //cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
@@ -207,8 +213,7 @@ var PlayScene = {
         }
         
         this.pauseButton.onDown.add(this.pauseMenu, this);
-        //----------------------------------ENEMY------------------
-       
+        //----------------------------------ENEMY-------------------
         this._enemy.detected(this._player);
         this._enemy.move(this.collidersgroup);
 
@@ -220,6 +225,7 @@ var PlayScene = {
         }
         //-----------------------------------DEATH----------------------------------
         this.checkPlayerDeath();
+        this.checkPlayerEnd();
     },
     
     init: function (spritePlayer){
@@ -236,7 +242,7 @@ var PlayScene = {
     		this.overLayer.layer.kill();
     	}
     	else {
-    		var self = this;
+    		var self = this; 
     		this.collidersgroup.forEach(function(item){
     			if(!self.overLayer.vis && self._player.overlap(item)){
     				self.overLayer.layer.revive();
@@ -255,7 +261,6 @@ var PlayScene = {
        	this.game.state.start('menu_in_game');
     },
     jumpCheck: function (){
-    	
     	var jump = this._player._jumpSpeed*this.timeJump;
     	if( jump < this._player._maxJumpSpeed){
     		this._player.body.velocity.y=0;
@@ -272,11 +277,21 @@ var PlayScene = {
         this.destroy();
         this.game.state.start('gameOver');
     },
+
+    onPlayerEnd: function(){
+        this.destroy();
+        this.game.state.start('endLevel');
+    },
     
     checkPlayerDeath: function(){
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
         if (this._player.life<1) this.onPlayerDeath();
+    },
+
+    checkPlayerEnd: function(){
+      if(this.game.physics.arcade.collide(this._player, this.endLayer))
+          this.onPlayerEnd();
     },
 
     isStanding: function(){
@@ -303,7 +318,8 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics systems
-        this.game.world.setBounds(0, 0, 864, 1760);
+        //this.game.world.setBounds(0, 0, 864, 1760); //Lvl1
+        this.game.world.setBounds(0, 0, 960, 640); //Lvl2
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);
         //FISICAS DEL JUGADOR (¿DESACTIVAR?)    ////////////////////////////////////////////////////////////////////////////////////////////////
