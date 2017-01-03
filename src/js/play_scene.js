@@ -2,7 +2,7 @@
 
 //Enumerados: PlayerState son los estado por los que pasa el player. Directions son las direcciones a las que se puede
 //mover el player.
-var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
+//var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'TOP':2, 'LOW':3}
 var level;
 
@@ -106,32 +106,70 @@ var enemy= function(index,game, x,y, destructor){
 //Scene de juego.
 var PlayScene = {
     //_rush: {},  ////////////////////////////////////////////////////////////////////////BORRAR?
-    gameState: { posX: 129,posY: 0},
+    gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
+      posX: 129,
+      posY: 0,
+      keyCount: 0,
+      playerHP: 4,
+      //state: PlayerState.STOP,
+      direct: Direction.NONE
+      },
     _player: {}, //Refinar esto con un creador de player.//player
     spritePlayer: 'player_01',
     level: 'level_01',
+    _resume: false,
     //_speed: 300, //velocidad del player
     //_gravity: 9.8,
     // _jumpSpeed: 600, //velocidad de salto
     //_jumpHight: 150, //altura máxima del salto.
-    _playerState: PlayerState.STOP, //estado del player
+    //_playerState: PlayerState.STOP, //estado del player
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
     _numJumps: 0,
     _keys: 0,
     _maxTimeInvincible: 80, //Tiempo que esta invencible tras ser golpeado
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
       
-  init: function (spritePlayer, levelSelected){
-    if (!!spritePlayer)this.spritePlayer = spritePlayer;
+  init: function (spritePlayer, levelSelected, inGameState, resume){
+    // Lo que se carga da igual de donde vengas...
+    if (!!spritePlayer)this.spritePlayer = spritePlayer; //Si no recibe un spritePlayer carga el básico
     this.level = levelSelected;
+    // Y ahora si venimos de pausa...
+    if (resume) {
+      console.log ('Escena Juego recibe llegada de pausa con los datos');
+      console.log('nivel= '+levelSelected);
+      console.log('sprite= '+spritePlayer);
+      console.log('posX= '+inGameState.posX);
+      console.log('posY= '+inGameState.posY);
+      console.log('playerHP= '+inGameState.playerHP);
+      console.log('llaves= '+inGameState.keyCount);
+      //Si se pasa el parametro resume como true se actualiza el estado del juego
+      this._resume = true;  //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
+      //JUGADOR
+      this.gameState.posX = inGameState.posX; //Almacenamos en el objeto de la escena los datos recibidos para inicializar el pj en create con ellos
+      this.gameState.posY = inGameState.posY;
+      this.gameState.playerHP = inGameState.playerHP;
+      this._keys = inGameState.keyCount;
+
+      console.log ('Escena Juego almacena los datos en gameState:');
+      console.log('nivel= '+this.level);
+      console.log('sprite= '+this.spritePlayer);
+      console.log('posX= '+this.gameState.posX);
+      console.log('posY= '+this.gameState.posY);
+      console.log('playerHP= '+this.gameState.playerHP);
+      console.log('llaves= '+this.gameState.keyCount);
+      //¿velocidad en x e y?
+      //¿invencible y contador de recover?
+      //ENEMIGOS
+    }
+
   },
   //Método constructor...
   create: function () {
+    var self = this;
     //Crear mapa;
     if (this.level === 'level_02') this.map = this.game.add.tilemap('level_02');
     else this.map = this.game.add.tilemap('level_01');
   	
-
   	this.map.addTilesetImage('patrones','tiles');
   	
     //Creación de layers
@@ -149,7 +187,7 @@ var PlayScene = {
   	this.collidersgroup.enableBody = true;
   	this.collidersgroup.alpha = 0;
    	this.map.createFromObjects('Colliders',8, 'trigger',0,true,false,this.collidersgroup);
-   	var self = this;
+
    	this.collidersgroup.forEach(function(obj){
    		obj.body.allowGravity = false;
    		obj.body.immovable = true;
@@ -161,11 +199,28 @@ var PlayScene = {
     this.map.setCollisionBetween(0,5000, true, 'EndLvl');
 
     //Crear player:
-    //Posición de inicio de nivel
-    if (this.level === 'level_02') this._player= this.game.add.sprite(480, 576, this.spritePlayer); //nivel2
-    else this._player = this.game.add.sprite(480,1184, this.spritePlayer); //nivel1
-    //Atributos
-    this._player.life=4;
+    //Posición al cargar de pausa o al inicio del nivel
+    if(this._resume){
+        console.log('Entramos en la creación del personaje tras una causa con los datos');
+        console.log('Posicion en X= '+self.gameState.posX);
+        console.log('Posicion en Y= '+self.gameState.posY);
+        console.log('Sprite= '+this.spritePlayer);
+        this._player = this.game.add.sprite(self.gameState.posX, self.gameState.posY, this.spritePlayer); //Carga su posición al pausar sin importar el nivel en el que este
+    }else{
+        if (this.level === 'level_02') this._player= this.game.add.sprite(480, 576, this.spritePlayer); //nivel2
+        else this._player = this.game.add.sprite(480,1184, this.spritePlayer); //nivel1      
+    }
+
+    //ATRIBUTOS DEL JUGADOR
+    //Cargados de pausa
+    if (this._resume){
+        this._player.life = this.gameState.playerHP;
+        this._resume = false; //A partir de aquí hay que reiniciar el valor ya que no se utiliza más (aunque no se si es necesario ya que arranca por defecto a false)
+    }
+    //Por Defecto
+    else {
+        this._player.life=4;  
+    }
     this._player._jumpSpeed= -80;
     this._player._maxJumpSpeed = -800;
     this._player.maxJumpReached = false;
@@ -174,8 +229,10 @@ var PlayScene = {
     this._player.hitDir = 0;
     this.jumpTimer = 0;
     this._player.invincible = false;
+    
+    //METODOS DEL JUGADOR
     this._player.jump = function(y){
-      this.body.velocity.y = y;
+          this.body.velocity.y = y;
     }
     this._player.hit = function(){
       if (this.body.velocity.x > 0) this.hitDir = 1;
@@ -268,6 +325,9 @@ var PlayScene = {
     	//TEXTO DE DEBUG----------------------------------------------------
     	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
       this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,80);
+
+      this.game.debug.text('Posición X: '+this._player.position.x, this.game.world.centerX-400,110);
+      this.game.debug.text('Posición Y: '+this._player.position.y, this.game.world.centerX-400,140);
       /*
       this.game.debug.text('X Velocity: '+this._player.body.velocity.x, this.game.world.centerX-400,110);
       this.game.debug.text('Y Velocity: '+this._player.body.velocity.y, this.game.world.centerX-400,140);
@@ -393,11 +453,19 @@ var PlayScene = {
     	}
     },
     pauseMenu: function (){
+      //Memorizamos el estado actual
+      //Jugador
     	this.gameState.posX = this._player.position.x;
     	this.gameState.posY = this._player.position.y;
+      this.gameState.playerHP = this._player.life;
+      this.gameState.keyCount = this._keys;
+      //Enemigos
+      console.log('gameState antes del destroy = '+this.gameState);
     	this.destroy();
       this.game.world.setBounds(0,0,800,600);
-      this.game.state.start('menu_in_game');
+      console.log('gameState despues del destroy = '+this.gameState);
+      //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
+      this.game.state.start('menu_in_game', true, false, this.spritePlayer, this.level, this.gameState);
     },
     jumpCheck: function (){
     	var jump = this._player._jumpSpeed*this.timeJump;
@@ -413,12 +481,14 @@ var PlayScene = {
     
     onPlayerDeath: function(){
         //TODO 6 Carga de 'gameOver';
+        this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
         this.game.state.start('gameOver', true, false, this.spritePlayer, this.level);
     },
 
     onPlayerEnd: function(){
+        this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
         this.game.state.start('endLevel', true, false, this.spritePlayer, this.level);
