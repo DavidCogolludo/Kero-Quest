@@ -47,7 +47,7 @@ var MenuScene = {
     next: function(){
       this.flechaDer.scale.set(3)
       this.players[this._it].visible = false;
-      this._it = (this._it +1) % this.players.length;console.log(this._it);
+      this._it = (this._it +1) % this.players.length;//console.log(this._it);
     },
     prev: function(){
        this.flechaIz.scale.set(3);

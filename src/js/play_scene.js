@@ -396,7 +396,8 @@ var PlayScene = {
     	this.gameState.posX = this._player.position.x;
     	this.gameState.posY = this._player.position.y;
     	this.destroy();
-       	this.game.state.start('menu_in_game');
+      this.game.world.setBounds(0,0,800,600);
+      this.game.state.start('menu_in_game');
     },
     jumpCheck: function (){
     	var jump = this._player._jumpSpeed*this.timeJump;

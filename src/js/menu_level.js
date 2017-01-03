@@ -2,9 +2,7 @@ var aux;
 var aux2;
 var MenuLevel = {
     init: function (selection){
-      console.log('selection = '+selection);
       aux = selection;
-      console.log('aux ='+aux);
     },
     create: function () {
         /*
@@ -38,18 +36,16 @@ var MenuLevel = {
     
     actionOnClick: function(){
         aux2 = 'level_01';
-        console.log ('Selected lvl 1');
         this.initLevel();
     },
 
     actionOnClick2: function(){
         aux2 = 'level_02';
-        console.log ('Selected lvl 2');
         this.initLevel();
     },
 
     initLevel: function(){
-      console.log('Se procede a iniciar el nivel: '+aux2 +' con jugador: '+aux);
+      //console.log('Se procede a iniciar el nivel: '+aux2 +' con jugador: '+aux);
       this.game.state.start('play', true, false, aux, aux2);
     }
 

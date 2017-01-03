@@ -17,7 +17,7 @@ var GameOver = {
                                           this, 2, 1, 0);
         button.anchor.set(0.5);
         //var goText = this.game.add.text(400, 100, "GameOver");
-        var text = this.game.add.text(0, 0, "Reset Game");
+        var text = this.game.add.text(0, 0, "Reset Level");
         var text2 = this.game.add.text(0, 0, "Return Menu");
         text.anchor.set(0.5);
         //goText.fill = '#43d637';
