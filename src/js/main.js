@@ -4,6 +4,7 @@
 var PlayScene = require('./play_scene.js');
 var GameOver = require('./gameover_scene.js');
 var MenuScene = require('./menu_scene.js');
+var MenuLevel = require('./menu_level.js')
 var MenuInGame = require('./menu_in_game.js');
 var SelectPlayer = require ('./select_player.js');
 var EndLevel = require ('./end_level.js');
@@ -100,9 +101,10 @@ window.onload = function () {
 
 function init (){
   var game = new Phaser.Game( 800, 600, Phaser.AUTO, 'game');
-//TODO 1.2 Añadir los states 'boot' BootScene, 'menu' MenuScene, 'preloader' PreloaderScene, 'play' PlayScene, 'gameOver' GameOver.
+//TODO 1.2 Añadir los states 'boot' BootScene, 'menu, 'preloader' PreloaderScene, 'play' PlayScene, 'gameOver' GameOver.
  game.state.add('boot', BootScene);
  game.state.add('menu', MenuScene);
+ game.state.add('level_select', MenuLevel);
  game.state.add('preloader', PreloaderScene);
  game.state.add('select_player', SelectPlayer);
  game.state.add('play', PlayScene);

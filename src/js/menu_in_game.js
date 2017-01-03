@@ -2,7 +2,7 @@ var MenuInGame = {
     create: function () {
 
         var button = this.game.add.button(this.game.world.centerX, 
-                                               0, 
+                                               300, 
                                                'button', 
                                                this.actionOnClick, 
                                                this, 2, 1, 0);

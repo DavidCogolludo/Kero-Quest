@@ -1,8 +1,14 @@
+var aux;
+var aux2;
 var EndLevel = {
+    init: function (actualPlayer, actualLevel){
+      aux = actualPlayer;
+      aux2 = actualLevel;
+    },
     create: function () {
         console.log("Level Completed!");
-        var BG = this.game.add.sprite(this.game.world.centerX-80, 
-                                      this.game.world.centerY-20, 
+        var BG = this.game.add.sprite(this.game.world.centerX, 
+                                      this.game.world.centerY, 
                                       'winBG');
         BG.anchor.setTo(0.5, 0.5);
         var button = this.game.add.button(533, 230, 
@@ -30,7 +36,7 @@ var EndLevel = {
     
     //TODO 7 declarar el callback del boton.
     actionOnClick: function(){
-        this.game.state.start('play');
+        this.game.state.start('play', true, false, aux, aux2);
     },
     actionOnClick2: function(){
        this.game.world.setBounds(0,0,800,600);

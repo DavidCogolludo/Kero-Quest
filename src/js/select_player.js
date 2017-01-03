@@ -42,7 +42,7 @@ var MenuScene = {
     },
     selectPlayer: function(){
       var aux = this.players[this._it].key;
-      this.game.state.start('play', true, false, aux);
+      this.game.state.start('level_select', true, false, aux);
     },
     next: function(){
       this.flechaDer.scale.set(3)
