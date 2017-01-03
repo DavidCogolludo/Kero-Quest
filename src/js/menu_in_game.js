@@ -14,13 +14,14 @@ var MenuInGame = {
 	//METODOS
 	init: function (actualPlayer, actualLevel, gameState){
 		//Mensajes de depuración
+		/*
 		console.log('Pausa recibe los datos:\n');
 		console.log('nivel= '+actualLevel);
 		console.log('sprite= '+actualPlayer);
 		console.log('posX= '+gameState.posX);
 		console.log('posY= '+gameState.posY);
 		console.log('playerHP= '+gameState.playerHP);
-		console.log('llaves= '+gameState.keyCount);
+		console.log('llaves= '+gameState.keyCount);*/
 
 		//Almacenamos los datos recibidos
 		this._level = actualLevel;
@@ -31,13 +32,14 @@ var MenuInGame = {
 		this.pauseGameState.keyCount = gameState.keyCount;
 
 		//MENSAJES DEPURACION
+		/*
 		console.log('Pausa ha almacenado:\n');
 		console.log('nivel= '+this._level);
 		console.log('sprite= '+this._sprite);
 		console.log('posX= '+this.pauseGameState.posX);
 		console.log('posY= '+this.pauseGameState.posY);
 		console.log('playerHP= '+this.pauseGameState.playerHP);
-		console.log('llaves= '+this.pauseGameState.keyCount);
+		console.log('llaves= '+this.pauseGameState.keyCount);*/
 		
 	},
 

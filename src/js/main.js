@@ -41,6 +41,7 @@ var PreloaderScene = {
       //como descriptor de la animación.
        this.game.load.tilemap('level_01', 'images/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.tilemap('level_02', 'images/lvl_02.json', null, Phaser.Tilemap.TILED_JSON);
+       this.game.load.tilemap('level_03', 'images/lvl_03.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.image('tiles', 'images/TileSet.png');
        this.game.load.image('player_01', 'images/player.png');
        this.game.load.image('player_02', 'images/player2.png');

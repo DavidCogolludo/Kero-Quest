@@ -128,6 +128,7 @@ var PlayScene = {
     _keys: 0,
     _maxTimeInvincible: 80, //Tiempo que esta invencible tras ser golpeado
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
+    //_maxYspeed: 500,      //Echarle un ojo para limitar la velocidad máxima y que así no atraviese colliders mientras cae
       
   init: function (spritePlayer, levelSelected, inGameState, resume){
     // Lo que se carga da igual de donde vengas...
@@ -135,13 +136,6 @@ var PlayScene = {
     this.level = levelSelected;
     // Y ahora si venimos de pausa...
     if (resume) {
-      console.log ('Escena Juego recibe llegada de pausa con los datos');
-      console.log('nivel= '+levelSelected);
-      console.log('sprite= '+spritePlayer);
-      console.log('posX= '+inGameState.posX);
-      console.log('posY= '+inGameState.posY);
-      console.log('playerHP= '+inGameState.playerHP);
-      console.log('llaves= '+inGameState.keyCount);
       //Si se pasa el parametro resume como true se actualiza el estado del juego
       this._resume = true;  //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
       //JUGADOR
@@ -149,17 +143,6 @@ var PlayScene = {
       this.gameState.posY = inGameState.posY;
       this.gameState.playerHP = inGameState.playerHP;
       this._keys = inGameState.keyCount;
-
-      console.log ('Escena Juego almacena los datos en gameState:');
-      console.log('nivel= '+this.level);
-      console.log('sprite= '+this.spritePlayer);
-      console.log('posX= '+this.gameState.posX);
-      console.log('posY= '+this.gameState.posY);
-      console.log('playerHP= '+this.gameState.playerHP);
-      console.log('llaves= '+this.gameState.keyCount);
-      //¿velocidad en x e y?
-      //¿invencible y contador de recover?
-      //ENEMIGOS
     }
 
   },
@@ -167,12 +150,14 @@ var PlayScene = {
   create: function () {
     var self = this;
     //Crear mapa;
-    if (this.level === 'level_02') this.map = this.game.add.tilemap('level_02');
+    if (this.level === 'level_03') this.map = this.game.add.tilemap('level_03');
+    else if (this.level === 'level_02') this.map = this.game.add.tilemap('level_02');
     else this.map = this.game.add.tilemap('level_01');
   	
   	this.map.addTilesetImage('patrones','tiles');
   	
     //Creación de layers
+    this.backgroundLayer = this.map.createLayer('Background');
   	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
   	this.groundLayer = this.map.createLayer('Ground');
   	this.deathLayer = this.map.createLayer('Death');
@@ -181,6 +166,7 @@ var PlayScene = {
   		vis: true,
   	};
     this.endLayer = this.map.createLayer('EndLvl');
+
 
     //Colisiones
   	this.collidersgroup = this.game.add.group();
@@ -201,13 +187,10 @@ var PlayScene = {
     //Crear player:
     //Posición al cargar de pausa o al inicio del nivel
     if(this._resume){
-        console.log('Entramos en la creación del personaje tras una causa con los datos');
-        console.log('Posicion en X= '+self.gameState.posX);
-        console.log('Posicion en Y= '+self.gameState.posY);
-        console.log('Sprite= '+this.spritePlayer);
         this._player = this.game.add.sprite(self.gameState.posX, self.gameState.posY, this.spritePlayer); //Carga su posición al pausar sin importar el nivel en el que este
     }else{
-        if (this.level === 'level_02') this._player= this.game.add.sprite(480, 576, this.spritePlayer); //nivel2
+        if (this.level === 'level_03') this._player= this.game.add.sprite(128, 512, this.spritePlayer);
+        else if (this.level === 'level_02') this._player= this.game.add.sprite(480, 576, this.spritePlayer); //nivel2
         else this._player = this.game.add.sprite(480,1184, this.spritePlayer); //nivel1      
     }
 
@@ -264,7 +247,13 @@ var PlayScene = {
     this.keyGroup = this.game.add.group();
     this.keyGroup.enableBody = true;
     this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
-    this.keyGroup.create(416, 480, 'llave_01');
+    if (this.level === 'level_03'){
+
+    } else if (this.level === 'level_02'){
+        this.keyGroup.create(416, 480, 'llave_01');
+    } else {
+
+    }
     this.keyGroup.forEach(function(obj){
       obj.body.allowGravity = false;
       obj.body.immovable = true;
@@ -274,7 +263,14 @@ var PlayScene = {
     this.doorGroup = this.game.add.group();
     this.doorGroup.enableBody = true;
     this.doorGroup.physicsBodyType = Phaser.Physics.ARCADE;
-    this.doorGroup.create(510, 480, 'puerta_01');
+    //Añadiendo puertas al grupo segun el nivel
+    if (this.level === 'level_03'){
+
+    } else if (this.level === 'level_02'){
+        this.doorGroup.create(510, 480, 'puerta_01');
+    } else {
+
+    }
     this.doorGroup.forEach(function(obj){
       obj.body.allowGravity = false;
       obj.body.immovable = true;
@@ -286,10 +282,23 @@ var PlayScene = {
     this.enemyGroup.physicsBodyType = Phaser.Physics.ARCADE;
 
    	//Crear enemigos segun nivel
-    if (this.level === 'level_02') {  //nivel2
+    if (this.level === 'level_03') {
+      this.enemyGroup.add(this._enemy = new enemy(0,this.game, 544, 512));
+      this.enemyGroup.add(this._enemyB = new enemy(1,this.game, 928, 512));
+      this.enemyGroup.add(this._enemyC = new enemy(2,this.game, 1952, 288));
+      this.enemyGroup.add(this._enemyD = new enemy(3,this.game, 2016, 288));
+      this.enemyGroup.add(this._enemyE = new enemy(4,this.game, 2368, 512));
+      this.enemyGroup.add(this._enemyF = new enemy(5,this.game, 2432, 512));
+      this.enemyGroup.add(this._enemyG = new enemy(6,this.game, 3168, 512));
+      this.enemyGroup.add(this._enemyH = new enemy(7,this.game, 3232, 512));
+      this.enemyGroup.add(this._enemyI = new enemy(8,this.game, 3296, 512));
+      this.enemyGroup.add(this._enemyJ = new enemy(9,this.game, 3360, 512));
+      this.enemyGroup.add(this._enemyK = new enemy(10,this.game, 4800, 512));
+      this.enemyGroup.add(this._enemyL = new enemy(11,this.game, 4832, 512));
+    } else if (this.level === 'level_02') {  //nivel2
       this.enemyGroup.add(this._enemy = new enemy(0,this.game, 480, 390));    //nivel2 : Con este comando creamos a la vez que agregamos al grupo
-      this.enemyGroup.add(this._enemy2 = new enemy(0,this.game, 480, 32));    //nivel2
-      this.enemyGroup.add(this._enemy3 = new enemy(0,this.game, 660, 580));   //nivel2
+      this.enemyGroup.add(this._enemy2 = new enemy(1,this.game, 480, 32));    //nivel2
+      this.enemyGroup.add(this._enemy3 = new enemy(2,this.game, 660, 580));   //nivel2
     } else this._enemy = new enemy(0,this.game,320,1152);  //nivel1
 
     this.enemyGroup.forEach(function(obj){
@@ -298,7 +307,8 @@ var PlayScene = {
     })
 
     //Crear Cañones
-    if (this.level === 'level_02') {  //nivel2
+    if (this.level === 'level_03'){
+    } else if (this.level === 'level_02') {  //nivel2
      this._cannon = new cannon(0,this.game, 128, 320);  //nivel2
      this._cannon2 = new cannon(0,this.game, 192, 576, Direction.LOW); //nivel2
     } else {
@@ -323,12 +333,12 @@ var PlayScene = {
     //IS called one per frame.
     update: function () {
     	//TEXTO DE DEBUG----------------------------------------------------
-    	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
+    	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX,50);
       this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,80);
-
+      
+      /*
       this.game.debug.text('Posición X: '+this._player.position.x, this.game.world.centerX-400,110);
       this.game.debug.text('Posición Y: '+this._player.position.y, this.game.world.centerX-400,140);
-      /*
       this.game.debug.text('X Velocity: '+this._player.body.velocity.x, this.game.world.centerX-400,110);
       this.game.debug.text('Y Velocity: '+this._player.body.velocity.y, this.game.world.centerX-400,140);
       this.game.debug.text('Invincible: '+this._player.invincible, this.game.world.centerX-400,170);
@@ -384,7 +394,33 @@ var PlayScene = {
             self.obj.detected(this._player);
             self.obj.move(this.collidersgroup);
         })*/
-        if (this.level === 'level_02'){
+        if (this.level === 'level_03'){
+          this._enemy.detected(this._player);
+          this._enemy.move(this.collidersgroup);
+          this._enemyB.detected(this._player);
+          this._enemyB.move(this.collidersgroup);
+          this._enemyC.detected(this._player);
+          this._enemyC.move(this.collidersgroup);
+          this._enemyD.detected(this._player);
+          this._enemyD.move(this.collidersgroup);
+          this._enemyE.detected(this._player);
+          this._enemyE.move(this.collidersgroup);
+          this._enemyF.detected(this._player);
+          this._enemyF.move(this.collidersgroup);
+          this._enemyG.detected(this._player);
+          this._enemyG.move(this.collidersgroup);
+          this._enemyH.detected(this._player);
+          this._enemyH.move(this.collidersgroup);
+          this._enemyI.detected(this._player);
+          this._enemyI.move(this.collidersgroup);
+          this._enemyJ.detected(this._player);
+          this._enemyJ.move(this.collidersgroup);
+          this._enemyK.detected(this._player);
+          this._enemyK.move(this.collidersgroup);          
+          this._enemyL.detected(this._player);
+          this._enemyL.move(this.collidersgroup);
+        } 
+        else if (this.level === 'level_02'){
           //Esto lo suyo sería que simplemente recorriera los elementos en el grupo enemigos
           this._enemy.detected(this._player);
           this._enemy.move(this.collidersgroup);
@@ -394,16 +430,19 @@ var PlayScene = {
         
           this._enemy3.detected(this._player);
           this._enemy3.move(this.collidersgroup);
-        } else {
+        } 
+        else {
           this._enemy.detected(this._player);
           this._enemy.move(this.collidersgroup);
         }
         
         //-----------------------------------CANNONS------------------------------
-        if(this.game.time.now > this.bulletTime){
-          this._cannon.shoot(this.bulletGroup);
-          this._cannon2.shoot(this.bulletGroup);
-          this.bulletTime = this.game.time.now + 2000;
+        if (this.level !== 'level_03'){
+          if(this.game.time.now > this.bulletTime){
+            this._cannon.shoot(this.bulletGroup);
+            this._cannon2.shoot(this.bulletGroup);
+            this.bulletTime = this.game.time.now + 2000;
+          }
         }
         //-----------------------------------PUERTAS Y LLAVES-------------------------------
         this.checkKey();
@@ -538,7 +577,8 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        if (this.level === "level_02") this.game.world.setBounds(0, 0, 960, 640); //Lvl2
+        if (this.level === "level_03") this.game.world.setBounds(0, 0, 5728 , 640);
+        else if (this.level === "level_02") this.game.world.setBounds(0, 0, 960, 640); 
         else this.game.world.setBounds(0,0, 864, 1760);
 
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
