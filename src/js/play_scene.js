@@ -5,6 +5,7 @@
 var PlayerState = {'JUMP':0, 'RUN':1, 'FALLING':2, 'STOP':3}
 var Direction = {'LEFT':0, 'RIGHT':1, 'TOP':2, 'LOW':3}
 
+////////////////////////////////ENTIDADES////////////////////////////////////////////
 //CAÑONES 
 var cannon = function(index, game, x,y, dir){
   var direction = dir || Direction.RIGHT;
@@ -43,6 +44,7 @@ var cannon = function(index, game, x,y, dir){
   };
   return this.cannon;
 };
+
 //ENEMIGO
 var enemy= function(index,game, x,y, destructor){
     //ATRIBUTOS
@@ -97,6 +99,7 @@ var enemy= function(index,game, x,y, destructor){
     };
 
 
+//////////////////////////////////////////////////ESCENA//////////////////////////////////////////////////
 //Scene de juego.
 var PlayScene = {
     //_rush: {},  ////////////////////////////////////////////////////////////////////////BORRAR?
@@ -110,6 +113,7 @@ var PlayScene = {
     _playerState: PlayerState.STOP, //estado del player
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
     _numJumps: 0,
+    _keys: 0,
   
   //Método constructor...
   create: function () {
@@ -165,14 +169,38 @@ var PlayScene = {
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
 
-   	//Crear enemigo
+    //Crear Llaves
+    this.keyGroup = this.game.add.group();
+    this.keyGroup.enableBody = true;
+    this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this.keyGroup.create(416, 480, 'llave_01');
+    this.keyGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
 
+    //Crear Puertas
+    this.doorGroup = this.game.add.group();
+    this.doorGroup.enableBody = true;
+    this.doorGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this.doorGroup.create(510, 480, 'puerta_01');
+    this.doorGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
+
+   	//Crear enemigo 
     //this._enemy = new enemy(0,this.game,320,1152);  //nivel1
     this._enemy = new enemy(0,this.game, 480, 390);   //nivel2
     this._enemy2 = new enemy(0,this.game, 480, 32);    //nivel2
 
+    //Crear Cañones
+    //this._cannon = new cannon(0,this.game, 94, 992);  //nivel1
+    //this._cannon2 = new cannon(0,this.game, 608, 1248, Direction.LOW); //nivel1
+    this._cannon = new cannon(0,this.game, 128, 320);  //nivel2
+    this._cannon2 = new cannon(0,this.game, 192, 576, Direction.LOW); //nivel2
 
-    //Crear cañones y balas
+    //Crear balas
     this.bulletTime = 4;
     this.bulletGroup = this.game.add.group();
     this.bulletGroup.enableBody = true;
@@ -186,17 +214,23 @@ var PlayScene = {
     })
 
     //Hacer grupo de cañones y enemigos.
-    //this._cannon = new cannon(0,this.game, 94, 992);  //nivel1
-    //this._cannon2 = new cannon(0,this.game, 608, 1248, Direction.LOW); //nivel1
-    this._cannon = new cannon(0,this.game, 128, 320);  //nivel2
-    this._cannon2 = new cannon(0,this.game, 192, 576, Direction.LOW); //nivel2
-   
+    this.enemyGroup = this.game.add.group();
+    this.enemyGroup.enableBody = true;
+    this.enemyGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this.enemyGroup.add(this._enemy);
+    this.enemyGroup.add(this._enemy2);
+
+    this.enemyGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
   },
     
     //IS called one per frame.
     update: function () {
     	//TEXTO DE DEBUG----------------------------------------------------
-    	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-300,50);
+    	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
+      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,80);
         
       //cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
@@ -232,8 +266,8 @@ var PlayScene = {
           this._cannon2.shoot(this.bulletGroup);
           this.bulletTime = this.game.time.now + 2000;
         }
-        //-----------------------------------BULLETS-------------------------------
-
+        //-----------------------------------PUERTAS Y LLAVES-------------------------------
+        this.checkKeyOrDoor();
         //-----------------------------------DEATH----------------------------------
         this.checkPlayerDeath();
         this.checkPlayerEnd();
@@ -245,6 +279,19 @@ var PlayScene = {
     collisionWithJumpThrough: function(){
     	var self = this;
     	self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
+    },
+    checkKeyOrDoor: function(){
+      var self = this;
+      this.keyGroup.forEach(function(obj){
+          if(self.game.physics.arcade.collide(self._player, obj)){
+          obj.destroy();
+          self._keys++;}
+      }),
+      this.doorGroup.forEach(function(obj){
+          if(self.game.physics.arcade.collide(self._player, obj)){
+          obj.destroy();
+          self._keys--;}
+      })
     },
     checKPlayerTrigger: function(){
     	//ZONAS SECRETAS
