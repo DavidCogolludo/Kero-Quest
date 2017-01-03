@@ -66,7 +66,7 @@ var enemy= function(index,game, x,y, destructor){
        		  colliders.forEach(function(trigger){
        		  	if(self.overlap(trigger) && delay === 0){
        		  		delay++;
-       		  		setTimeout(function(){delay = 0;},1000);
+       		  		setTimeout(function(){delay = 0;},300);
        		  		self.body.velocity.x=0;
        		  		self.vel *= -1;
        		  	}
@@ -91,8 +91,10 @@ var enemy= function(index,game, x,y, destructor){
         	if (this.overlap(target) && delay === 0){
         		delay++;
         		setTimeout(function(){delay = 0;}, 1000);
-        		if (!destructor) target.life--;
-        		else target.life = 0;
+        		if (!destructor && !target.invincible) {
+                target.hit();
+              }
+        	  else if (!target.invincible) target.life = 0;
         	} 
         };
         return this.enemy;
@@ -114,6 +116,8 @@ var PlayScene = {
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
     _numJumps: 0,
     _keys: 0,
+    _maxTimeInvincible: 80, //Tiempo que esta invencible tras ser golpeado
+    _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
   
   //Método constructor...
   create: function () {
@@ -155,9 +159,29 @@ var PlayScene = {
     this._player._jumpSpeed= -80;
     this._player._maxJumpSpeed = -800;
     this._player.maxJumpReached = false;
+    this._player.timeRecover = 0;
+    this._player.ignoraInput = false;
+    this._player.hitDir = 0;
     this.jumpTimer = 0;
+    this._player.invincible = false;
     this._player.jump = function(y){
       this.body.velocity.y = y;
+    }
+    this._player.hit = function(){
+      if (this.body.velocity.x > 0) this.hitDir = 1;
+      else if (this.body.velocity.x < 0) this.hitDir = -1;
+      else this.hitDir = 0;
+      this.ignoraInput = true;
+      this.jump(-500);
+      if (!this.invincible) this.damage();
+    }
+    this._player.damage = function(){
+      this.life--;
+      this.invincible = true;
+    }
+    this._player.recover = function(){
+      this.tint = 0xffffff;
+      this.invincible = false;
     }
     this._player.moveLeft = function(x){ this.body.velocity.x = -x; }
     this._player.moveRight = function(x){ this.body.velocity.x = x; }
@@ -189,10 +213,21 @@ var PlayScene = {
       obj.body.immovable = true;
     })
 
+    //Hacer grupo de cañones y enemigos.
+    this.enemyGroup = this.game.add.group();
+    this.enemyGroup.enableBody = true;
+    this.enemyGroup.physicsBodyType = Phaser.Physics.ARCADE;
+
    	//Crear enemigo 
     //this._enemy = new enemy(0,this.game,320,1152);  //nivel1
-    this._enemy = new enemy(0,this.game, 480, 390);   //nivel2
-    this._enemy2 = new enemy(0,this.game, 480, 32);    //nivel2
+    this.enemyGroup.add(this._enemy = new enemy(0,this.game, 480, 390));    //nivel2 : Con este comando creamos a la vez que agregamos al grupo
+    this.enemyGroup.add(this._enemy2 = new enemy(0,this.game, 480, 32));    //nivel2
+    this.enemyGroup.add(this._enemy3 = new enemy(0,this.game, 660, 580));   //nivel2
+
+    this.enemyGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
 
     //Crear Cañones
     //this._cannon = new cannon(0,this.game, 94, 992);  //nivel1
@@ -212,18 +247,6 @@ var PlayScene = {
       obj.body.allowGravity = false;
       obj.body.immovable = true;
     })
-
-    //Hacer grupo de cañones y enemigos.
-    this.enemyGroup = this.game.add.group();
-    this.enemyGroup.enableBody = true;
-    this.enemyGroup.physicsBodyType = Phaser.Physics.ARCADE;
-    this.enemyGroup.add(this._enemy);
-    this.enemyGroup.add(this._enemy2);
-
-    this.enemyGroup.forEach(function(obj){
-      obj.body.allowGravity = false;
-      obj.body.immovable = true;
-    })
   },
     
     //IS called one per frame.
@@ -231,17 +254,28 @@ var PlayScene = {
     	//TEXTO DE DEBUG----------------------------------------------------
     	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
       this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,80);
-        
+      this.game.debug.text('X Velocity: '+this._player.body.velocity.x, this.game.world.centerX-400,110);
+      this.game.debug.text('Y Velocity: '+this._player.body.velocity.y, this.game.world.centerX-400,140);
+      this.game.debug.text('Invincible: '+this._player.invincible, this.game.world.centerX-400,170);
+      this.game.debug.text('Recovery time: '+this._player.timeRecover, this.game.world.centerX-400,200);
+      this.game.debug.text('Ignore input: '+this._player.ignoraInput, this.game.world.centerX-200,170);
+      this.game.debug.text('Direccion impacto:'+this._player.hitDir, this.game.world.centerX-200,200);        
       //cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
     	this.checKPlayerTrigger();
     	var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
+      this.game.physics.arcade.collide(this._player, this._enemy);
     	this.game.physics.arcade.collide(this._enemy, this.groundLayer);
       this.game.physics.arcade.collide(this._enemy2, this.groundLayer);
         //----------------------------------PLAYER-----------------
         this._player.body.velocity.x = 0;
-        if(this._player.body.onFloor())this._numJumps=0;
-        this.movement(150);
+        if(this._player.body.onFloor()){this._numJumps=0;}
+        if(!this._player.ignoraInput) this.movement(150);
+        if(this._player.ignoraInput){
+          if (this._player.hitDir === -1) this._player.body.velocity.x = 50;
+          else if (this._player.hitDir === 1) this._player.body.velocity.x = -50;
+          else this._player.body.velocity.x = 0;
+        }
 
         //this.jumpButton.onDown.add(this.jumpCheck, this);
         if (this.jumpButton.isDown && this._player.body.onFloor()){
@@ -251,14 +285,38 @@ var PlayScene = {
         	this.jumpCheck();
         	this.timeJump= 0;
         }
+
+        //Frames de invencibilidad
+        if(this._player.invincible){
+          this._player.tint = Math.random() * 0xffffff;
+          this._player.timeRecover++; //Frames de invencibilidad
+        }
+
+        if(this._player.timeRecover >= this._maxInputIgnore){
+          this._player.ignoraInput = false;
+        }
+        if(this._player.timeRecover >= this._maxTimeInvincible){  //Fin invencibilidad
+          this._player.timeRecover = 0;
+          this._player.recover();
+        }
         
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY-------------------
+        /*
+        this.enemyGroup.forEach(function(obj){
+          obj.detected(self._player);
+          obj.move(self.collidersgroup);
+        })
+        */
+        
         this._enemy.detected(this._player);
         this._enemy.move(this.collidersgroup);
 
         this._enemy2.detected(this._player);
         this._enemy2.move(this.collidersgroup);
+        
+        this._enemy3.detected(this._player);
+        this._enemy3.move(this.collidersgroup);
 
         //-----------------------------------CANNONS------------------------------
         if(this.game.time.now > this.bulletTime){
@@ -347,7 +405,7 @@ var PlayScene = {
         this.bulletGroup.forEach(function(obj){
           if(self.game.physics.arcade.collide(self._player, obj)){
           obj.destroy();
-          self._player.life--;}
+          self._player.hit();}
         })
         //Death Layer
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
