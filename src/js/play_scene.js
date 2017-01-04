@@ -105,14 +105,12 @@ var enemy= function(index,game, x,y, destructor){
 //////////////////////////////////////////////////ESCENA//////////////////////////////////////////////////
 //Scene de juego.
 var PlayScene = {
-    //_rush: {},  ////////////////////////////////////////////////////////////////////////BORRAR?
     gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
       posX: 129,
       posY: 0,
-      keyCount: 0,
       playerHP: 4,
-      //state: PlayerState.STOP,
-      direct: Direction.NONE
+      invincible: false,
+      timeRecover: 80,
       },
     _player: {}, //Refinar esto con un creador de player.//player
     spritePlayer: 'player_01',
@@ -137,14 +135,16 @@ var PlayScene = {
     this.level = levelSelected;
     // Y ahora si venimos de pausa...
     if (resume) {
+      console.log("cargamos los datos");
       //Si se pasa el parametro resume como true se actualiza el estado del juego
       this._resume = true;  //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
       //JUGADOR
       this.gameState.posX = inGameState.posX; //Almacenamos en el objeto de la escena los datos recibidos para inicializar el pj en create con ellos
       this.gameState.posY = inGameState.posY;
       this.gameState.playerHP = inGameState.playerHP;
-      this._keys = inGameState.keyCount;
-    }
+      this.gameState.invincible = inGameState.invincible;
+      this.gameState.timeRecover = inGameState.timeRecover;
+    } else this._keys = 0;
 
   },
   //Método constructor...
@@ -202,19 +202,22 @@ var PlayScene = {
     if (this._resume){
         this._player.life = this.gameState.playerHP;
         this._resume = false; //A partir de aquí hay que reiniciar el valor ya que no se utiliza más (aunque no se si es necesario ya que arranca por defecto a false)
+        this._player.invincible = this.gameState.invincible;
+        this._player.timeRecover = this.gameState.timeRecover;
     }
     //Por Defecto
     else {
-        this._player.life=4;  
+        this._player.life=4;
+        this._player.invincible = false;
+        this._player.timeRecover = 0;
     }
     this._player._jumpSpeed= -80;
     this._player._maxJumpSpeed = -800;
     this._player.maxJumpReached = false;
-    this._player.timeRecover = 0;
     this._player.ignoraInput = false;
     this._player.hitDir = 0;
     this.jumpTimer = 0;
-    this._player.invincible = false;
+
     
     //METODOS DEL JUGADOR
     this._player.jump = function(y){
@@ -250,8 +253,9 @@ var PlayScene = {
     this.keyGroup = this.game.add.group();
     this.keyGroup.enableBody = true;
     this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
-    if (this.level === 'level_02') this.keyGroup.create(416, 480, 'llave_01');
-
+    if (this._keys === 0){  //Solo puede existir una llave por nivel, si se carga la pausa con una llave no generara una nueva.
+        if (this.level === 'level_02') this.keyGroup.create(416, 480, 'llave_01');
+    }
     this.keyGroup.forEach(function(obj){
       obj.body.allowGravity = false;
       obj.body.immovable = true;
@@ -326,10 +330,10 @@ var PlayScene = {
     update: function () {
       self=this;
     	//TEXTO DE DEBUG----------------------------------------------------
-      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX, 80);
-      this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX, 110);
-    	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX,50);
-      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX,80);
+      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-400, 80);
+      this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
+    	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
+      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);
       if (this._player.body.velocity.y > this._maxYspeed) this._maxYspeed = this._player.body.velocity.y;
       /*
       this.game.debug.text('Posición X: '+this._player.position.x, this.game.world.centerX-400,110);
@@ -491,11 +495,12 @@ var PlayScene = {
       //Memorizamos el estado actual
       //Escena
       this._maxYspeed = 0;
+      this.gameState.invincible = this._player.invincible;
       //Jugador
     	this.gameState.posX = this._player.position.x;
     	this.gameState.posY = this._player.position.y;
       this.gameState.playerHP = this._player.life;
-      this.gameState.keyCount = this._keys;
+      this.gameState.timeRecover = this._player.timeRecover;
       //Enemigos
       //Cambio escena
     	this.destroy();
