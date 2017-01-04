@@ -131,7 +131,7 @@ var PlayScene = {
 
     //Crear enemigos segun nivel
     this._enemy = [];
-    this._enemy.push(new entities.Enemy(0,this.game,544,512));
+    this._enemy.push(new entities.Enemy (0,this.game,544,512));
     this._enemy.push(new entities.Enemy (1,this.game, 928,512));
     this._enemy.push(new entities.Enemy (2,this.game, 1952,288));
     this._enemy.push(new entities.Enemy (3,this.game, 2016,288)); 
@@ -335,12 +335,7 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        if (this.level === "JumpTestLevel") this.game.world.setBounds(0,0, 768, 736);
-        else if (this.level === "level_03") this.game.world.setBounds(0, 0, 5728 , 640);
-        else if (this.level === "level_02") this.game.world.setBounds(0, 0, 960, 640); 
-        else if (this.level === "level_01") this.game.world.setBounds(0,0, 864, 1760);
-        else this.game.world.setBounds (0,0,800,600);
-
+        this.game.world.setBounds(0, 0, 5728 , 640);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);        
         this.game.physics.arcade.gravity.y = 2000;  
