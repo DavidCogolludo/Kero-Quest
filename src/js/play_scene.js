@@ -118,6 +118,7 @@ var PlayScene = {
     spritePlayer: 'player_01',
     level: 'level_01',
     _resume: false,
+    _maxYspeed: 0,
     //_speed: 300, //velocidad del player
     //_gravity: 9.8,
     // _jumpSpeed: 600, //velocidad de salto
@@ -128,7 +129,7 @@ var PlayScene = {
     _keys: 0,
     _maxTimeInvincible: 80, //Tiempo que esta invencible tras ser golpeado
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
-    //_maxYspeed: 500,      //Echarle un ojo para limitar la velocidad máxima y que así no atraviese colliders mientras cae
+    _ySpeedLimit: 1000,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
       
   init: function (spritePlayer, levelSelected, inGameState, resume){
     // Lo que se carga da igual de donde vengas...
@@ -150,7 +151,8 @@ var PlayScene = {
   create: function () {
     var self = this;
     //Crear mapa;
-    if (this.level === 'level_03') this.map = this.game.add.tilemap('level_03');
+    if (this.level === 'JumpTestLevel') this.map = this.game.add.tilemap('JumpTestLevel');
+    else if (this.level === 'level_03') this.map = this.game.add.tilemap('level_03');
     else if (this.level === 'level_02') this.map = this.game.add.tilemap('level_02');
     else this.map = this.game.add.tilemap('level_01');
   	
@@ -189,7 +191,8 @@ var PlayScene = {
     if(this._resume){
         this._player = this.game.add.sprite(self.gameState.posX, self.gameState.posY, this.spritePlayer); //Carga su posición al pausar sin importar el nivel en el que este
     }else{
-        if (this.level === 'level_03') this._player= this.game.add.sprite(128, 512, this.spritePlayer);
+        if (this.level === 'JumpTestLevel') this._player= this.game.add.sprite(384, 544, this.spritePlayer);
+        else if (this.level === 'level_03') this._player= this.game.add.sprite(128, 512, this.spritePlayer);
         else if (this.level === 'level_02') this._player= this.game.add.sprite(480, 576, this.spritePlayer); //nivel2
         else this._player = this.game.add.sprite(480,1184, this.spritePlayer); //nivel1      
     }
@@ -247,30 +250,20 @@ var PlayScene = {
     this.keyGroup = this.game.add.group();
     this.keyGroup.enableBody = true;
     this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
-    if (this.level === 'level_03'){
+    if (this.level === 'level_02') this.keyGroup.create(416, 480, 'llave_01');
 
-    } else if (this.level === 'level_02'){
-        this.keyGroup.create(416, 480, 'llave_01');
-    } else {
-
-    }
     this.keyGroup.forEach(function(obj){
       obj.body.allowGravity = false;
       obj.body.immovable = true;
     })
 
-    //Crear Puertas
+    //Crear Puertas (OJO DECISION DISEÑO: SOLO 1 PUERTA Y LLAVE POR NIVEL)
     this.doorGroup = this.game.add.group();
     this.doorGroup.enableBody = true;
     this.doorGroup.physicsBodyType = Phaser.Physics.ARCADE;
     //Añadiendo puertas al grupo segun el nivel
-    if (this.level === 'level_03'){
-
-    } else if (this.level === 'level_02'){
-        this.doorGroup.create(510, 480, 'puerta_01');
-    } else {
-
-    }
+    if (this.level === 'level_02') this.doorGroup.create(510, 480, 'puerta_01');
+    
     this.doorGroup.forEach(function(obj){
       obj.body.allowGravity = false;
       obj.body.immovable = true;
@@ -299,7 +292,7 @@ var PlayScene = {
       this.enemyGroup.add(this._enemy = new enemy(0,this.game, 480, 390));    //nivel2 : Con este comando creamos a la vez que agregamos al grupo
       this.enemyGroup.add(this._enemy2 = new enemy(1,this.game, 480, 32));    //nivel2
       this.enemyGroup.add(this._enemy3 = new enemy(2,this.game, 660, 580));   //nivel2
-    } else this._enemy = new enemy(0,this.game,320,1152);  //nivel1
+    } else if (this.level === 'level_01') this._enemy = new enemy(0,this.game,320,1152);  //nivel1
 
     this.enemyGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -307,11 +300,10 @@ var PlayScene = {
     })
 
     //Crear Cañones
-    if (this.level === 'level_03'){
-    } else if (this.level === 'level_02') {  //nivel2
+   if (this.level === 'level_02') {  
      this._cannon = new cannon(0,this.game, 128, 320);  //nivel2
      this._cannon2 = new cannon(0,this.game, 192, 576, Direction.LOW); //nivel2
-    } else {
+    } else if (this.level === 'level_01') {
       this._cannon = new cannon(0,this.game, 94, 992);  //nivel1
       this._cannon2 = new cannon(0,this.game, 608, 1248, Direction.LOW); //nivel1
     }
@@ -332,10 +324,13 @@ var PlayScene = {
     
     //IS called one per frame.
     update: function () {
+      self=this;
     	//TEXTO DE DEBUG----------------------------------------------------
+      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX, 80);
+      this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX, 110);
     	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX,50);
-      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,80);
-      
+      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX,80);
+      if (this._player.body.velocity.y > this._maxYspeed) this._maxYspeed = this._player.body.velocity.y;
       /*
       this.game.debug.text('Posición X: '+this._player.position.x, this.game.world.centerX-400,110);
       this.game.debug.text('Posición Y: '+this._player.position.y, this.game.world.centerX-400,140);
@@ -349,6 +344,7 @@ var PlayScene = {
       //cambiar la gravedad
     	//this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
     	this.checKPlayerTrigger();
+      if (this._player.body.velocity.y > this._ySpeedLimit) this._player.body.velocity.y = this._ySpeedLimit; //Evitar bug omitir colisiones
     	var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
       this.game.physics.arcade.collide(this._player, this._enemy);
     	this.game.physics.arcade.collide(this._enemy, this.groundLayer);
@@ -431,13 +427,13 @@ var PlayScene = {
           this._enemy3.detected(this._player);
           this._enemy3.move(this.collidersgroup);
         } 
-        else {
+        else if (this.level === 'level_01') {
           this._enemy.detected(this._player);
           this._enemy.move(this.collidersgroup);
-        }
+        } 
         
         //-----------------------------------CANNONS------------------------------
-        if (this.level !== 'level_03'){
+        if (this.level === 'level_02' || this.level === 'level_01'){
           if(this.game.time.now > this.bulletTime){
             this._cannon.shoot(this.bulletGroup);
             this._cannon2.shoot(this.bulletGroup);
@@ -493,16 +489,17 @@ var PlayScene = {
     },
     pauseMenu: function (){
       //Memorizamos el estado actual
+      //Escena
+      this._maxYspeed = 0;
       //Jugador
     	this.gameState.posX = this._player.position.x;
     	this.gameState.posY = this._player.position.y;
       this.gameState.playerHP = this._player.life;
       this.gameState.keyCount = this._keys;
       //Enemigos
-      console.log('gameState antes del destroy = '+this.gameState);
+      //Cambio escena
     	this.destroy();
       this.game.world.setBounds(0,0,800,600);
-      console.log('gameState despues del destroy = '+this.gameState);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
       this.game.state.start('menu_in_game', true, false, this.spritePlayer, this.level, this.gameState);
     },
@@ -577,9 +574,11 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        if (this.level === "level_03") this.game.world.setBounds(0, 0, 5728 , 640);
+        if (this.level === "JumpTestLevel") this.game.world.setBounds(0,0, 768, 736);
+        else if (this.level === "level_03") this.game.world.setBounds(0, 0, 5728 , 640);
         else if (this.level === "level_02") this.game.world.setBounds(0, 0, 960, 640); 
-        else this.game.world.setBounds(0,0, 864, 1760);
+        else if (this.level === "level_01") this.game.world.setBounds(0,0, 864, 1760);
+        else this.game.world.setBounds (0,0,800,600);
 
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);        

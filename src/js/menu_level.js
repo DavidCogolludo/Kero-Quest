@@ -6,10 +6,10 @@ var MenuLevel = {
     },
     create: function () {
         /*
-        var logo = this.game.add.sprite(this.game.world.centerX, 
+        var bg = this.game.add.sprite(this.game.world.centerX, 
                                         this.game.world.centerY, 
-                                        'logo');
-        logo.anchor.setTo(0.5, 0.5);
+                                        'background');
+        bg.anchor.setTo(0.5, 0.5);
         */
         var buttonLvl1 = this.game.add.button(this.game.world.centerX, 
                                                this.game.world.centerY - 100, 
@@ -44,6 +44,18 @@ var MenuLevel = {
         textLvl3.anchor.set(0.5);
         buttonLvl3.addChild(textLvl3);
 
+        var buttonLvl4 = this.game.add.button(this.game.world.centerX, 
+                                               this.game.world.centerY + 200, 
+                                               'button', 
+                                               this.actionOnClick4, 
+                                               this, 2, 1, 0);
+        buttonLvl4.anchor.set(0.5);
+        var textLvl4 = this.game.add.text(0, 0, "JumpTestLevel");
+        textLvl4.font = 'Sniglet';
+        textLvl4.anchor.set(0.5);
+        buttonLvl4.addChild(textLvl4);
+
+
     },
     
     actionOnClick: function(){
@@ -58,6 +70,11 @@ var MenuLevel = {
 
     actionOnClick3: function(){
         aux2 = 'level_03';
+        this.initLevel();
+    },
+
+    actionOnClick4: function(){
+        aux2 = 'JumpTestLevel';
         this.initLevel();
     },
 
