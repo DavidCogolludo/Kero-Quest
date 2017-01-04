@@ -1,7 +1,10 @@
 'use strict';
 
 //TODO 1.1 Require de las escenas, play_scene, gameover_scene y menu_scene.
-var PlayScene = require('./play_scene.js');
+var Level_01 = require('./level_01.js');
+var Level_02 = require('./level_02.js');
+var Level_03 = require('./level_03.js');
+var JumpTestLevel = require('./jumpTestLevel.js');
 var GameOver = require('./gameover_scene.js');
 var MenuScene = require('./menu_scene.js');
 var MenuLevel = require('./menu_level.js')
@@ -39,10 +42,10 @@ var PreloaderScene = {
       //la imagen 'images/simples_pimples.png' con el nombre de la cache 'tiles' y
       // el atlasJSONHash con 'images/rush_spritesheet.png' como imagen y 'images/rush_spritesheet.json'
       //como descriptor de la animación.
-       this.game.load.tilemap('level_01', 'images/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
-       this.game.load.tilemap('level_02', 'images/lvl_02.json', null, Phaser.Tilemap.TILED_JSON);
-       this.game.load.tilemap('level_03', 'images/lvl_03.json', null, Phaser.Tilemap.TILED_JSON);
-       this.game.load.tilemap('JumpTestLevel', 'images/JumpTestLevel.json', null, Phaser.Tilemap.TILED_JSON);
+       this.game.load.tilemap('map_01', 'images/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
+       this.game.load.tilemap('map_02', 'images/lvl_02.json', null, Phaser.Tilemap.TILED_JSON);
+       this.game.load.tilemap('map_03', 'images/lvl_03.json', null, Phaser.Tilemap.TILED_JSON);
+       this.game.load.tilemap('jumpTestLevel', 'images/JumpTestLevel.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.image('tiles', 'images/TileSet.png');
        this.game.load.image('player_01', 'images/player.png');
        this.game.load.image('player_02', 'images/player2.png');
@@ -109,7 +112,10 @@ function init (){
  game.state.add('level_select', MenuLevel);
  game.state.add('preloader', PreloaderScene);
  game.state.add('select_player', SelectPlayer);
- game.state.add('play', PlayScene);
+ game.state.add('level_01', Level_01);
+ game.state.add('level_02', Level_02);
+ game.state.add('level_03', Level_03);
+ game.state.add('jumpTestLevel', JumpTestLevel);
  game.state.add('menu_in_game',MenuInGame);
  game.state.add ('gameOver', GameOver);
  game.state.add('endLevel', EndLevel);

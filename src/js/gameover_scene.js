@@ -1,9 +1,7 @@
 var aux;
-var aux2;
 var GameOver = {
-    init: function (actualPlayer, actualLevel){
-      aux = actualPlayer;
-      aux2 = actualLevel;
+    init: function (actualLevel){
+      aux = actualLevel;
     },
     create: function () {
         console.log("Game Over");
@@ -25,7 +23,7 @@ var GameOver = {
         text2.anchor.set(0.5);
         //goText.anchor.set(0.5);
         button.addChild(text);
-        //TODO 8 crear un boton con el texto 'Return Main Menu' que nos devuelva al menu del juego.
+       
         var button2 = this.game.add.button(510, 430, 
                                           'button', 
                                           this.actionOnClick2, 
@@ -34,9 +32,8 @@ var GameOver = {
         button2.addChild(text2);
     },
     
-    //TODO 7 declarar el callback del boton.
     actionOnClick: function(){
-        this.game.state.start('play', true, false, aux, aux2);
+        this.game.state.start(aux, true, false, false);
     },
     actionOnClick2: function(){
        this.game.world.setBounds(0,0,800,600);

@@ -1,46 +1,7 @@
 var MenuInGame = {
-	//ATRIBUTOS con inicializaciones por defecto
-	pauseGameState : {
-		posX: 0,
-		posY: 0,
-		playerHP: 0,
-		invencible: false,
-		timeRecover: 0,
-	},
-	_level: 'level_01',
-	_sprite: 'player_01',
-
 	//METODOS
-	init: function (actualPlayer, actualLevel, gameState){
-		//Mensajes de depuración
-		/*
-		console.log('Pausa recibe los datos:\n');
-		console.log('nivel= '+actualLevel);
-		console.log('sprite= '+actualPlayer);
-		console.log('posX= '+gameState.posX);
-		console.log('posY= '+gameState.posY);
-		console.log('playerHP= '+gameState.playerHP);
-		console.log('llaves= '+gameState.keyCount);*/
-
-		//Almacenamos los datos recibidos
-		this._level = actualLevel;
-		this._sprite = actualPlayer;
-		this.pauseGameState.posX = gameState.posX;
-		this.pauseGameState.posY = gameState.posY;
-		this.pauseGameState.playerHP = gameState.playerHP;
-		this.pauseGameState.invincible = gameState.invincible;
-		this.pauseGameState.timeRecover = gameState.timeRecover;
-
-		//MENSAJES DEPURACION
-		/*
-		console.log('Pausa ha almacenado:\n');
-		console.log('nivel= '+this._level);
-		console.log('sprite= '+this._sprite);
-		console.log('posX= '+this.pauseGameState.posX);
-		console.log('posY= '+this.pauseGameState.posY);
-		console.log('playerHP= '+this.pauseGameState.playerHP);
-		console.log('invincible= '+this.pauseGameState.invincible);
-		*/
+	init: function (gameState){
+		this.prevState = gameState;
 	},
 
     create: function () {
@@ -80,13 +41,13 @@ var MenuInGame = {
     
     actionOnClick: function(){
     	console.log('Boton RESUME pulsado');
-    	this.game.state.start('play', true, false, this._sprite, this._level, this.pauseGameState, true);
+    	this.game.state.start(this.prevState, true, false, true);
         //this.game.state.resume('play', true, false, this._sprite, this._level, this.pauseGameState, true);
     },
 
     actionOnClick2: function(){
     	console.log('Boton RESET pulsado');
-    	this.game.state.start('play', true, false, this._sprite, this._level, this.pauseGameState, false);
+    	this.game.state.start(this.prevState, true, false, false);
         //this.game.state.resume('play', true, false, this._sprite, this._level, this.pauseGameState, true);
     },
 

@@ -74,13 +74,12 @@ var MenuLevel = {
     },
 
     actionOnClick4: function(){
-        aux2 = 'JumpTestLevel';
+        aux2 = 'jumpTestLevel';
         this.initLevel();
     },
 
     initLevel: function(){
-      //console.log('Se procede a iniciar el nivel: '+aux2 +' con jugador: '+aux);
-      this.game.state.start('play', true, false, aux, aux2);
+      this.game.state.start(aux2, true, false, false, aux);
     }
 
 };
