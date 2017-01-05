@@ -37,27 +37,27 @@ Usar comando "$ node ./node_modules/gulp/bin/gulp run" en la consola de GIT BASH
 
 
 Se incluirán:
-[ ] una pantalla de carga,
-[ ] una pantalla de menú
+[v] una pantalla de carga,
+[v] una pantalla de menú
 [v] un modo de juego al menos con un nivel
-[ ] una pantalla de pausa durante el juego con al menos dos opciones: Continuar el juego y Salir. Salir te llevará al menú principal.
-[ ] un modo de “fin de partida”, bien al superar el o los niveles, bien cuando muere el jugador.
+[v] una pantalla de pausa durante el juego con al menos dos opciones: Continuar el juego y Salir. Salir te llevará al menú principal.
+[v] un modo de “fin de partida”, bien al superar el o los niveles, bien cuando muere el jugador.
 [v] Se tratará de llevar un personaje desde un punto a otro. El personaje podrá moverse hacia la izquierda y la derecha y podrá saltar.
-[ ] Al llegar al punto exitosamente, se informará de la victoria y se irá al menú tras la pantalla de fin de partida.
-[ ] Si “muere”, se informará también y se irá al menú tras la pantalla de fin de partida.
+[v] Al llegar al punto exitosamente, se informará de la victoria y se irá al menú tras la pantalla de fin de partida.
+[v] Si “muere”, se informará también y se irá al menú tras la pantalla de fin de partida.
 [v] Al menos debe haber un tipo de enemigo.
 [v] “Morirá” por contacto con enemigos, que obligatoriamente han de moverse (aunque sea simplemente en la dirección contraria).
-[ ] También podrá morir “cayendo” por zonas
+[v] También podrá morir “cayendo” por zonas
 [v] Los niveles se crearán con tiles, y se usará el formato de Tiled (se recomienda usar esta herramienta).
 [v] No se tendrán en cuenta las animaciones, parallax o el audio, ya que serán el núcleo de las ampliaciones de la práctica 4.
 [v] No se tendrá en cuenta el despliegue del juego, ya que será el núcleo de las ampliaciones de la práctica 5.
-[ ] Además, se hará un mini “GDD” que no podrá exceder de una cara en A4 en ningún caso. Es decir, será un documento corto descriptivo en el que tendréis que:
-	[ ] Poner título al juego.
-	[ ] Publico objetivo, calificación de edad estimada.
-	[ ] Contar la historia (es obligatorio una) y los objetivos.
-	[ ] Explicar cómo jugar.
-	[ ] Hacer un poco de “venta” del juego: ¿por qué querría alguien jugar al juego?
-	[ ] Referencias utilizadas.
+[v] Además, se hará un mini “GDD” que no podrá exceder de una cara en A4 en ningún caso. Es decir, será un documento corto descriptivo en el que tendréis que:
+	[v] Poner título al juego.
+	[v] Publico objetivo, calificación de edad estimada.
+	[v] Contar la historia (es obligatorio una) y los objetivos.
+	[v] Explicar cómo jugar.
+	[v] Hacer un poco de “venta” del juego: ¿por qué querría alguien jugar al juego?
+	[v] Referencias utilizadas.
 
 .:EVALUACION:.
 GDD: 1 punto
