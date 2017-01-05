@@ -273,7 +273,8 @@ var PlayScene = {
     		var self = this; 
     		this.collidersgroup.forEach(function(item){
     			if(!self.overLayer.vis && self._player.overlap(item)){
-    				self.overLayer.layer.revive();
+    				self.overLayer.vis = true;
+            self.overLayer.layer.revive();
        			}
        			else if (self._player.overlap(item)){
        				self.collisionWithJumpThrough();			

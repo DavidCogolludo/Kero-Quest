@@ -870,7 +870,8 @@ var PlayScene = {
     		var self = this; 
     		this.collidersgroup.forEach(function(item){
     			if(!self.overLayer.vis && self._player.overlap(item)){
-    				self.overLayer.layer.revive();
+    				self.overLayer.vis = true;
+            self.overLayer.layer.revive();
        			}
        			else if (self._player.overlap(item)){
        				self.collisionWithJumpThrough();			
@@ -1256,7 +1257,8 @@ var PlayScene = {
     		var self = this; 
     		this.collidersgroup.forEach(function(item){
     			if(!self.overLayer.vis && self._player.overlap(item)){
-    				self.overLayer.layer.revive();
+    				self.overLayer.vis = true;
+            self.overLayer.layer.revive();
        			}
        			else if (self._player.overlap(item)){
        				self.collisionWithJumpThrough();			
@@ -1413,7 +1415,7 @@ var PlayScene = {
     _keys: 0,
     _maxTimeInvincible: 80, //Tiempo que esta invencible tras ser golpeado
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
-    _ySpeedLimit: 1000,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
+    _ySpeedLimit: 800,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
       
   init: function (resume, spritePlayer){
     // Lo que se carga da igual de donde vengas...
@@ -1457,10 +1459,6 @@ var PlayScene = {
     this.jumpThroughLayer = this.map.createLayer('JumpThrough');
     this.groundLayer = this.map.createLayer('Ground');
     this.deathLayer = this.map.createLayer('Death');
-    this.overLayer = {
-      layer: this.map.createLayer('OverLayer'),
-      vis: true,
-    };
     this.endLayer = this.map.createLayer('EndLvl');
 
     //Colisiones
@@ -1494,7 +1492,7 @@ var PlayScene = {
     this.keyGroup.enableBody = true;
     this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
     if (this._keys === 0){  //Solo puede existir una llave por nivel, si se carga la pausa con una llave no generara una nueva.
-        this.keyGroup.create(416, 480, 'llave_01');
+        this.keyGroup.create(0, 32, 'llave_01');
     }
     this.keyGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -1506,7 +1504,7 @@ var PlayScene = {
     this.doorGroup.enableBody = true;
     this.doorGroup.physicsBodyType = Phaser.Physics.ARCADE;
     //Añadiendo puertas al grupo segun el nivel
-    this.doorGroup.create(510, 480, 'puerta_01');
+    this.doorGroup.create(928, 544, 'puerta_01');
     
     this.doorGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -1551,6 +1549,12 @@ var PlayScene = {
       obj.body.allowGravity = false;
       obj.body.immovable = true;
     })
+
+    //Capa por encima de todo lo demás
+    this.overLayer = {
+      layer: this.map.createLayer('OverLayer'),
+      vis: true,
+    };
   },
     
     //IS called one per frame.
@@ -1630,13 +1634,14 @@ var PlayScene = {
 
     collisionWithJumpThrough: function(){
       var self = this;
+      console.log('col');
       self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
     },
     checkKey: function(){
       var self = this;
       this.keyGroup.forEach(function(obj){
           if(self.game.physics.arcade.collide(self._player, obj)){
-          obj.destroy();
+          obj.kill();
           self._keys++;}
       })
     },
@@ -1658,6 +1663,7 @@ var PlayScene = {
         var self = this; 
         this.collidersgroup.forEach(function(item){
           if(!self.overLayer.vis && self._player.overlap(item)){
+            self.overLayer.vis = true;
             self.overLayer.layer.revive();
             }
             else if (self._player.overlap(item)){
@@ -2037,6 +2043,7 @@ var PlayScene = {
         var self = this; 
         this.collidersgroup.forEach(function(item){
           if(!self.overLayer.vis && self._player.overlap(item)){
+            self.overLayer.vis = true;
             self.overLayer.layer.revive();
             }
             else if (self._player.overlap(item)){
@@ -2411,6 +2418,7 @@ var PlayScene = {
         var self = this; 
         this.collidersgroup.forEach(function(item){
           if(!self.overLayer.vis && self._player.overlap(item)){
+            self.overLayer.vis = true;
             self.overLayer.layer.revive();
             }
             else if (self._player.overlap(item)){
