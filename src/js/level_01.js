@@ -10,8 +10,8 @@ var entities = require('./entities.js');
 //Scene de juego.
 var PlayScene = {
     gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 480,
-      posY: 1184,
+      posX: 128,
+      posY: 448,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
@@ -51,8 +51,8 @@ var PlayScene = {
 
     }
     else this.gameState= {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 480,
-      posY: 1184,
+      posX: 128,
+      posY: 448,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
@@ -107,6 +107,9 @@ var PlayScene = {
     this.keyGroup = this.game.add.group();
     this.keyGroup.enableBody = true;
     this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    if (this._keys === 0){  //Solo puede existir una llave por nivel, si se carga la pausa con una llave no generara una nueva.
+        this.keyGroup.create(2240, 192, 'llave_01');
+    }
    
     this.keyGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -117,6 +120,7 @@ var PlayScene = {
     this.doorGroup = this.game.add.group();
     this.doorGroup.enableBody = true;
     this.doorGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this.doorGroup.create(2496, 160, 'puerta_01');
     
     this.doorGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -130,7 +134,8 @@ var PlayScene = {
 
    	//Crear enemigos segun nivel
     this._enemy = [];
-    this._enemy.push(new entities.Enemy(0,this.game,320,1152));
+    this._enemy.push(new entities.Enemy(0,this.game,320,704));
+    this._enemy.push(new entities.Enemy(0,this.game,2240,736));
     for (var i = 0; i < this._enemy.length; i++){
     	this.enemyGroup.add(this._enemy[i]);
     }
@@ -140,11 +145,12 @@ var PlayScene = {
     })
         
     //Crear Cañones
+    /*
     this.cannonGroup = this.game.add.group();
     this._cannons =[];
     this._cannons.push(new entities.Cannon(0,this.game, 94, 992));  //nivel1
     this._cannons.push(new entities.Cannon(0,this.game, 608, 1248, Direction.LOW)); //nivel1
-   for (var i = 0; i < this._cannons.length; i++){
+    for (var i = 0; i < this._cannons.length; i++){
     	this.cannonGroup.add(this._cannons[i]);
     }
 
@@ -160,6 +166,7 @@ var PlayScene = {
       obj.body.allowGravity = false;
       obj.body.immovable = true;
     })
+    */
   },
     
     //IS called one per frame.
@@ -317,12 +324,13 @@ var PlayScene = {
     
     checkPlayerDeath: function(){
         self = this;
+        /*
         //Collision with bullet
         this.bulletGroup.forEach(function(obj){
           if(self.game.physics.arcade.collide(self._player, obj)){
           obj.destroy();
           self._player.hit();}
-        })
+        })*/
         //Death Layer
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
@@ -359,7 +367,7 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        this.game.world.setBounds(0,0, 864, 1760);
+        this.game.world.setBounds(0,0, 2560 , 800);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);        
         this.game.physics.arcade.gravity.y = 2000;  
