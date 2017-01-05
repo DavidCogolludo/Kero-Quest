@@ -9,26 +9,39 @@ var EndLevel = {
                                       this.game.world.centerY, 
                                       'winBG');
         BG.anchor.setTo(0.5, 0.5);
-        var button = this.game.add.button(533, 230, 
-                                          'button', 
-                                          this.actionOnClick, 
-                                          this, 2, 1, 0);
-        button.anchor.set(0.5);
-        //var goText = this.game.add.text(400, 100, "YOU WIN!!");
+
+        //TEXTOS
         var text = this.game.add.text(0, 0, "Reset Level");
         var text2 = this.game.add.text(0, 0, "Return Menu");
+        var text3 = this.game.add.text(0, 0, "Next Level");
         text.anchor.set(0.5);
         //goText.fill = '#43d637';
         //goText.anchor.set(0.5);
         text2.anchor.set(0.5);
         //goText.anchor.set(0.5);
+        text3.anchor.set(0.5);
+
+        //BOTONES
+        var button = this.game.add.button(533, 230, 
+                                          'button', 
+                                          this.actionOnClick, 
+                                          this, 2, 1, 0);
+        button.anchor.set(0.5);
         button.addChild(text);
+
         var button2 = this.game.add.button(533, 320, 
                                           'button', 
                                           this.actionOnClick2, 
                                           this, 2, 1, 0);
         button2.anchor.set(0.5);
         button2.addChild(text2);
+
+        var button3 = this.game.add.button(303, 320, 
+                                          'button', 
+                                          this.actionOnClick3, 
+                                          this, 2, 1, 0);
+        button3.anchor.set(0.5);
+        button3.addChild(text3);
     },
     
     actionOnClick: function(){
@@ -38,6 +51,13 @@ var EndLevel = {
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
        this.game.state.start('menu');
+    },
+    actionOnClick3: function(){
+       this.game.world.setBounds(0,0,800,600);
+       this.game.stage.backgroundColor = '#000000';
+       if (aux === 'level_01') this.game.state.start('level_02');
+       else if (aux === 'level_02') this.game.state.start('level_03');
+       else if (aux === 'level_03') this.game.state.start('level_04');
     }
 
 };

@@ -107,7 +107,7 @@ var PlayScene = {
     this.keyGroup.enableBody = true;
     this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
     if (this._keys === 0){  //Solo puede existir una llave por nivel, si se carga la pausa con una llave no generara una nueva.
-        if (this.level === 'level_02') this.keyGroup.create(416, 480, 'llave_01');
+        this.keyGroup.create(416, 480, 'llave_01');
     }
     this.keyGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -372,8 +372,19 @@ var PlayScene = {
     },
     //move the player
     movement: function(incrementoX){
-         if (this.cursors.left.isDown) this._player.moveLeft(incrementoX);
-        else if (this.cursors.right.isDown) this._player.moveRight(incrementoX);
+         if (this.cursors.left.isDown){
+        this._player.animations.play('walkL', 8, true);
+        this._direction= Direction.LEFT;
+        this._player.moveLeft(incrementoX);
+         }
+        else if (this.cursors.right.isDown) {
+          this._player.animations.play('walkR', 8, true);
+          this._direction= Direction.RIGHT;
+          this._player.moveRight(incrementoX);
+        }
+        else{
+          this._player.animations.play('breath',2,true);          
+        } 
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.

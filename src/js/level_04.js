@@ -10,15 +10,15 @@ var entities = require('./entities.js');
 //Scene de juego.
 var PlayScene = {
     gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 128,
-      posY: 448,
+      posX: 480,
+      posY: 192,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
       },
     _player: {}, //Refinar esto con un creador de player.//player
     spritePlayer: 'player_01',
-    level: 'level_01',
+    level: 'level_04',
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -26,22 +26,21 @@ var PlayScene = {
     _keys: 0,
     _maxTimeInvincible: 80, //Tiempo que esta invencible tras ser golpeado
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
-    _ySpeedLimit: 800,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
+    _ySpeedLimit: 1000,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
       
   init: function (resume, spritePlayer){
     // Lo que se carga da igual de donde vengas...
     if (!!spritePlayer) this.spritePlayer = spritePlayer; //Si no recibe un spritePlayer carga el básico
     // Y ahora si venimos de pausa...
-    if (resume)this._resume = true;
-     //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
+    if (resume)this._resume = true; //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
     else{
       this.shutdown();
       this._keys = 0;
     } 
   },
   shutdown: function(){
-  	if (this._resume){
-  	  this.gameState= {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
+    if (this._resume){
+      this.gameState= {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
         posX: this._player.position.x,
         posY: this._player.position.y,
         playerHP: this._player.life,
@@ -51,8 +50,8 @@ var PlayScene = {
 
     }
     else this.gameState= {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 128,
-      posY: 448,
+      posX: 480,
+      posY: 192,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
@@ -63,43 +62,43 @@ var PlayScene = {
   create: function () {
     var self = this;
     //Crear mapa;
-    this.map = this.game.add.tilemap('map_01');
-  	this.map.addTilesetImage('patrones','tiles');
-  	
+    this.map = this.game.add.tilemap('map_04');
+    this.map.addTilesetImage('patrones','tiles');
+    
     //Creación de layers
     this.backgroundLayer = this.map.createLayer('Background');
-  	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
-  	this.groundLayer = this.map.createLayer('Ground');
-  	this.deathLayer = this.map.createLayer('Death');
-  	this.overLayer = {
-  		layer: this.map.createLayer('OverLayer'),
-  		vis: true,
-  	};
+    this.jumpThroughLayer = this.map.createLayer('JumpThrough');
+    this.groundLayer = this.map.createLayer('Ground');
+    this.deathLayer = this.map.createLayer('Death');
+    this.overLayer = {
+      layer: this.map.createLayer('OverLayer'),
+      vis: true,
+    };
     this.endLayer = this.map.createLayer('EndLvl');
 
     //Colisiones
-  	this.collidersgroup = this.game.add.group();
-  	this.collidersgroup.enableBody = true;
-  	this.collidersgroup.alpha = 0;
-   	this.map.createFromObjects('Colliders',8, 'trigger',0,true,false,this.collidersgroup);
+    this.collidersgroup = this.game.add.group();
+    this.collidersgroup.enableBody = true;
+    this.collidersgroup.alpha = 0;
+    this.map.createFromObjects('Colliders',8, 'trigger',0,true,false,this.collidersgroup);
 
-   	this.collidersgroup.forEach(function(obj){
-   		obj.body.allowGravity = false;
-   		obj.body.immovable = true;
-   	})
-  	this.map.setCollisionBetween(0,5000, true, 'Ground');
-  	this.map.setCollisionBetween(0,5000, true, 'Death');
-  	this.map.setCollisionBetween(0,5000, true, 'OverLayer');
-  	this.map.setCollisionBetween(0,5000, true, 'JumpThrough');
+    this.collidersgroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
+    this.map.setCollisionBetween(0,5000, true, 'Ground');
+    this.map.setCollisionBetween(0,5000, true, 'Death');
+    this.map.setCollisionBetween(0,5000, true, 'OverLayer');
+    this.map.setCollisionBetween(0,5000, true, 'JumpThrough');
     this.map.setCollisionBetween(0,5000, true, 'EndLvl');
 
     //Crear player:
     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.spritePlayer, 4);
     this.configure();
 
-  	//Crear cursores
-  	this.timeJump = 0;
-  	this.cursors = this.game.input.keyboard.createCursorKeys();
+    //Crear cursores
+    this.timeJump = 0;
+    this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
 
@@ -107,9 +106,6 @@ var PlayScene = {
     this.keyGroup = this.game.add.group();
     this.keyGroup.enableBody = true;
     this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
-    if (this._keys === 0){  //Solo puede existir una llave por nivel, si se carga la pausa con una llave no generara una nueva.
-        this.keyGroup.create(2240, 192, 'llave_01');
-    }
    
     this.keyGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -120,7 +116,8 @@ var PlayScene = {
     this.doorGroup = this.game.add.group();
     this.doorGroup.enableBody = true;
     this.doorGroup.physicsBodyType = Phaser.Physics.ARCADE;
-    this.doorGroup.create(2496, 160, 'puerta_01');
+    //Añadiendo puertas al grupo segun el nivel
+    //this.doorGroup.create(510, 480, 'puerta_01');
     
     this.doorGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -132,63 +129,46 @@ var PlayScene = {
     this.enemyGroup.enableBody = true;
     this.enemyGroup.physicsBodyType = Phaser.Physics.ARCADE;
 
-   	//Crear enemigos segun nivel
+    //Crear enemigos segun nivel
     this._enemy = [];
-    this._enemy.push(new entities.Enemy(0,this.game,320,704));
-    this._enemy.push(new entities.Enemy(0,this.game,2240,736));
+    /*
+    this._enemy.push(new entities.Enemy (0,this.game,544,512));
+    this._enemy.push(new entities.Enemy (1,this.game, 928,512));
+    this._enemy.push(new entities.Enemy (2,this.game, 1952,288));
+    this._enemy.push(new entities.Enemy (3,this.game, 2016,288)); 
+    this._enemy.push(new entities.Enemy (4,this.game, 2368,512)); 
+    this._enemy.push(new entities.Enemy (5,this.game, 2432,512)); 
+    this._enemy.push(new entities.Enemy (6,this.game, 3168,512)); 
+    this._enemy.push(new entities.Enemy (7,this.game, 3232,512)); 
+    this._enemy.push(new entities.Enemy (8,this.game, 3296,512)); 
+    this._enemy.push(new entities.Enemy (9,this.game, 3360,512)); 
+    this._enemy.push(new entities.Enemy (10,this.game, 4800,512));
+    this._enemy.push(new entities.Enemy (11,this.game, 4832,512));    
+    */
     for (var i = 0; i < this._enemy.length; i++){
-    	this.enemyGroup.add(this._enemy[i]);
+      this.enemyGroup.add(this._enemy[i]);
     }
    
     this.enemyGroup.forEach(function(obj){
       obj.body.immovable = true;
     })
-        
-    //Crear Cañones
-    /*
-    this.cannonGroup = this.game.add.group();
-    this._cannons =[];
-    this._cannons.push(new entities.Cannon(0,this.game, 94, 992));  //nivel1
-    this._cannons.push(new entities.Cannon(0,this.game, 608, 1248, Direction.LOW)); //nivel1
-    for (var i = 0; i < this._cannons.length; i++){
-    	this.cannonGroup.add(this._cannons[i]);
-    }
-
-    //Crear balas
-    this.bulletTime = 4;
-    this.bulletGroup = this.game.add.group();
-    this.bulletGroup.enableBody = true;
-    this.bulletGroup.physicsBodyType = Phaser.Physics.ARCADE;
-    this.bulletGroup.createMultiple (20, 'bullet_01');
-    this.bulletGroup.setAll('outOfBoundsKill', true);
-    this.bulletGroup.setAll('checkWorldBounds', true);
-    this.bulletGroup.forEach(function(obj){
-      obj.body.allowGravity = false;
-      obj.body.immovable = true;
-    })
-    */
   },
     
     //IS called one per frame.
     update: function () {
       var self=this;
-
-    	//TEXTO DE DEBUG----------------------------------------------------
-
-      this.game.debug.text('Y speed: '+this._player.body.velocity.y, 896, 320);
-      this.game.debug.text('MAX Y Speed: '+this._maxYspeed, 896, 320);
-    	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
-      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);
-      if (this._player.body.velocity.y > this._maxYspeed){
-         console.log('Max Y Speed:'+ this._maxYspeed); 
-         this._maxYspeed = this._player.body.velocity.y;
-         }
-
-    	this.checKPlayerTrigger();
+      //TEXTO DE DEBUG----------------------------------------------------
+      this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
+      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,80);
+      //if (this._player.body.velocity.y > this._maxYspeed) this._maxYspeed = this._player.body.velocity.y;
+      
+      //cambiar la gravedad
+      //this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
+      this.checKPlayerTrigger();
       if (this._player.body.velocity.y > this._ySpeedLimit) this._player.body.velocity.y = this._ySpeedLimit; //Evitar bug omitir colisiones
-    	var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
+      var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
       this.game.physics.arcade.collide(this._player, this.enemyGroup);
-    	this.game.physics.arcade.collide(this.enemyGroup, this.groundLayer);
+      this.game.physics.arcade.collide(this.enemyGroup, this.groundLayer);
       
       if (this._keys <= 0) this.game.physics.arcade.collide(this._player, this.doorGroup);
         //----------------------------------PLAYER-----------------
@@ -203,11 +183,11 @@ var PlayScene = {
 
         //this.jumpButton.onDown.add(this.jumpCheck, this);
         if (this.jumpButton.isDown && this._player.body.onFloor()){
-        	this.timeJump++;
+          this.timeJump++;
         } 
         if(!this.jumpButton.isDown && this.timeJump != 0){
-        	this.jumpCheck();
-        	this.timeJump= 0;
+          this.jumpCheck();
+          this.timeJump= 0;
         }
 
         //Frames de invencibilidad
@@ -232,13 +212,6 @@ var PlayScene = {
             obj.move(self.collidersgroup);
         })
         
-        //-----------------------------------CANNONS------------------------------
-          if(this.game.time.now > this.bulletTime){
-          	this.cannonGroup.forEach(function(obj){
-            obj.shoot(self.bulletGroup);
-        })
-            this.bulletTime = this.game.time.now + 2000;
-          }
         //-----------------------------------PUERTAS Y LLAVES-------------------------------
         this.checkKey();
         if (this._keys > 0) this.checkDoor();
@@ -248,8 +221,8 @@ var PlayScene = {
     },
 
     collisionWithJumpThrough: function(){
-    	var self = this;
-    	self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
+      var self = this;
+      self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
     },
     checkKey: function(){
       var self = this;
@@ -268,42 +241,42 @@ var PlayScene = {
       })
     },
     checKPlayerTrigger: function(){
-    	//ZONAS SECRETAS
-    	if(this.game.physics.arcade.collide(this._player,this.overLayer.layer)){
-    		this.overLayer.vis= false;
-    		this.overLayer.layer.kill();
-    	}
-    	else {
-    		var self = this; 
-    		this.collidersgroup.forEach(function(item){
-    			if(!self.overLayer.vis && self._player.overlap(item)){
-    				self.overLayer.layer.revive();
-       			}
-       			else if (self._player.overlap(item)){
-       				self.collisionWithJumpThrough();			
-       				
-       			}
-    		})
-    	}
+      //ZONAS SECRETAS
+      if(this.game.physics.arcade.collide(this._player,this.overLayer.layer)){
+        this.overLayer.vis= false;
+        this.overLayer.layer.kill();
+      }
+      else {
+        var self = this; 
+        this.collidersgroup.forEach(function(item){
+          if(!self.overLayer.vis && self._player.overlap(item)){
+            self.overLayer.layer.revive();
+            }
+            else if (self._player.overlap(item)){
+              self.collisionWithJumpThrough();      
+              
+            }
+        })
+      }
     },
     pauseMenu: function (){
       //Memorizamos el estado actual
       //Escena
       this._maxYspeed = 0;
       //Cambio escena
-      this._resume= true;
-    	this.destroy();
+      this._resume = true;
+      this.destroy();
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
       this.game.state.start('menu_in_game', true, false, this.level);
     },
     jumpCheck: function (){
-    	var jump = this._player._jumpSpeed*(this.timeJump/1.5);
-    	if( jump < this._player._maxJumpSpeed){
-    		this._player.body.velocity.y=0;
-    		this._player.jump(this._player._maxJumpSpeed);
-    	}
-    	else this._player.jump(jump);
+      var jump = this._player._jumpSpeed*this.timeJump;
+      if( jump < this._player._maxJumpSpeed){
+        this._player.body.velocity.y=0;
+        this._player.jump(this._player._maxJumpSpeed);
+      }
+      else this._player.jump(jump);
     },
     canJump: function(collisionWithTilemap){
         return this.isStanding() && collisionWithTilemap || this._jamping;
@@ -321,18 +294,11 @@ var PlayScene = {
         this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
-        this.game.state.start('endLevel', true, false, this.level);
+        this.game.state.start('end_game', true, false); //Es el último nivel y llama a la pantalla de fin de juego.
     },
     
     checkPlayerDeath: function(){
         self = this;
-        /*
-        //Collision with bullet
-        this.bulletGroup.forEach(function(obj){
-          if(self.game.physics.arcade.collide(self._player, obj)){
-          obj.destroy();
-          self._player.hit();}
-        })*/
         //Death Layer
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
@@ -369,7 +335,7 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        this.game.world.setBounds(0,0, 2560 , 800);
+        this.game.world.setBounds(0, 0, 800, 600);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);        
         this.game.physics.arcade.gravity.y = 2000;  
@@ -381,17 +347,17 @@ var PlayScene = {
     //move the player
     movement: function(incrementoX){
          if (this.cursors.left.isDown){
-   		 	this._player.animations.play('walkL', 8, true);
-   		 	this._direction= Direction.LEFT;
-    		this._player.moveLeft(incrementoX);
+        this._player.animations.play('walkL', 8, true);
+        this._direction= Direction.LEFT;
+        this._player.moveLeft(incrementoX);
          }
         else if (this.cursors.right.isDown) {
-        	this._player.animations.play('walkR', 8, true);
-        	this._direction= Direction.RIGHT;
-        	this._player.moveRight(incrementoX);
+          this._player.animations.play('walkR', 8, true);
+          this._direction= Direction.RIGHT;
+          this._player.moveRight(incrementoX);
         }
         else{
-        	this._player.animations.play('breath',2,true);        	
+          this._player.animations.play('breath',2,true);          
         } 
     },
     

@@ -4,6 +4,9 @@
 var Level_01 = require('./level_01.js');
 var Level_02 = require('./level_02.js');
 var Level_03 = require('./level_03.js');
+var Level_04 = require('./level_04.js');
+var EndGame = require('./end_game_level.js');
+var Credits = require('./credits.js');
 var JumpTestLevel = require('./jumpTestLevel.js');
 var GameOver = require('./gameover_scene.js');
 var MenuScene = require('./menu_scene.js');
@@ -45,6 +48,8 @@ var PreloaderScene = {
        this.game.load.tilemap('map_01', 'images/lvl_01.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.tilemap('map_02', 'images/lvl_02.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.tilemap('map_03', 'images/lvl_03.json', null, Phaser.Tilemap.TILED_JSON);
+       this.game.load.tilemap('map_04', 'images/lvl_04.json', null, Phaser.Tilemap.TILED_JSON);
+       this.game.load.tilemap('end_game_level', 'images/end_game_level.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.tilemap('jumpTestLevel', 'images/JumpTestLevel.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.image('tiles', 'images/TileSet.png');
        this.game.load.spritesheet('player_01', 'images/player_01.png',28,28,11);
@@ -60,6 +65,7 @@ var PreloaderScene = {
        this.game.load.image('trigger', 'images/trigger.png');
        this.game.load.image('winBG', 'images/win.png');
        this.game.load.image('gameOverBG', 'images/gameover.png');
+       this.game.load.image('creditsBG', 'images/creditsBG.png');
        //this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
@@ -114,10 +120,13 @@ function init (){
  game.state.add('level_01', Level_01);
  game.state.add('level_02', Level_02);
  game.state.add('level_03', Level_03);
+ game.state.add('level_04', Level_04);
+ game.state.add('end_game', EndGame);
  game.state.add('jumpTestLevel', JumpTestLevel);
  game.state.add('menu_in_game',MenuInGame);
  game.state.add ('gameOver', GameOver);
  game.state.add('endLevel', EndLevel);
+ game.state.add('credits', Credits);
 
 //TODO 1.3 iniciar el state 'boot'. 
 game.state.start('boot');

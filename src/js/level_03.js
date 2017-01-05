@@ -10,8 +10,8 @@ var entities = require('./entities.js');
 //Scene de juego.
 var PlayScene = {
     gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 480,
-      posY: 192,
+      posX: 96,
+      posY: 512,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
@@ -50,8 +50,8 @@ var PlayScene = {
 
     }
     else this.gameState= {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 480,
-      posY: 192,
+      posX: 96,
+      posY: 512,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
@@ -117,7 +117,7 @@ var PlayScene = {
     this.doorGroup.enableBody = true;
     this.doorGroup.physicsBodyType = Phaser.Physics.ARCADE;
     //Añadiendo puertas al grupo segun el nivel
-    this.doorGroup.create(510, 480, 'puerta_01');
+    //this.doorGroup.create(510, 480, 'puerta_01');
     
     this.doorGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -346,8 +346,19 @@ var PlayScene = {
     },
     //move the player
     movement: function(incrementoX){
-         if (this.cursors.left.isDown) this._player.moveLeft(incrementoX);
-        else if (this.cursors.right.isDown) this._player.moveRight(incrementoX);
+         if (this.cursors.left.isDown){
+        this._player.animations.play('walkL', 8, true);
+        this._direction= Direction.LEFT;
+        this._player.moveLeft(incrementoX);
+         }
+        else if (this.cursors.right.isDown) {
+          this._player.animations.play('walkR', 8, true);
+          this._direction= Direction.RIGHT;
+          this._player.moveRight(incrementoX);
+        }
+        else{
+          this._player.animations.play('breath',2,true);          
+        } 
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.

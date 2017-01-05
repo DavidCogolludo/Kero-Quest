@@ -50,7 +50,7 @@ var MenuLevel = {
                                                this.actionOnClick4, 
                                                this, 2, 1, 0);
         buttonLvl4.anchor.set(0.5);
-        var textLvl4 = this.game.add.text(0, 0, "JumpTestLevel");
+        var textLvl4 = this.game.add.text(0, 0, "Level_04");
         textLvl4.font = 'Sniglet';
         textLvl4.anchor.set(0.5);
         buttonLvl4.addChild(textLvl4);
@@ -74,7 +74,7 @@ var MenuLevel = {
     },
 
     actionOnClick4: function(){
-        aux2 = 'jumpTestLevel';
+        aux2 = 'level_04';
         this.initLevel();
     },
 
