@@ -156,7 +156,7 @@ var PlayScene = {
     update: function () {
       var self=this;
       //TEXTO DE DEBUG----------------------------------------------------
-      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-400, 80);
+      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-800, 80);
       this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
       this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
       this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);

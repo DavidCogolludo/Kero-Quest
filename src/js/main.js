@@ -47,9 +47,9 @@ var PreloaderScene = {
        this.game.load.tilemap('map_03', 'images/lvl_03.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.tilemap('jumpTestLevel', 'images/JumpTestLevel.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.image('tiles', 'images/TileSet.png');
-       this.game.load.image('player_01', 'images/player.png');
-       this.game.load.image('player_02', 'images/player2.png');
-       this.game.load.image('player_03', 'images/player3.png');
+       this.game.load.spritesheet('player_01', 'images/player_01.png',28,28,11);
+       this.game.load.spritesheet('player_02', 'images/player_02.png',28,28,11);
+       this.game.load.spritesheet('player_03', 'images/player_03.png',28,28,11);
        this.game.load.image('enemy_01', 'images/enemy.png');
        this.game.load.image('cannon_01', 'images/cannon.png');
        this.game.load.image('bullet_01', 'images/bullet.png');
@@ -71,7 +71,6 @@ var PreloaderScene = {
   },
     
     
-     //TODO 2.2b function loadComplete()
   loadComplete: function(){
     console.log("dentro");
 		//this._ready = true;

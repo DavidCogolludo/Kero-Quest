@@ -3,6 +3,12 @@ var Direction = {'LEFT':0, 'RIGHT':1, 'TOP':2, 'LOW':3}
 //PLAYER---------------------------------------------------------------------
 function Player (game, x,y, sprite, life){
   this._player = game.add.sprite(x,y,sprite);
+
+    this._player.animations.add('breath',[0,1,2,3]);
+    this._player.animations.add('walkR',[3,4,5,6]);
+    this._player.animations.add('walkL',[10,9,8,7]);
+
+
   this._player.life = life || 5;
   this._player.invincible = false;
   this._player.timeRecover=80;
@@ -32,7 +38,7 @@ function Player (game, x,y, sprite, life){
       this.tint = 0xffffff;
       this.invincible = false;
     }
-    this._player.moveLeft = function(x){ this.body.velocity.x = -x; }
+    this._player.moveLeft = function(x){this.body.velocity.x = -x; }
     this._player.moveRight = function(x){ this.body.velocity.x = x; }
 
     return this._player;

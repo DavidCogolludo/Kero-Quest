@@ -138,6 +138,7 @@ var PlayScene = {
     this.enemyGroup.forEach(function(obj){
       obj.body.immovable = true;
     })
+        
     //Crear Cañones
     this.cannonGroup = this.game.add.group();
     this._cannons =[];
@@ -164,6 +165,7 @@ var PlayScene = {
     //IS called one per frame.
     update: function () {
       var self=this;
+
     	//TEXTO DE DEBUG----------------------------------------------------
       //this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-400, 80);
       //this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
@@ -287,7 +289,7 @@ var PlayScene = {
       this.game.state.start('menu_in_game', true, false, this.level);
     },
     jumpCheck: function (){
-    	var jump = this._player._jumpSpeed*this.timeJump;
+    	var jump = this._player._jumpSpeed*(this.timeJump/1.5);
     	if( jump < this._player._maxJumpSpeed){
     		this._player.body.velocity.y=0;
     		this._player.jump(this._player._maxJumpSpeed);
@@ -368,8 +370,19 @@ var PlayScene = {
     },
     //move the player
     movement: function(incrementoX){
-         if (this.cursors.left.isDown) this._player.moveLeft(incrementoX);
-        else if (this.cursors.right.isDown) this._player.moveRight(incrementoX);
+         if (this.cursors.left.isDown){
+   		 	this._player.animations.play('walkL', 8, true);
+   		 	this._direction= Direction.LEFT;
+    		this._player.moveLeft(incrementoX);
+         }
+        else if (this.cursors.right.isDown) {
+        	this._player.animations.play('walkR', 8, true);
+        	this._direction= Direction.RIGHT;
+        	this._player.moveRight(incrementoX);
+        }
+        else{
+        	this._player.animations.play('breath',2,true);        	
+        } 
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.

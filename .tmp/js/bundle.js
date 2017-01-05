@@ -52,6 +52,12 @@ var Direction = {'LEFT':0, 'RIGHT':1, 'TOP':2, 'LOW':3}
 //PLAYER---------------------------------------------------------------------
 function Player (game, x,y, sprite, life){
   this._player = game.add.sprite(x,y,sprite);
+
+    this._player.animations.add('breath',[0,1,2,3]);
+    this._player.animations.add('walkR',[3,4,5,6]);
+    this._player.animations.add('walkL',[10,9,8,7]);
+
+
   this._player.life = life || 5;
   this._player.invincible = false;
   this._player.timeRecover=80;
@@ -81,7 +87,7 @@ function Player (game, x,y, sprite, life){
       this.tint = 0xffffff;
       this.invincible = false;
     }
-    this._player.moveLeft = function(x){ this.body.velocity.x = -x; }
+    this._player.moveLeft = function(x){this.body.velocity.x = -x; }
     this._player.moveRight = function(x){ this.body.velocity.x = x; }
 
     return this._player;
@@ -519,12 +525,7 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        if (this.level === "JumpTestLevel") this.game.world.setBounds(0,0, 768, 736);
-        else if (this.level === "level_03") this.game.world.setBounds(0, 0, 5728 , 640);
-        else if (this.level === "level_02") this.game.world.setBounds(0, 0, 960, 640); 
-        else if (this.level === "level_01") this.game.world.setBounds(0,0, 864, 1760);
-        else this.game.world.setBounds (0,0,800,600);
-
+        this.game.world.setBounds(0,0, 768, 736);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);        
         this.game.physics.arcade.gravity.y = 2000;  
@@ -690,6 +691,7 @@ var PlayScene = {
     this.enemyGroup.forEach(function(obj){
       obj.body.immovable = true;
     })
+        
     //Crear Cañones
     this.cannonGroup = this.game.add.group();
     this._cannons =[];
@@ -716,9 +718,10 @@ var PlayScene = {
     //IS called one per frame.
     update: function () {
       var self=this;
+
     	//TEXTO DE DEBUG----------------------------------------------------
-      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-400, 80);
-      this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
+      //this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-400, 80);
+      //this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
     	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
       this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);
       if (this._player.body.velocity.y > this._maxYspeed) this._maxYspeed = this._player.body.velocity.y;
@@ -839,7 +842,7 @@ var PlayScene = {
       this.game.state.start('menu_in_game', true, false, this.level);
     },
     jumpCheck: function (){
-    	var jump = this._player._jumpSpeed*this.timeJump;
+    	var jump = this._player._jumpSpeed*(this.timeJump/1.5);
     	if( jump < this._player._maxJumpSpeed){
     		this._player.body.velocity.y=0;
     		this._player.jump(this._player._maxJumpSpeed);
@@ -909,12 +912,7 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        if (this.level === "JumpTestLevel") this.game.world.setBounds(0,0, 768, 736);
-        else if (this.level === "level_03") this.game.world.setBounds(0, 0, 5728 , 640);
-        else if (this.level === "level_02") this.game.world.setBounds(0, 0, 960, 640); 
-        else if (this.level === "level_01") this.game.world.setBounds(0,0, 864, 1760);
-        else this.game.world.setBounds (0,0,800,600);
-
+        this.game.world.setBounds(0,0, 864, 1760);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);        
         this.game.physics.arcade.gravity.y = 2000;  
@@ -925,8 +923,19 @@ var PlayScene = {
     },
     //move the player
     movement: function(incrementoX){
-         if (this.cursors.left.isDown) this._player.moveLeft(incrementoX);
-        else if (this.cursors.right.isDown) this._player.moveRight(incrementoX);
+         if (this.cursors.left.isDown){
+   		 	this._player.animations.play('walkL', 8, true);
+   		 	this._direction= Direction.LEFT;
+    		this._player.moveLeft(incrementoX);
+         }
+        else if (this.cursors.right.isDown) {
+        	this._player.animations.play('walkR', 8, true);
+        	this._direction= Direction.RIGHT;
+        	this._player.moveRight(incrementoX);
+        }
+        else{
+        	this._player.animations.play('breath',2,true);        	
+        } 
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
@@ -1112,8 +1121,8 @@ var PlayScene = {
     update: function () {
       var self=this;
       //TEXTO DE DEBUG----------------------------------------------------
-      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-400, 80);
-      this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
+      //this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-400, 80);
+      //this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
       this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
       this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);
       if (this._player.body.velocity.y > this._maxYspeed) this._maxYspeed = this._player.body.velocity.y;
@@ -1246,7 +1255,6 @@ var PlayScene = {
     },
     
     onPlayerDeath: function(){
-        //TODO 6 Carga de 'gameOver';
         this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
@@ -1304,12 +1312,7 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        if (this.level === "JumpTestLevel") this.game.world.setBounds(0,0, 768, 736);
-        else if (this.level === "level_03") this.game.world.setBounds(0, 0, 5728 , 640);
-        else if (this.level === "level_02") this.game.world.setBounds(0, 0, 960, 640); 
-        else if (this.level === "level_01") this.game.world.setBounds(0,0, 864, 1760);
-        else this.game.world.setBounds (0,0,800,600);
-
+        this.game.world.setBounds(0, 0, 960, 640); 
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);        
         this.game.physics.arcade.gravity.y = 2000;  
@@ -1468,7 +1471,7 @@ var PlayScene = {
 
     //Crear enemigos segun nivel
     this._enemy = [];
-    this._enemy.push(new entities.Enemy(0,this.game,544,512));
+    this._enemy.push(new entities.Enemy (0,this.game,544,512));
     this._enemy.push(new entities.Enemy (1,this.game, 928,512));
     this._enemy.push(new entities.Enemy (2,this.game, 1952,288));
     this._enemy.push(new entities.Enemy (3,this.game, 2016,288)); 
@@ -1493,7 +1496,7 @@ var PlayScene = {
     update: function () {
       var self=this;
       //TEXTO DE DEBUG----------------------------------------------------
-      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-400, 80);
+      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-800, 80);
       this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
       this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
       this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);
@@ -1672,12 +1675,7 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        if (this.level === "JumpTestLevel") this.game.world.setBounds(0,0, 768, 736);
-        else if (this.level === "level_03") this.game.world.setBounds(0, 0, 5728 , 640);
-        else if (this.level === "level_02") this.game.world.setBounds(0, 0, 960, 640); 
-        else if (this.level === "level_01") this.game.world.setBounds(0,0, 864, 1760);
-        else this.game.world.setBounds (0,0,800,600);
-
+        this.game.world.setBounds(0, 0, 5728 , 640);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);        
         this.game.physics.arcade.gravity.y = 2000;  
@@ -1752,9 +1750,9 @@ var PreloaderScene = {
        this.game.load.tilemap('map_03', 'images/lvl_03.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.tilemap('jumpTestLevel', 'images/JumpTestLevel.json', null, Phaser.Tilemap.TILED_JSON);
        this.game.load.image('tiles', 'images/TileSet.png');
-       this.game.load.image('player_01', 'images/player.png');
-       this.game.load.image('player_02', 'images/player2.png');
-       this.game.load.image('player_03', 'images/player3.png');
+       this.game.load.spritesheet('player_01', 'images/player_01.png',28,28,11);
+       this.game.load.spritesheet('player_02', 'images/player_02.png',28,28,11);
+       this.game.load.spritesheet('player_03', 'images/player_03.png',28,28,11);
        this.game.load.image('enemy_01', 'images/enemy.png');
        this.game.load.image('cannon_01', 'images/cannon.png');
        this.game.load.image('bullet_01', 'images/bullet.png');
@@ -1776,7 +1774,6 @@ var PreloaderScene = {
   },
     
     
-     //TODO 2.2b function loadComplete()
   loadComplete: function(){
     console.log("dentro");
 		//this._ready = true;
