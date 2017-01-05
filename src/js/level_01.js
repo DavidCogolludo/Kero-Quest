@@ -71,10 +71,6 @@ var PlayScene = {
   	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
   	this.groundLayer = this.map.createLayer('Ground');
   	this.deathLayer = this.map.createLayer('Death');
-  	this.overLayer = {
-  		layer: this.map.createLayer('OverLayer'),
-  		vis: true,
-  	};
     this.endLayer = this.map.createLayer('EndLvl');
 
     //Colisiones
@@ -108,7 +104,7 @@ var PlayScene = {
     this.keyGroup.enableBody = true;
     this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
     if (this._keys === 0){  //Solo puede existir una llave por nivel, si se carga la pausa con una llave no generara una nueva.
-        this.keyGroup.create(2240, 192, 'llave_01');
+        this.keyGroup.create(96, 608, 'llave_01');
     }
    
     this.keyGroup.forEach(function(obj){
@@ -143,13 +139,18 @@ var PlayScene = {
     this.enemyGroup.forEach(function(obj){
       obj.body.immovable = true;
     })
-        
+    
+    this.overLayer = {
+      layer: this.map.createLayer('OverLayer'),
+      vis: true,
+    };
     //Crear Cañones
-    /*
     this.cannonGroup = this.game.add.group();
     this._cannons =[];
-    this._cannons.push(new entities.Cannon(0,this.game, 94, 992));  //nivel1
-    this._cannons.push(new entities.Cannon(0,this.game, 608, 1248, Direction.LOW)); //nivel1
+    this._cannons.push(new entities.Cannon(0,this.game, 736, 576,Direction.LOW));  //nivel1
+    this._cannons.push(new entities.Cannon(1,this.game, 1152, 704, Direction.LOW));
+    this._cannons.push(new entities.Cannon(2,this.game, 1245, 704, Direction.LOW));
+    this._cannons.push(new entities.Cannon(3,this.game, 1344, 704, Direction.LOW));
     for (var i = 0; i < this._cannons.length; i++){
     	this.cannonGroup.add(this._cannons[i]);
     }
@@ -166,7 +167,6 @@ var PlayScene = {
       obj.body.allowGravity = false;
       obj.body.immovable = true;
     })
-    */
   },
     
     //IS called one per frame.
@@ -179,10 +179,6 @@ var PlayScene = {
       this.game.debug.text('MAX Y Speed: '+this._maxYspeed, 896, 320);
     	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
       this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);
-      if (this._player.body.velocity.y > this._maxYspeed){
-         console.log('Max Y Speed:'+ this._maxYspeed); 
-         this._maxYspeed = this._player.body.velocity.y;
-         }
 
     	this.checKPlayerTrigger();
       if (this._player.body.velocity.y > this._ySpeedLimit) this._player.body.velocity.y = this._ySpeedLimit; //Evitar bug omitir colisiones
@@ -326,13 +322,13 @@ var PlayScene = {
     
     checkPlayerDeath: function(){
         self = this;
-        /*
+        
         //Collision with bullet
         this.bulletGroup.forEach(function(obj){
           if(self.game.physics.arcade.collide(self._player, obj)){
           obj.destroy();
           self._player.hit();}
-        })*/
+        })
         //Death Layer
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
