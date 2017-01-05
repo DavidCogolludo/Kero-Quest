@@ -48,7 +48,8 @@ Enemy.prototype.constructor = Enemy;
     
 //CAÑONES--------------------------------------------------------------------- 
 function Cannon (index, game, x,y, dir){
-  var direction = dir || Direction.RIGHT;
+  var direction = dir;
+  if(dir === undefined) direction = Direction.RIGHT;
   this.cannon = game.add.sprite(x,y, 'cannon_01');
   switch (direction){
     case 0: this.cannon.anchor.set(1);
