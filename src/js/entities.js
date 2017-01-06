@@ -20,7 +20,7 @@ function Player (game, x,y, sprite, life){
   this.jumpTimer = 0;
 
   this._player.jump = function(y){
-          this.body.velocity.y = y;
+          if(this.body.onFloor())this.body.velocity.y = y;
   }
     this._player.hit = function(){
       if (this.body.velocity.x > 0) this.hitDir = 1;

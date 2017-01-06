@@ -332,7 +332,7 @@ var PlayScene = {
     
     checkPlayerDeath: function(){
         self = this;
-        /*//Collision with bullet
+        //Collision with bullet
         this.bulletGroup.forEach(function(obj){
           if(self.game.physics.arcade.collide(self._player, obj)){
           obj.destroy();
@@ -342,7 +342,7 @@ var PlayScene = {
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
         //No HP left
-        if (this._player.life<1) this.onPlayerDeath();*/
+        if (this._player.life<1) this.onPlayerDeath();
     },
 
     checkPlayerEnd: function(){

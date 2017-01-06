@@ -499,7 +499,7 @@ function Player (game, x,y, sprite, life){
   this.jumpTimer = 0;
 
   this._player.jump = function(y){
-          this.body.velocity.y = y;
+          if(this.body.onFloor())this.body.velocity.y = y;
   }
     this._player.hit = function(){
       if (this.body.velocity.x > 0) this.hitDir = 1;
@@ -2126,7 +2126,7 @@ var PlayScene = {
     
     checkPlayerDeath: function(){
         self = this;
-        /*//Collision with bullet
+        //Collision with bullet
         this.bulletGroup.forEach(function(obj){
           if(self.game.physics.arcade.collide(self._player, obj)){
           obj.destroy();
@@ -2136,7 +2136,7 @@ var PlayScene = {
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
         //No HP left
-        if (this._player.life<1) this.onPlayerDeath();*/
+        if (this._player.life<1) this.onPlayerDeath();
     },
 
     checkPlayerEnd: function(){
@@ -2217,8 +2217,8 @@ var entities = require('./entities.js');
 //Scene de juego.
 var PlayScene = {
     gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 480,
-      posY: 192,
+      posX: 32,
+      posY: 768,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
@@ -2257,8 +2257,8 @@ var PlayScene = {
 
     }
     else this.gameState= {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 480,
-      posY: 192,
+      posX: 32,
+      posY: 768,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
@@ -2277,10 +2277,7 @@ var PlayScene = {
     this.jumpThroughLayer = this.map.createLayer('JumpThrough');
     this.groundLayer = this.map.createLayer('Ground');
     this.deathLayer = this.map.createLayer('Death');
-    this.overLayer = {
-      layer: this.map.createLayer('OverLayer'),
-      vis: true,
-    };
+   
     this.endLayer = this.map.createLayer('EndLvl');
 
     //Colisiones
@@ -2313,7 +2310,9 @@ var PlayScene = {
     this.keyGroup = this.game.add.group();
     this.keyGroup.enableBody = true;
     this.keyGroup.physicsBodyType = Phaser.Physics.ARCADE;
-   
+    if (this._keys === 0){  //Solo puede existir una llave por nivel, si se carga la pausa con una llave no generara una nueva.
+        this.keyGroup.create(2240, 128, 'llave_01');
+    }
     this.keyGroup.forEach(function(obj){
       obj.body.allowGravity = false;
       obj.body.immovable = true;
@@ -2324,7 +2323,7 @@ var PlayScene = {
     this.doorGroup.enableBody = true;
     this.doorGroup.physicsBodyType = Phaser.Physics.ARCADE;
     //Añadiendo puertas al grupo segun el nivel
-    //this.doorGroup.create(510, 480, 'puerta_01');
+    this.doorGroup.create(1472, 896, 'puerta_01');
     
     this.doorGroup.forEach(function(obj){
       obj.body.allowGravity = false;
@@ -2338,20 +2337,18 @@ var PlayScene = {
 
     //Crear enemigos segun nivel
     this._enemy = [];
-    /*
-    this._enemy.push(new entities.Enemy (0,this.game,544,512));
-    this._enemy.push(new entities.Enemy (1,this.game, 928,512));
-    this._enemy.push(new entities.Enemy (2,this.game, 1952,288));
-    this._enemy.push(new entities.Enemy (3,this.game, 2016,288)); 
-    this._enemy.push(new entities.Enemy (4,this.game, 2368,512)); 
-    this._enemy.push(new entities.Enemy (5,this.game, 2432,512)); 
-    this._enemy.push(new entities.Enemy (6,this.game, 3168,512)); 
-    this._enemy.push(new entities.Enemy (7,this.game, 3232,512)); 
-    this._enemy.push(new entities.Enemy (8,this.game, 3296,512)); 
-    this._enemy.push(new entities.Enemy (9,this.game, 3360,512)); 
-    this._enemy.push(new entities.Enemy (10,this.game, 4800,512));
-    this._enemy.push(new entities.Enemy (11,this.game, 4832,512));    
-    */
+    this._enemy.push(new entities.Enemy (0,this.game,544,832));
+    this._enemy.push(new entities.Enemy (1,this.game, 1600,832));
+    this._enemy.push(new entities.Enemy (2,this.game, 2080,608));
+    this._enemy.push(new entities.Enemy (3,this.game, 2336,416)); 
+    this._enemy.push(new entities.Enemy (4,this.game, 2496,608)); 
+    this._enemy.push(new entities.Enemy (5,this.game, 2304,832)); 
+    this._enemy.push(new entities.Enemy (6,this.game, 2816,832)); 
+    this._enemy.push(new entities.Enemy (7,this.game, 2752,288)); 
+    this._enemy.push(new entities.Enemy (8,this.game, 3680,608)); 
+    this._enemy.push(new entities.Enemy (9,this.game, 3616,288)); 
+    this._enemy.push(new entities.Enemy (10,this.game, 4640,512));
+
     for (var i = 0; i < this._enemy.length; i++){
       this.enemyGroup.add(this._enemy[i]);
     }
@@ -2359,6 +2356,36 @@ var PlayScene = {
     this.enemyGroup.forEach(function(obj){
       obj.body.immovable = true;
     })
+    //Crear Cañones
+    this.cannonGroup = this.game.add.group();
+    this._cannons =[];
+    this._cannons.push(new entities.Cannon(0,this.game, 1344, 736, Direction.RIGHT));  //nivel1
+    this._cannons.push(new entities.Cannon(1,this.game, 1312, 736, Direction.LEFT)); //nivel1
+    this._cannons.push(new entities.Cannon(2,this.game, 1888, 800, Direction.LOW));
+    this._cannons.push(new entities.Cannon(3,this.game, 2336, 224, Direction.TOP));
+    this._cannons.push(new entities.Cannon(4,this.game, 4384, 192, Direction.LOW));
+    this._cannons.push(new entities.Cannon(5,this.game, 4544, 192, Direction.LOW));
+    this._cannons.push(new entities.Cannon(6,this.game, 4672, 256, Direction.LOW));
+   for (var i = 0; i < this._cannons.length; i++){
+      this.cannonGroup.add(this._cannons[i]);
+    }
+
+    //Crear balas
+    this.bulletTime = 4;
+    this.bulletGroup = this.game.add.group();
+    this.bulletGroup.enableBody = true;
+    this.bulletGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this.bulletGroup.createMultiple (20, 'bullet_01');
+    this.bulletGroup.setAll('outOfBoundsKill', true);
+    this.bulletGroup.setAll('checkWorldBounds', true);
+    this.bulletGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
+     this.overLayer = {
+      layer: this.map.createLayer('OverLayer'),
+      vis: true,
+    };
   },
     
     //IS called one per frame.
@@ -2418,7 +2445,13 @@ var PlayScene = {
             obj.detected(self._player);
             obj.move(self.collidersgroup);
         })
-        
+        //-----------------------------------CANNONS------------------------------
+          if(this.game.time.now > this.bulletTime){
+            this.cannonGroup.forEach(function(obj){
+            obj.shoot(self.bulletGroup);
+        })
+            this.bulletTime = this.game.time.now + 2000;
+          }
         //-----------------------------------PUERTAS Y LLAVES-------------------------------
         this.checkKey();
         if (this._keys > 0) this.checkDoor();
@@ -2507,6 +2540,12 @@ var PlayScene = {
     
     checkPlayerDeath: function(){
         self = this;
+         //Collision with bullet
+        this.bulletGroup.forEach(function(obj){
+          if(self.game.physics.arcade.collide(self._player, obj)){
+          obj.destroy();
+          self._player.hit();}
+        })
         //Death Layer
         if(this.game.physics.arcade.collide(this._player, this.deathLayer))
             this.onPlayerDeath();
@@ -2543,7 +2582,7 @@ var PlayScene = {
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
-        this.game.world.setBounds(0, 0, 800, 600);
+        this.game.world.setBounds(0, 0, 6368, 928);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this._player);        
         this.game.physics.arcade.gravity.y = 2000;  
