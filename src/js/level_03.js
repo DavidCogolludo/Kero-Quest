@@ -18,7 +18,7 @@ var PlayScene = {
       },
     _player: {}, //Refinar esto con un creador de player.//player
     playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
-    level: 'level_01',
+    level: 'level_03',
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.

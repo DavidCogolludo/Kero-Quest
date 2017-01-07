@@ -44,11 +44,11 @@ var MenuScene = {
     },
     selectPlayer: function(){
       switch (this._it){
-        case 0: aux = { name: 'player_01', life: 4, jump: -750, speedPower: 1 }; // 1 aumenta la velocidad.
+        case 0: aux = { name: 'player_01', life: 5, jump: -750, speedPower: 1 }; // 1 aumenta la velocidad.
                 break;
-        case 1: aux = { name: 'player_02', life: 5, jump: -800, speedPower: 0 }; // 0 la mantiene.
+        case 1: aux = { name: 'player_02', life: 4, jump: -800, speedPower: 0 }; // 0 la mantiene.
                 break; 
-        case 2: aux = { name: 'player_03', life: 4, jump: -900, speedPower: -1 }; // -1 la decrementa.
+        case 2: aux = { name: 'player_03', life: 5, jump: -900, speedPower: -1 }; // -1 la decrementa.
                 break; 
       }
       console.log(aux);
