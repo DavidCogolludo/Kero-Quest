@@ -504,6 +504,9 @@ function Player (game, x,y, playerInfo){
   this._player.jump = function(y){
           if(this.body.onFloor())this.body.velocity.y = y;
   }
+    this._player.health = function(){
+      this.life++;
+    }
     this._player.hit = function(){
       if (this.body.velocity.x > 0) this.hitDir = 1;
       else if (this.body.velocity.x < 0) this.hitDir = -1;
@@ -1069,6 +1072,20 @@ var PlayScene = {
     //Crear player:
     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
+    //Crear vidas
+    this.lifeGroup = this.game.add.group();
+    this.lifeGroup.enableBody = true;
+    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this._powerLife = [];
+    this._powerLife.push(this.game.add.sprite(4312,320,'powerLife'));
+    for (var i = 0; i < this._powerLife.length; i++){
+      this.lifeGroup.add(this._powerLife[i]);
+    }
+
+    this.lifeGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
 
   	//Crear cursores
   	this.timeJump = 0;
@@ -1193,7 +1210,14 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-        
+        //Comprobar vida 
+        this.lifeGroup.forEach(function(obj){
+          if (obj.overlap(self._player)){
+            self._player.health();
+            obj.destroy();
+          }
+        }) 
+
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY-------------------
         
@@ -1454,7 +1478,21 @@ var PlayScene = {
     //Crear player:
      this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
+   //Crear vidas
+    this.lifeGroup = this.game.add.group();
+    this.lifeGroup.enableBody = true;
+    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this._powerLife = [];
+    this._powerLife.push(this.game.add.sprite(448,480,'powerLife'));
+    this._powerLife.push(this.game.add.sprite(448,0,'powerLife'));
+    for (var i = 0; i < this._powerLife.length; i++){
+      this.lifeGroup.add(this._powerLife[i]);
+    }
 
+    this.lifeGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
     //Crear cursores
     this.timeJump = 0;
     this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -1578,7 +1616,13 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-        
+         //Comprobar vida 
+        this.lifeGroup.forEach(function(obj){
+          if (obj.overlap(self._player)){
+            self._player.health();
+            obj.destroy();
+          }
+        }) 
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY-------------------
         
@@ -1844,7 +1888,21 @@ var PlayScene = {
     //Crear player:
     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
+//Crear vidas
+    this.lifeGroup = this.game.add.group();
+    this.lifeGroup.enableBody = true;
+    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this._powerLife = [];
+    this._powerLife.push(this.game.add.sprite(2080,64,'powerLife'));
+    this._powerLife.push(this.game.add.sprite(3392,384,'powerLife'));
+    for (var i = 0; i < this._powerLife.length; i++){
+      this.lifeGroup.add(this._powerLife[i]);
+    }
 
+    this.lifeGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
     //Crear cursores
     this.timeJump = 0;
     this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -1974,7 +2032,13 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-        
+         //Comprobar vida 
+        this.lifeGroup.forEach(function(obj){
+          if (obj.overlap(self._player)){
+            self._player.health();
+            obj.destroy();
+          }
+        }) 
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY-------------------
         
@@ -2236,7 +2300,22 @@ var PlayScene = {
     //Crear player:
      this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
+//Crear vidas
+    this.lifeGroup = this.game.add.group();
+    this.lifeGroup.enableBody = true;
+    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this._powerLife = [];
+    this._powerLife.push(this.game.add.sprite(2144,128,'powerLife'));
+    this._powerLife.push(this.game.add.sprite(2752,160,'powerLife'));
+   this._powerLife.push(this.game.add.sprite(3616,288,'powerLife'));
+    for (var i = 0; i < this._powerLife.length; i++){
+      this.lifeGroup.add(this._powerLife[i]);
+    }
 
+    this.lifeGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
     //Crear cursores
     this.timeJump = 0;
     this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -2372,7 +2451,13 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-        
+         //Comprobar vida 
+        this.lifeGroup.forEach(function(obj){
+          if (obj.overlap(self._player)){
+            self._player.health();
+            obj.destroy();
+          }
+        }) 
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY-------------------
         
@@ -2599,6 +2684,7 @@ var PreloaderScene = {
        this.game.load.image('player_info_01', 'images/player_info_01.png');
        this.game.load.image('player_info_02', 'images/player_info_02.png');
        this.game.load.image('player_info_03', 'images/player_info_03.png');
+       this.game.load.image('powerLife', 'images/life.png');
        this.game.load.image('enemy_01', 'images/enemy.png');
        this.game.load.image('cannon_01', 'images/cannon.png');
        this.game.load.image('bullet_01', 'images/bullet.png');
@@ -2745,12 +2831,9 @@ var MenuLevel = {
       aux = selection;
     },
     create: function () {
-        /*
-        var bg = this.game.add.sprite(this.game.world.centerX, 
-                                        this.game.world.centerY, 
-                                        'background');
-        bg.anchor.setTo(0.5, 0.5);
-        */
+       var selectText = this.game.add.text(400, 100, "Select the level");
+       selectText.fill = '#43d637';
+       selectText.anchor.set(0.5);
         var buttonLvl1 = this.game.add.button(this.game.world.centerX, 
                                                this.game.world.centerY - 100, 
                                                'button', 
@@ -2907,7 +2990,6 @@ var MenuScene = {
         case 2: aux = { name: 'player_03', life: 5, jump: -900, speedPower: -1 }; // -1 la decrementa.
                 break; 
       }
-      console.log(aux);
       this.game.state.start('level_select', true, false, aux);
     },
     next: function(){

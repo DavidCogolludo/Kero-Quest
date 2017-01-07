@@ -25,6 +25,9 @@ function Player (game, x,y, playerInfo){
   this._player.jump = function(y){
           if(this.body.onFloor())this.body.velocity.y = y;
   }
+    this._player.health = function(){
+      this.life++;
+    }
     this._player.hit = function(){
       if (this.body.velocity.x > 0) this.hitDir = 1;
       else if (this.body.velocity.x < 0) this.hitDir = -1;

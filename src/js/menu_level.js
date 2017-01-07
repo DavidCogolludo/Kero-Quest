@@ -5,12 +5,9 @@ var MenuLevel = {
       aux = selection;
     },
     create: function () {
-        /*
-        var bg = this.game.add.sprite(this.game.world.centerX, 
-                                        this.game.world.centerY, 
-                                        'background');
-        bg.anchor.setTo(0.5, 0.5);
-        */
+       var selectText = this.game.add.text(400, 100, "Select the level");
+       selectText.fill = '#43d637';
+       selectText.anchor.set(0.5);
         var buttonLvl1 = this.game.add.button(this.game.world.centerX, 
                                                this.game.world.centerY - 100, 
                                                'button', 

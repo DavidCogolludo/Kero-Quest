@@ -51,7 +51,6 @@ var MenuScene = {
         case 2: aux = { name: 'player_03', life: 5, jump: -900, speedPower: -1 }; // -1 la decrementa.
                 break; 
       }
-      console.log(aux);
       this.game.state.start('level_select', true, false, aux);
     },
     next: function(){

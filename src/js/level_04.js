@@ -93,7 +93,22 @@ var PlayScene = {
     //Crear player:
      this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
+//Crear vidas
+    this.lifeGroup = this.game.add.group();
+    this.lifeGroup.enableBody = true;
+    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    this._powerLife = [];
+    this._powerLife.push(this.game.add.sprite(2144,128,'powerLife'));
+    this._powerLife.push(this.game.add.sprite(2752,160,'powerLife'));
+   this._powerLife.push(this.game.add.sprite(3616,288,'powerLife'));
+    for (var i = 0; i < this._powerLife.length; i++){
+      this.lifeGroup.add(this._powerLife[i]);
+    }
 
+    this.lifeGroup.forEach(function(obj){
+      obj.body.allowGravity = false;
+      obj.body.immovable = true;
+    })
     //Crear cursores
     this.timeJump = 0;
     this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -229,7 +244,13 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-        
+         //Comprobar vida 
+        this.lifeGroup.forEach(function(obj){
+          if (obj.overlap(self._player)){
+            self._player.health();
+            obj.destroy();
+          }
+        }) 
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY-------------------
         
