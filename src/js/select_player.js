@@ -2,20 +2,22 @@ var MenuScene = {
   player:'',
   cont: 0,
     create: function () {
-      var goText = this.game.add.text(400, 100, "Select the player");
-      goText.fill = '#43d637';
-      goText.anchor.set(0.5);
-      this.flechaDer = this.game.add.sprite(this.game.world.centerX+100, this.game.world.centerY,'flechaDer');
-      this.flechaIz = this.game.add.sprite(this.game.world.centerX-100, this.game.world.centerY,'flechaIz');
-      this.flechaIz.scale.set(2.5);
+       this.game.stage.backgroundColor = "#4488AA";
+      var selectText = this.game.add.text(400, 100, "Select the player");
+      selectText.fill = '#43d637';
+      selectText.anchor.set(0.5);
+      var auxText = this.game.add.text(400, 500, "Press INTRO to select");
+      auxText.fill = '#43d637';
+      auxText.anchor.set(0.5);
+      this.flechaDer = this.game.add.sprite(this.game.world.centerX+300, this.game.world.centerY,'flechaDer');
+      this.flechaIz = this.game.add.sprite(this.game.world.centerX-300, this.game.world.centerY,'flechaIz');
       this.flechaIz.anchor.set(0.5);
-      this.flechaDer.scale.set(2.5);
       this.flechaDer.anchor.set(0.5);
 
       this.players = [
-       p1= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_01'),
-       p2= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_02'),
-       p3 = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_03'),
+       p1 = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_info_01'),
+       p2= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_info_02'),
+       p3 = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_info_03'),
       ]
       this._it=0;
       this.selectButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
@@ -30,8 +32,8 @@ var MenuScene = {
        //this.players[this._it].anchor
        this.cont++;
       if (this.cont == 20) {
-        this.flechaIz.scale.set(2.5);
-        this.flechaDer.scale.set(2.5);
+        this.flechaIz.scale.set(1);
+        this.flechaDer.scale.set(1);
         this.cont = 0;
       }
 
@@ -41,16 +43,24 @@ var MenuScene = {
        this.selectButton.onDown.add(this.selectPlayer, this);
     },
     selectPlayer: function(){
-      var aux = this.players[this._it].key;
+      switch (this._it){
+        case 0: aux = { name: 'player_01', life: 4, jump: -750, speedPower: 1 }; // 1 aumenta la velocidad.
+                break;
+        case 1: aux = { name: 'player_02', life: 5, jump: -800, speedPower: 0 }; // 0 la mantiene.
+                break; 
+        case 2: aux = { name: 'player_03', life: 4, jump: -900, speedPower: -1 }; // -1 la decrementa.
+                break; 
+      }
+      console.log(aux);
       this.game.state.start('level_select', true, false, aux);
     },
     next: function(){
-      this.flechaDer.scale.set(3)
+      this.flechaDer.scale.set(1.25)
       this.players[this._it].visible = false;
       this._it = (this._it +1) % this.players.length;//console.log(this._it);
     },
     prev: function(){
-       this.flechaIz.scale.set(3);
+       this.flechaIz.scale.set(1.25);
        this.players[this._it].visible = false;
        if (!!this._it) this._it--;
        else this._it = this.players.length -1;

@@ -480,19 +480,22 @@ module.exports = EndLevel;
 'use strict';
 var Direction = {'LEFT':0, 'RIGHT':1, 'TOP':2, 'LOW':3}
 //PLAYER---------------------------------------------------------------------
-function Player (game, x,y, sprite, life){
-  this._player = game.add.sprite(x,y,sprite);
+function Player (game, x,y, playerInfo){
+  this._player = game.add.sprite(x,y,playerInfo.name);
 
     this._player.animations.add('breath',[0,1,2,3]);
     this._player.animations.add('walkR',[3,4,5,6]);
     this._player.animations.add('walkL',[10,9,8,7]);
 
 
-  this._player.life = life || 5;
+  this._player.life = playerInfo.life || 4;
   this._player.invincible = false;
   this._player.timeRecover=80;
   this._player._jumpSpeed= -80;
-  this._player._maxJumpSpeed = -800;
+  this._player._maxJumpSpeed = playerInfo.jump || -800;
+  if(playerInfo.speedPower === 1) this._player._speed = 2;
+  else if (playerInfo.speedPower === -1) this._player._speed = 0.6;
+  else this._player._speed = 1;
   this._player.maxJumpReached = false;
   this._player.ignoraInput = false;
   this._player.hitDir = 0;
@@ -517,8 +520,12 @@ function Player (game, x,y, sprite, life){
       this.tint = 0xffffff;
       this.invincible = false;
     }
-    this._player.moveLeft = function(x){this.body.velocity.x = -x; }
-    this._player.moveRight = function(x){ this.body.velocity.x = x; }
+    this._player.moveLeft = function(x){
+      this.body.velocity.x = this._speed*(-x); 
+    }
+    this._player.moveRight = function(x){ 
+      this.body.velocity.x = this._speed*x; 
+    }
 
     return this._player;
 }
@@ -1002,7 +1009,7 @@ var PlayScene = {
       timeRecover: 80,
       },
     _player: {}, //Refinar esto con un creador de player.//player
-    spritePlayer: 'player_01',
+    playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
     level: 'level_01',
     _resume: false,
     _maxYspeed: 0,
@@ -1013,9 +1020,9 @@ var PlayScene = {
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
     _ySpeedLimit: 800,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
       
-  init: function (resume, spritePlayer){
+  init: function (resume, playerInfo){
     // Lo que se carga da igual de donde vengas...
-    if (!!spritePlayer) this.spritePlayer = spritePlayer; //Si no recibe un spritePlayer carga el básico
+    if (!!playerInfo) this.playerInfo = playerInfo; //Si no recibe un spritePlayer carga el básico
     // Y ahora si venimos de pausa...
     if (resume)this._resume = true;
      //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
@@ -1075,7 +1082,7 @@ var PlayScene = {
     this.map.setCollisionBetween(0,5000, true, 'EndLvl');
 
     //Crear player:
-    this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.spritePlayer, 4);
+    this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
 
   	//Crear cursores
@@ -1400,15 +1407,15 @@ var entities = require('./entities.js');
 //Scene de juego.
 var PlayScene = {
     gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 480,
-      posY: 192,
+      posX: 128,
+      posY: 448,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
       },
     _player: {}, //Refinar esto con un creador de player.//player
-    spritePlayer: 'player_01',
-    level: 'level_02',
+    playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
+    level: 'level_01',
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -1418,11 +1425,12 @@ var PlayScene = {
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
     _ySpeedLimit: 800,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
       
-  init: function (resume, spritePlayer){
+  init: function (resume, playerInfo){
     // Lo que se carga da igual de donde vengas...
-    if (!!spritePlayer) this.spritePlayer = spritePlayer; //Si no recibe un spritePlayer carga el básico
+    if (!!playerInfo) this.playerInfo = playerInfo; //Si no recibe un spritePlayer carga el básico
     // Y ahora si venimos de pausa...
-    if (resume)this._resume = true; //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
+    if (resume)this._resume = true;
+     //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
     else{
       this.shutdown();
       this._keys = 0;
@@ -1479,7 +1487,7 @@ var PlayScene = {
     this.map.setCollisionBetween(0,5000, true, 'EndLvl');
 
     //Crear player:
-    this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.spritePlayer, 4);
+     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
 
     //Crear cursores
@@ -1804,15 +1812,15 @@ var entities = require('./entities.js');
 //Scene de juego.
 var PlayScene = {
     gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 96,
-      posY: 512,
+      posX: 128,
+      posY: 448,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
       },
     _player: {}, //Refinar esto con un creador de player.//player
-    spritePlayer: 'player_01',
-    level: 'level_03',
+    playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
+    level: 'level_01',
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -1820,13 +1828,14 @@ var PlayScene = {
     _keys: 0,
     _maxTimeInvincible: 80, //Tiempo que esta invencible tras ser golpeado
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
-    _ySpeedLimit: 1000,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
+    _ySpeedLimit: 800,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
       
-  init: function (resume, spritePlayer){
+  init: function (resume, playerInfo){
     // Lo que se carga da igual de donde vengas...
-    if (!!spritePlayer) this.spritePlayer = spritePlayer; //Si no recibe un spritePlayer carga el básico
+    if (!!playerInfo) this.playerInfo = playerInfo; //Si no recibe un spritePlayer carga el básico
     // Y ahora si venimos de pausa...
-    if (resume)this._resume = true; //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
+    if (resume)this._resume = true;
+     //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
     else{
       this.shutdown();
       this._keys = 0;
@@ -1887,7 +1896,7 @@ var PlayScene = {
     this.map.setCollisionBetween(0,5000, true, 'EndLvl');
 
     //Crear player:
-    this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.spritePlayer, 4);
+    this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
 
     //Crear cursores
@@ -2217,15 +2226,15 @@ var entities = require('./entities.js');
 //Scene de juego.
 var PlayScene = {
     gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 32,
-      posY: 768,
+      posX: 128,
+      posY: 448,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
       },
     _player: {}, //Refinar esto con un creador de player.//player
-    spritePlayer: 'player_01',
-    level: 'level_04',
+    playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
+    level: 'level_01',
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -2233,13 +2242,14 @@ var PlayScene = {
     _keys: 0,
     _maxTimeInvincible: 80, //Tiempo que esta invencible tras ser golpeado
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
-    _ySpeedLimit: 1000,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
+    _ySpeedLimit: 800,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
       
-  init: function (resume, spritePlayer){
+  init: function (resume, playerInfo){
     // Lo que se carga da igual de donde vengas...
-    if (!!spritePlayer) this.spritePlayer = spritePlayer; //Si no recibe un spritePlayer carga el básico
+    if (!!playerInfo) this.playerInfo = playerInfo; //Si no recibe un spritePlayer carga el básico
     // Y ahora si venimos de pausa...
-    if (resume)this._resume = true; //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
+    if (resume)this._resume = true;
+     //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
     else{
       this.shutdown();
       this._keys = 0;
@@ -2297,7 +2307,7 @@ var PlayScene = {
     this.map.setCollisionBetween(0,5000, true, 'EndLvl');
 
     //Crear player:
-    this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.spritePlayer, 4);
+     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
 
     //Crear cursores
@@ -2676,6 +2686,9 @@ var PreloaderScene = {
        this.game.load.spritesheet('player_01', 'images/player_01.png',28,28,11);
        this.game.load.spritesheet('player_02', 'images/player_02.png',28,28,11);
        this.game.load.spritesheet('player_03', 'images/player_03.png',28,28,11);
+       this.game.load.image('player_info_01', 'images/player_info_01.png');
+       this.game.load.image('player_info_02', 'images/player_info_02.png');
+       this.game.load.image('player_info_03', 'images/player_info_03.png');
        this.game.load.image('enemy_01', 'images/enemy.png');
        this.game.load.image('cannon_01', 'images/cannon.png');
        this.game.load.image('bullet_01', 'images/bullet.png');
@@ -2935,20 +2948,22 @@ var MenuScene = {
   player:'',
   cont: 0,
     create: function () {
-      var goText = this.game.add.text(400, 100, "Select the player");
-      goText.fill = '#43d637';
-      goText.anchor.set(0.5);
-      this.flechaDer = this.game.add.sprite(this.game.world.centerX+100, this.game.world.centerY,'flechaDer');
-      this.flechaIz = this.game.add.sprite(this.game.world.centerX-100, this.game.world.centerY,'flechaIz');
-      this.flechaIz.scale.set(2.5);
+       this.game.stage.backgroundColor = "#4488AA";
+      var selectText = this.game.add.text(400, 100, "Select the player");
+      selectText.fill = '#43d637';
+      selectText.anchor.set(0.5);
+      var auxText = this.game.add.text(400, 500, "Press INTRO to select");
+      auxText.fill = '#43d637';
+      auxText.anchor.set(0.5);
+      this.flechaDer = this.game.add.sprite(this.game.world.centerX+300, this.game.world.centerY,'flechaDer');
+      this.flechaIz = this.game.add.sprite(this.game.world.centerX-300, this.game.world.centerY,'flechaIz');
       this.flechaIz.anchor.set(0.5);
-      this.flechaDer.scale.set(2.5);
       this.flechaDer.anchor.set(0.5);
 
       this.players = [
-       p1= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_01'),
-       p2= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_02'),
-       p3 = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_03'),
+       p1 = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_info_01'),
+       p2= this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_info_02'),
+       p3 = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY,'player_info_03'),
       ]
       this._it=0;
       this.selectButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
@@ -2963,8 +2978,8 @@ var MenuScene = {
        //this.players[this._it].anchor
        this.cont++;
       if (this.cont == 20) {
-        this.flechaIz.scale.set(2.5);
-        this.flechaDer.scale.set(2.5);
+        this.flechaIz.scale.set(1);
+        this.flechaDer.scale.set(1);
         this.cont = 0;
       }
 
@@ -2974,16 +2989,24 @@ var MenuScene = {
        this.selectButton.onDown.add(this.selectPlayer, this);
     },
     selectPlayer: function(){
-      var aux = this.players[this._it].key;
+      switch (this._it){
+        case 0: aux = { name: 'player_01', life: 4, jump: -750, speedPower: 1 }; // 1 aumenta la velocidad.
+                break;
+        case 1: aux = { name: 'player_02', life: 5, jump: -800, speedPower: 0 }; // 0 la mantiene.
+                break; 
+        case 2: aux = { name: 'player_03', life: 4, jump: -900, speedPower: -1 }; // -1 la decrementa.
+                break; 
+      }
+      console.log(aux);
       this.game.state.start('level_select', true, false, aux);
     },
     next: function(){
-      this.flechaDer.scale.set(3)
+      this.flechaDer.scale.set(1.25)
       this.players[this._it].visible = false;
       this._it = (this._it +1) % this.players.length;//console.log(this._it);
     },
     prev: function(){
-       this.flechaIz.scale.set(3);
+       this.flechaIz.scale.set(1.25);
        this.players[this._it].visible = false;
        if (!!this._it) this._it--;
        else this._it = this.players.length -1;

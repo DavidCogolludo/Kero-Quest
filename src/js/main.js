@@ -55,6 +55,9 @@ var PreloaderScene = {
        this.game.load.spritesheet('player_01', 'images/player_01.png',28,28,11);
        this.game.load.spritesheet('player_02', 'images/player_02.png',28,28,11);
        this.game.load.spritesheet('player_03', 'images/player_03.png',28,28,11);
+       this.game.load.image('player_info_01', 'images/player_info_01.png');
+       this.game.load.image('player_info_02', 'images/player_info_02.png');
+       this.game.load.image('player_info_03', 'images/player_info_03.png');
        this.game.load.image('enemy_01', 'images/enemy.png');
        this.game.load.image('cannon_01', 'images/cannon.png');
        this.game.load.image('bullet_01', 'images/bullet.png');

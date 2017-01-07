@@ -1,19 +1,22 @@
 'use strict';
 var Direction = {'LEFT':0, 'RIGHT':1, 'TOP':2, 'LOW':3}
 //PLAYER---------------------------------------------------------------------
-function Player (game, x,y, sprite, life){
-  this._player = game.add.sprite(x,y,sprite);
+function Player (game, x,y, playerInfo){
+  this._player = game.add.sprite(x,y,playerInfo.name);
 
     this._player.animations.add('breath',[0,1,2,3]);
     this._player.animations.add('walkR',[3,4,5,6]);
     this._player.animations.add('walkL',[10,9,8,7]);
 
 
-  this._player.life = life || 5;
+  this._player.life = playerInfo.life || 4;
   this._player.invincible = false;
   this._player.timeRecover=80;
   this._player._jumpSpeed= -80;
-  this._player._maxJumpSpeed = -800;
+  this._player._maxJumpSpeed = playerInfo.jump || -800;
+  if(playerInfo.speedPower === 1) this._player._speed = 2;
+  else if (playerInfo.speedPower === -1) this._player._speed = 0.6;
+  else this._player._speed = 1;
   this._player.maxJumpReached = false;
   this._player.ignoraInput = false;
   this._player.hitDir = 0;
@@ -38,8 +41,12 @@ function Player (game, x,y, sprite, life){
       this.tint = 0xffffff;
       this.invincible = false;
     }
-    this._player.moveLeft = function(x){this.body.velocity.x = -x; }
-    this._player.moveRight = function(x){ this.body.velocity.x = x; }
+    this._player.moveLeft = function(x){
+      this.body.velocity.x = this._speed*(-x); 
+    }
+    this._player.moveRight = function(x){ 
+      this.body.velocity.x = this._speed*x; 
+    }
 
     return this._player;
 }

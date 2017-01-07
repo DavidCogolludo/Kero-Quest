@@ -10,15 +10,15 @@ var entities = require('./entities.js');
 //Scene de juego.
 var PlayScene = {
     gameState: {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
-      posX: 32,
-      posY: 768,
+      posX: 128,
+      posY: 448,
       playerHP: 4,
       invincible: false,
       timeRecover: 80,
       },
     _player: {}, //Refinar esto con un creador de player.//player
-    spritePlayer: 'player_01',
-    level: 'level_04',
+    playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
+    level: 'level_01',
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -26,13 +26,14 @@ var PlayScene = {
     _keys: 0,
     _maxTimeInvincible: 80, //Tiempo que esta invencible tras ser golpeado
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
-    _ySpeedLimit: 1000,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
+    _ySpeedLimit: 800,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
       
-  init: function (resume, spritePlayer){
+  init: function (resume, playerInfo){
     // Lo que se carga da igual de donde vengas...
-    if (!!spritePlayer) this.spritePlayer = spritePlayer; //Si no recibe un spritePlayer carga el básico
+    if (!!playerInfo) this.playerInfo = playerInfo; //Si no recibe un spritePlayer carga el básico
     // Y ahora si venimos de pausa...
-    if (resume)this._resume = true; //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
+    if (resume)this._resume = true;
+     //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
     else{
       this.shutdown();
       this._keys = 0;
@@ -90,7 +91,7 @@ var PlayScene = {
     this.map.setCollisionBetween(0,5000, true, 'EndLvl');
 
     //Crear player:
-    this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.spritePlayer, 4);
+     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
 
     //Crear cursores
