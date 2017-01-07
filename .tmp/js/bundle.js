@@ -907,9 +907,6 @@ var PlayScene = {
     	}
     	else this._player.jump(jump);
     },
-    canJump: function(collisionWithTilemap){
-        return this.isStanding() && collisionWithTilemap || this._jamping;
-    },
     
     onPlayerDeath: function(){
         //TODO 6 Carga de 'gameOver';
@@ -939,28 +936,7 @@ var PlayScene = {
       if(this.game.physics.arcade.collide(this._player, this.endLayer))
           this.onPlayerEnd();
     },
-
-    isStanding: function(){
-        return this._player.body.blocked.down || this._player.body.touching.down
-    },
         
-    isJumping: function(collisionWithTilemap){
-        return this.canJump(collisionWithTilemap) && 
-            this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR);
-    },
-        
-    GetMovement: function(){
-        var movement = Direction.NONE
-        //Move Right
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
-            movement = Direction.RIGHT;
-        }
-        //Move Left
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
-            movement = Direction.LEFT;
-        }
-        return movement;
-    },
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
@@ -981,6 +957,15 @@ var PlayScene = {
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(){
+       this.enemyGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.cannonGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.bulletGroup.forEach(function(obj){
+        obj.destroy();
+      })
       this._player.destroy();
       this.map.destroy();
     }
@@ -1189,7 +1174,6 @@ var PlayScene = {
           else this._player.body.velocity.x = 0;
         }
 
-        //this.jumpButton.onDown.add(this.jumpCheck, this);
         if (this.jumpButton.isDown && this._player.body.onFloor()){
         	this.timeJump++;
         } 
@@ -1294,12 +1278,8 @@ var PlayScene = {
     	}
     	else this._player.jump(jump);
     },
-    canJump: function(collisionWithTilemap){
-        return this.isStanding() && collisionWithTilemap || this._jamping;
-    },
     
     onPlayerDeath: function(){
-        //TODO 6 Carga de 'gameOver';
         this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
@@ -1333,28 +1313,7 @@ var PlayScene = {
       if(this.game.physics.arcade.collide(this._player, this.endLayer))
           this.onPlayerEnd();
     },
-
-    isStanding: function(){
-        return this._player.body.blocked.down || this._player.body.touching.down
-    },
         
-    isJumping: function(collisionWithTilemap){
-        return this.canJump(collisionWithTilemap) && 
-            this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR);
-    },
-        
-    GetMovement: function(){
-        var movement = Direction.NONE
-        //Move Right
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
-            movement = Direction.RIGHT;
-        }
-        //Move Left
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
-            movement = Direction.LEFT;
-        }
-        return movement;
-    },
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
@@ -1384,8 +1343,16 @@ var PlayScene = {
         } 
     },
     
-    //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(){
+      this.enemyGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.cannonGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.bulletGroup.forEach(function(obj){
+        obj.destroy();
+      })
       this._player.destroy();
       this.map.destroy();
     }
@@ -1701,9 +1668,6 @@ var PlayScene = {
       }
       else this._player.jump(jump);
     },
-    canJump: function(collisionWithTilemap){
-        return this.isStanding() && collisionWithTilemap || this._jamping;
-    },
     
     onPlayerDeath: function(){
         this._keys = 0;
@@ -1739,27 +1703,6 @@ var PlayScene = {
           this.onPlayerEnd();
     },
 
-    isStanding: function(){
-        return this._player.body.blocked.down || this._player.body.touching.down
-    },
-        
-    isJumping: function(collisionWithTilemap){
-        return this.canJump(collisionWithTilemap) && 
-            this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR);
-    },
-        
-    GetMovement: function(){
-        var movement = Direction.NONE
-        //Move Right
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
-            movement = Direction.RIGHT;
-        }
-        //Move Left
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
-            movement = Direction.LEFT;
-        }
-        return movement;
-    },
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
@@ -1791,6 +1734,15 @@ var PlayScene = {
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(){
+      this.enemyGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.cannonGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.bulletGroup.forEach(function(obj){
+        obj.destroy();
+      })
       this._player.destroy();
       this.map.destroy();
     }
@@ -2114,9 +2066,6 @@ var PlayScene = {
       }
       else this._player.jump(jump);
     },
-    canJump: function(collisionWithTilemap){
-        return this.isStanding() && collisionWithTilemap || this._jamping;
-    },
     
     onPlayerDeath: function(){
         //TODO 6 Carga de 'gameOver';
@@ -2153,27 +2102,6 @@ var PlayScene = {
           this.onPlayerEnd();
     },
 
-    isStanding: function(){
-        return this._player.body.blocked.down || this._player.body.touching.down
-    },
-        
-    isJumping: function(collisionWithTilemap){
-        return this.canJump(collisionWithTilemap) && 
-            this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR);
-    },
-        
-    GetMovement: function(){
-        var movement = Direction.NONE
-        //Move Right
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
-            movement = Direction.RIGHT;
-        }
-        //Move Left
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
-            movement = Direction.LEFT;
-        }
-        return movement;
-    },
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
@@ -2205,6 +2133,15 @@ var PlayScene = {
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(){
+     this.enemyGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.cannonGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.bulletGroup.forEach(function(obj){
+        obj.destroy();
+      })
       this._player.destroy();
       this.map.destroy();
     }
@@ -2529,9 +2466,6 @@ var PlayScene = {
       }
       else this._player.jump(jump);
     },
-    canJump: function(collisionWithTilemap){
-        return this.isStanding() && collisionWithTilemap || this._jamping;
-    },
     
     onPlayerDeath: function(){
         //TODO 6 Carga de 'gameOver';
@@ -2568,27 +2502,6 @@ var PlayScene = {
           this.onPlayerEnd();
     },
 
-    isStanding: function(){
-        return this._player.body.blocked.down || this._player.body.touching.down
-    },
-        
-    isJumping: function(collisionWithTilemap){
-        return this.canJump(collisionWithTilemap) && 
-            this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR);
-    },
-        
-    GetMovement: function(){
-        var movement = Direction.NONE
-        //Move Right
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)){
-            movement = Direction.RIGHT;
-        }
-        //Move Left
-        if(this.game.input.keyboard.isDown(Phaser.Keyboard.LEFT)){
-            movement = Direction.LEFT;
-        }
-        return movement;
-    },
     //configure the scene
     configure: function(){
         //Start the Arcade Physics system
@@ -2620,6 +2533,15 @@ var PlayScene = {
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(){
+      this.enemyGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.cannonGroup.forEach(function(obj){
+        obj.destroy();
+      })
+      this.bulletGroup.forEach(function(obj){
+        obj.destroy();
+      })
       this._player.destroy();
       this.map.destroy();
     }
