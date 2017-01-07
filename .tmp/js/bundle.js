@@ -1144,19 +1144,17 @@ var PlayScene = {
       obj.body.allowGravity = false;
       obj.body.immovable = true;
     })
+
+    //--------------CANVAS-----------------------------
+      this.canvasText = this.game.add.text(this.game.camera.x +50, this.game.camera.y+50,"Life: "+this._player.life+"\nKeys: "+this._keys);
+      this.canvasText.fixedToCamera = true;  
   },
     
     //IS called one per frame.
     update: function () {
       var self=this;
 
-    	//TEXTO DE DEBUG----------------------------------------------------
-
-      this.game.debug.text('Y speed: '+this._player.body.velocity.y, 896, 320);
-      this.game.debug.text('MAX Y Speed: '+this._maxYspeed, 896, 320);
-    	this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
-      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);
-
+      this.canvasText.setText('Life: '+this._player.life + '\nKeys: '+this._keys);
     	this.checKPlayerTrigger();
       if (this._player.body.velocity.y > this._ySpeedLimit) this._player.body.velocity.y = this._ySpeedLimit; //Evitar bug omitir colisiones
     	var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
@@ -1531,20 +1529,16 @@ var PlayScene = {
       layer: this.map.createLayer('OverLayer'),
       vis: true,
     };
+  //--------------CANVAS-----------------------------
+      this.canvasText = this.game.add.text(this.game.camera.x +50, this.game.camera.y+50,"Life: "+this._player.life+"\nKeys: "+this._keys);
+      this.canvasText.fixedToCamera = true;  
   },
     
     //IS called one per frame.
     update: function () {
       var self=this;
-      //TEXTO DE DEBUG----------------------------------------------------
-      //this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-400, 80);
-      //this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
-      this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
-      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);
-      if (this._player.body.velocity.y > this._maxYspeed) this._maxYspeed = this._player.body.velocity.y;
-      
-      //cambiar la gravedad
-      //this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
+
+      this.canvasText.setText('Life: '+this._player.life + '\nKeys: '+this._keys);
       this.checKPlayerTrigger();
       if (this._player.body.velocity.y > this._ySpeedLimit) this._player.body.velocity.y = this._ySpeedLimit; //Evitar bug omitir colisiones
       var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
@@ -1931,20 +1925,16 @@ var PlayScene = {
       obj.body.allowGravity = false;
       obj.body.immovable = true;
     })
+  //--------------CANVAS-----------------------------
+      this.canvasText = this.game.add.text(this.game.camera.x +50, this.game.camera.y+50,"Life: "+this._player.life+"\nKeys: "+this._keys);
+      this.canvasText.fixedToCamera = true;  
   },
     
     //IS called one per frame.
     update: function () {
       var self=this;
-      //TEXTO DE DEBUG----------------------------------------------------
-      this.game.debug.text('Y speed: '+this._player.body.velocity.y, this.game.world.centerX-800, 80);
-      this.game.debug.text('MAX Y Speed: '+this._maxYspeed, this.game.world.centerX-400, 110);
-      this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
-      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,140);
-      if (this._player.body.velocity.y > this._maxYspeed) this._maxYspeed = this._player.body.velocity.y;
-      
-      //cambiar la gravedad
-      //this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
+
+      this.canvasText.setText('Life: '+this._player.life + '\nKeys: '+this._keys);
       this.checKPlayerTrigger();
       if (this._player.body.velocity.y > this._ySpeedLimit) this._player.body.velocity.y = this._ySpeedLimit; //Evitar bug omitir colisiones
       var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
@@ -2333,18 +2323,16 @@ var PlayScene = {
       layer: this.map.createLayer('OverLayer'),
       vis: true,
     };
+  //--------------CANVAS-----------------------------
+      this.canvasText = this.game.add.text(this.game.camera.x +50, this.game.camera.y+50,"Life: "+this._player.life+"\nKeys: "+this._keys);
+      this.canvasText.fixedToCamera = true;  
   },
     
     //IS called one per frame.
     update: function () {
       var self=this;
-      //TEXTO DE DEBUG----------------------------------------------------
-      this.game.debug.text('PLAYER HEALTH: '+this._player.life,this.game.world.centerX-400,50);
-      this.game.debug.text('KEYS: '+this._keys, this.game.world.centerX-400,80);
-      //if (this._player.body.velocity.y > this._maxYspeed) this._maxYspeed = this._player.body.velocity.y;
-      
-      //cambiar la gravedad
-      //this._player.body.velocity.y += (this._gravity*this.game.time.elapsed/2);
+
+      this.canvasText.setText('Life: '+this._player.life + '\nKeys: '+this._keys);
       this.checKPlayerTrigger();
       if (this._player.body.velocity.y > this._ySpeedLimit) this._player.body.velocity.y = this._ySpeedLimit; //Evitar bug omitir colisiones
       var collisionWithTilemap = this.game.physics.arcade.collide(this._player, this.groundLayer);
