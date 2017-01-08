@@ -33,6 +33,15 @@ var BootScene = {
 
 var PreloaderScene = {
   preload: function () {
+    
+    this.spriteLogo = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'logo');
+
+    this.spriteLogo.anchor.setTo(0.5, 0.5);
+    this.spriteLogo.alpha = 0;
+    var tween = this.game.add.tween(this.spriteLogo).to( { alpha: 1 }, 2000, "Linear", true, 0, -1);
+
+    tween.yoyo(true, 3000);
+
     this.loadingBar = this.game.add.sprite(100,300, 'preloader_bar');
     this.loadingBar.anchor.setTo(0, 0.5); 
     this.game.load.setPreloadSprite(this.loadingBar);
@@ -82,10 +91,7 @@ var PreloaderScene = {
     
     
   loadComplete: function(){
-    console.log("dentro");
-		//this._ready = true;
-    //this.game.state.start('play');
-    this.game.state.start('select_player');
+       this.game.state.start('select_player');
     },
 
   update: function(){
