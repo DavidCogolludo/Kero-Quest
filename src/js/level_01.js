@@ -92,7 +92,7 @@ var PlayScene = {
     //Crear player:
     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
-    //Crear vidas
+    //Crear vida
     this.lifeGroup = this.game.add.group();
     this.lifeGroup.enableBody = true;
     this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
@@ -332,7 +332,7 @@ var PlayScene = {
         this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
-        this.game.state.start('endLevel', true, false, this.level);
+        this.game.state.start('endLevel', true, false, this.level, this.playerInfo);
     },
     
     checkPlayerDeath: function(){

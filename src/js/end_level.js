@@ -1,7 +1,9 @@
 var aux;
+var pInfo;
 var EndLevel = {
-    init: function (actualLevel){
+    init: function (actualLevel, playerInfo){
       aux = actualLevel;
+      pInfo = playerInfo;
     },
     create: function () {
         console.log("Level Completed!");
@@ -55,9 +57,10 @@ var EndLevel = {
     actionOnClick3: function(){
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
-       if (aux === 'level_01') this.game.state.start('level_02');
-       else if (aux === 'level_02') this.game.state.start('level_03');
-       else if (aux === 'level_03') this.game.state.start('level_04');
+       if (aux === 'level_01') this.game.state.start('level_02',true, false, false, pInfo);
+       else if (aux === 'level_02') this.game.state.start('level_03',true, false, false, pInfo);
+       else if (aux === 'level_03') this.game.state.start('level_04',true, false, false, pInfo);
+       else if (aux === 'level_04') this.game.state.start('credits');
     }
 
 };

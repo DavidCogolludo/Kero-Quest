@@ -8,7 +8,6 @@ function Player (game, x,y, playerInfo){
     this._player.animations.add('walkR',[3,4,5,6]);
     this._player.animations.add('walkL',[10,9,8,7]);
 
-
   this._player.life = playerInfo.life || 4;
   this._player.invincible = false;
   this._player.timeRecover=80;

@@ -338,7 +338,7 @@ var PlayScene = {
         this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
-        this.game.state.start('gameOver', true, false, this.level);
+        this.game.state.start('endLevel', true, false, this.level, this.playerInfo);
     },
 
     onPlayerEnd: function(){

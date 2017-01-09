@@ -5,7 +5,6 @@ var Level_01 = require('./level_01.js');
 var Level_02 = require('./level_02.js');
 var Level_03 = require('./level_03.js');
 var Level_04 = require('./level_04.js');
-var EndGame = require('./end_game_level.js');
 var Credits = require('./credits.js');
 var JumpTestLevel = require('./jumpTestLevel.js');
 var GameOver = require('./gameover_scene.js');
@@ -131,7 +130,6 @@ function init (){
  game.state.add('level_02', Level_02);
  game.state.add('level_03', Level_03);
  game.state.add('level_04', Level_04);
- game.state.add('end_game', EndGame);
  game.state.add('jumpTestLevel', JumpTestLevel);
  game.state.add('menu_in_game',MenuInGame);
  game.state.add ('gameOver', GameOver);
