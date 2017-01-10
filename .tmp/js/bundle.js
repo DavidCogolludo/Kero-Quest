@@ -114,7 +114,6 @@ function Player (game, x,y, playerInfo){
     this._player.animations.add('walkR',[3,4,5,6]);
     this._player.animations.add('walkL',[10,9,8,7]);
 
-  this._player.turn = false;
   this._player.life = playerInfo.life || 4;
   this._player.invincible = false;
   this._player.timeRecover=80;
@@ -151,11 +150,9 @@ function Player (game, x,y, playerInfo){
       this.invincible = false;
     }
     this._player.moveLeft = function(x){
-      if (!this.turn)this.turn = true;
       this.body.velocity.x = this._speed*(-x); 
     }
     this._player.moveRight = function(x){ 
-      if(this.turn)this.turn = false;
       this.body.velocity.x = this._speed*x; 
     }
 
