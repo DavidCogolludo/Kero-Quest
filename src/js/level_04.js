@@ -338,14 +338,14 @@ var PlayScene = {
         this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
-        this.game.state.start('endLevel', true, false, this.level, this.playerInfo);
+        this.game.state.start('gameOver', true, false, this.level);
     },
 
     onPlayerEnd: function(){
         this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
-        this.game.state.start('end_game', true, false); //Es el último nivel y llama a la pantalla de fin de juego.
+        this.game.state.start('endLevel', true, false, this.level, this.playerInfo); //Es el último nivel y llama a la pantalla de fin de juego.
     },
     
     checkPlayerDeath: function(){
