@@ -389,8 +389,9 @@ var PlayScene = {
           this._direction= Direction.RIGHT;
           this._player.moveRight(incrementoX);
         }
-        else{
-          this._player.animations.play('breath',2,true);          
+        else {
+          if (this._direction === Direction.RIGHT) this._player.animations.play('breath',2,true);
+          else this._player.animations.play('breath',2,true);
         } 
     },
     
