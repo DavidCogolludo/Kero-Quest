@@ -1,7 +1,8 @@
 var MenuInGame = {
 	//METODOS
-	init: function (gameState){
+	init: function (gameState, mus){
 		this.prevState = gameState;
+    this.music = mus;
 	},
 
     create: function () {
@@ -52,6 +53,7 @@ var MenuInGame = {
     },
 
     actionOnClick3: function(){
+       this.music.destroy();
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
        this.game.state.start('menu');

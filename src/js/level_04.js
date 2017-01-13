@@ -332,7 +332,7 @@ var PlayScene = {
       this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
-      this.game.state.start('menu_in_game', true, false, this.level);
+      this.game.state.start('menu_in_game', true, false, this.level,this.sound.music);
     },
     jumpCheck: function (){
       var jump = this._player._jumpSpeed*this.timeJump;
