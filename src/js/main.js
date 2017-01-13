@@ -78,6 +78,10 @@ var PreloaderScene = {
        this.game.load.image('winBG', 'images/win.png');
        this.game.load.image('gameOverBG', 'images/gameover.png');
        this.game.load.image('creditsBG', 'images/creditsBG.png');
+       //SOUND-------------------------------------------------------------------------------------------
+       this.game.load.audio('menu_music', ['sound/A Walk in the Park.mp3', 'sound/A_Walk_in_the_Park.ogg']);
+       this.game.load.audio('outside_music', ['sound/Platform80kbps.mp3','sound/Platform80kbps.ogg']);
+       this.game.load.audio('cave_music', ['sound/Craig Stern - Funky, Funky Spy.mp3','sound/Craig_Stern_-_Funky_Funky_Spy.ogg']);
        //this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'

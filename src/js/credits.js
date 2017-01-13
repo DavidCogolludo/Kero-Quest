@@ -4,6 +4,10 @@ var EndLevel = {
       aux = actualLevel;
     },
     create: function () {
+       //SOUND---------------------------------------
+      this.music = this.game.add.audio('menu_music');
+      this.music.onDecoded.add(this.startMusic, this);
+      //-----------------------------------------------
         console.log("Level Completed!");
         var BG = this.game.add.sprite(this.game.world.centerX, 
                                       this.game.world.centerY, 
@@ -22,8 +26,11 @@ var EndLevel = {
         button.anchor.set(0.5);
         button.addChild(text);
     },
-    
+     startMusic: function(){
+      this.music.fadeIn(2000,true);
+    },
     actionOnClick: function(){
+        this.music.destroy();
         this.game.state.start('menu');
     },
 };

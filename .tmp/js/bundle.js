@@ -625,6 +625,7 @@ var PlayScene = {
     _player: {}, //Refinar esto con un creador de player.//player
     playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
     level: 'level_01',
+    sound: {},
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -668,6 +669,13 @@ var PlayScene = {
   //Método constructor...
   create: function () {
     var self = this;
+    //SOUND--------------------------------------------------------
+    if(!this._resume){
+      this.sound.music = this.game.add.audio('outside_music');
+     /* // se llama a `start` cuando todos los sonidos de la lista están cargados
+     game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+     this.sound.music.onDecoded.add(this.startMusic, this);
+    }
     //Crear mapa;
     this.map = this.game.add.tilemap('map_01');
   	this.map.addTilesetImage('patrones','tiles');
@@ -866,7 +874,9 @@ var PlayScene = {
         this.checkPlayerDeath();
         this.checkPlayerEnd();
     },
-
+    startMusic: function (){
+      this.sound.music.fadeIn(4000, true);
+    },
     collisionWithJumpThrough: function(){
     	var self = this;
     	self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
@@ -913,7 +923,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume= true;
-    	this.destroy();
+    	this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
       this.game.state.start('menu_in_game', true, false, this.level);
@@ -991,7 +1001,9 @@ var PlayScene = {
         } 
     },
     
-    destroy: function(){
+    destroy: function(pause){
+      var p = pause || false;
+      if (!p) this.sound.music.destroy();
       this.enemyGroup.forEach(function(obj){
         obj.destroy();
       })
@@ -1031,6 +1043,7 @@ var PlayScene = {
     _player: {}, //Refinar esto con un creador de player.//player
     playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
     level: 'level_02',
+    music: {},
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -1074,6 +1087,13 @@ var PlayScene = {
   //Método constructor...
   create: function () {
     var self = this;
+    //SOUND---------------------------------------------------------------------
+    if(!this._resume){
+      this.sound.music = this.game.add.audio('cave_music');
+      /* // se llama a `start` cuando todos los sonidos de la lista están cargados
+      game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+      this.sound.music.onDecoded.add(this.startMusic, this);
+    }
     //Crear mapa;
     this.map = this.game.add.tilemap('map_02');
     this.map.addTilesetImage('patrones','tiles');
@@ -1271,7 +1291,9 @@ var PlayScene = {
         this.checkPlayerDeath();
         this.checkPlayerEnd();
     },
-
+    startMusic: function (){
+      this.sound.music.fadeIn(4000, true);
+    },
     collisionWithJumpThrough: function(){
       var self = this;
       console.log('col');
@@ -1319,7 +1341,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume = true;
-      this.destroy();
+      this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
       this.game.state.start('menu_in_game', true, false, this.level);
@@ -1397,7 +1419,9 @@ var PlayScene = {
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
-    destroy: function(){
+    destroy: function(pause){
+      var p = pause || false;
+      if(!p)this.sound.music.destroy();
       this.enemyGroup.forEach(function(obj){
         obj.destroy();
       })
@@ -1437,6 +1461,7 @@ var PlayScene = {
     _player: {}, //Refinar esto con un creador de player.//player
     playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
     level: 'level_03',
+    sound: {},
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -1480,6 +1505,13 @@ var PlayScene = {
   //Método constructor...
   create: function () {
     var self = this;
+    //SOUND--------------------------------------------------------
+    if (!this._resume){
+      this.sound.music = this.game.add.audio('outside_music');
+    /* // se llama a `start` cuando todos los sonidos de la lista están cargados
+    game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+    this.sound.music.onDecoded.add(this.startMusic, this);
+  }
     //Crear mapa;
     this.map = this.game.add.tilemap('map_03');
     this.map.addTilesetImage('patrones','tiles');
@@ -1686,7 +1718,9 @@ var PlayScene = {
         this.checkPlayerDeath();
         this.checkPlayerEnd();
     },
-
+    startMusic: function (){
+      this.sound.music.fadeIn(4000, true);
+    },
     collisionWithJumpThrough: function(){
       var self = this;
       self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
@@ -1733,7 +1767,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume = true;
-      this.destroy();
+      this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
       this.game.state.start('menu_in_game', true, false, this.level);
@@ -1812,7 +1846,9 @@ var PlayScene = {
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
-    destroy: function(){
+    destroy: function(pause){
+      var p = pause || false;
+      if(!p)this.sound.music.destroy();
      this.enemyGroup.forEach(function(obj){
         obj.destroy();
       })
@@ -1852,6 +1888,7 @@ var PlayScene = {
     _player: {}, //Refinar esto con un creador de player.//player
     playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
     level: 'level_04',
+    sound: {},
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -1895,6 +1932,13 @@ var PlayScene = {
   //Método constructor...
   create: function () {
     var self = this;
+    //SOUND----------------------------------------------------------------
+    if(!this._resume){
+      this.sound.music = this.game.add.audio('cave_music');
+      /* // se llama a `start` cuando todos los sonidos de la lista están cargados
+      game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+      this.sound.music.onDecoded.add(this.startMusic, this);
+    }
     //Crear mapa;
     this.map = this.game.add.tilemap('map_04');
     this.map.addTilesetImage('patrones','tiles');
@@ -2105,7 +2149,9 @@ var PlayScene = {
         this.checkPlayerDeath();
         this.checkPlayerEnd();
     },
-
+    startMusic: function (){
+      this.sound.music.fadeIn(4000, true);
+    },
     collisionWithJumpThrough: function(){
       var self = this;
       self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
@@ -2152,7 +2198,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume = true;
-      this.destroy();
+      this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
       this.game.state.start('menu_in_game', true, false, this.level);
@@ -2231,7 +2277,9 @@ var PlayScene = {
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
-    destroy: function(){
+    destroy: function(pause){
+      var p = pause || false;
+      if(!p) this.sound.music.destroy();
       this.enemyGroup.forEach(function(obj){
         obj.destroy();
       })
@@ -2330,6 +2378,10 @@ var PreloaderScene = {
        this.game.load.image('winBG', 'images/win.png');
        this.game.load.image('gameOverBG', 'images/gameover.png');
        this.game.load.image('creditsBG', 'images/creditsBG.png');
+       //SOUND-------------------------------------------------------------------------------------------
+       this.game.load.audio('menu_music', ['sound/A Walk in the Park.mp3', 'sound/A_Walk_in_the_Park.ogg']);
+       this.game.load.audio('outside_music', ['sound/Platform80kbps.mp3','sound/Platform80kbps.ogg']);
+       this.game.load.audio('cave_music', ['sound/Craig Stern - Funky, Funky Spy.mp3','sound/Craig_Stern_-_Funky_Funky_Spy.ogg']);
        //this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
@@ -2456,9 +2508,11 @@ module.exports = MenuInGame;
 },{}],12:[function(require,module,exports){
 var aux;
 var aux2;
+var musica;
 var MenuLevel = {
-    init: function (selection){
+    init: function (selection, music){
       aux = selection;
+      musica = music;
     },
     create: function () {
        var selectText = this.game.add.text(400, 100, "Select the level");
@@ -2532,6 +2586,7 @@ var MenuLevel = {
     },
 
     initLevel: function(){
+      musica.destroy();
       this.game.state.start(aux2, true, false, false, aux);
     }
 
@@ -2571,6 +2626,11 @@ var MenuScene = {
   player:'',
   cont: 0,
     create: function () {
+
+      //SOUND---------------------------------------
+      this.music = this.game.add.audio('menu_music');
+      this.music.onDecoded.add(this.startMusic, this);
+      //---------------------------------------------
        this.game.stage.backgroundColor = "#4488AA";
       var selectText = this.game.add.text(400, 100, "Select the player");
       selectText.fill = '#43d637';
@@ -2611,6 +2671,9 @@ var MenuScene = {
        this.cursors.right.onDown.add(this.next, this);
        this.selectButton.onDown.add(this.selectPlayer, this);
     },
+    startMusic: function(){
+      this.music.fadeIn(2000,true);
+    },
     selectPlayer: function(){
       switch (this._it){
         case 0: aux = { name: 'player_01', life: 5, jump: -750, speedPower: 1 }; // 1 aumenta la velocidad.
@@ -2620,7 +2683,7 @@ var MenuScene = {
         case 2: aux = { name: 'player_03', life: 5, jump: -900, speedPower: -1 }; // -1 la decrementa.
                 break; 
       }
-      this.game.state.start('level_select', true, false, aux);
+      this.game.state.start('level_select', true, false, aux,this.music);
     },
     next: function(){
       this.flechaDer.scale.set(1.25)

@@ -19,6 +19,7 @@ var PlayScene = {
     _player: {}, //Refinar esto con un creador de player.//player
     playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
     level: 'level_01',
+    sound: {},
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -62,6 +63,13 @@ var PlayScene = {
   //Método constructor...
   create: function () {
     var self = this;
+    //SOUND--------------------------------------------------------
+    if(!this._resume){
+      this.sound.music = this.game.add.audio('outside_music');
+     /* // se llama a `start` cuando todos los sonidos de la lista están cargados
+     game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+     this.sound.music.onDecoded.add(this.startMusic, this);
+    }
     //Crear mapa;
     this.map = this.game.add.tilemap('map_01');
   	this.map.addTilesetImage('patrones','tiles');
@@ -260,7 +268,9 @@ var PlayScene = {
         this.checkPlayerDeath();
         this.checkPlayerEnd();
     },
-
+    startMusic: function (){
+      this.sound.music.fadeIn(4000, true);
+    },
     collisionWithJumpThrough: function(){
     	var self = this;
     	self.game.physics.arcade.collide(self._player, self.jumpThroughLayer);
@@ -307,7 +317,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume= true;
-    	this.destroy();
+    	this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
       this.game.state.start('menu_in_game', true, false, this.level);
@@ -385,7 +395,9 @@ var PlayScene = {
         } 
     },
     
-    destroy: function(){
+    destroy: function(pause){
+      var p = pause || false;
+      if (!p) this.sound.music.destroy();
       this.enemyGroup.forEach(function(obj){
         obj.destroy();
       })

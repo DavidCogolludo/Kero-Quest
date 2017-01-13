@@ -1,8 +1,10 @@
 var aux;
 var aux2;
+var musica;
 var MenuLevel = {
-    init: function (selection){
+    init: function (selection, music){
       aux = selection;
+      musica = music;
     },
     create: function () {
        var selectText = this.game.add.text(400, 100, "Select the level");
@@ -76,6 +78,7 @@ var MenuLevel = {
     },
 
     initLevel: function(){
+      musica.destroy();
       this.game.state.start(aux2, true, false, false, aux);
     }
 

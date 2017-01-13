@@ -2,6 +2,11 @@ var MenuScene = {
   player:'',
   cont: 0,
     create: function () {
+
+      //SOUND---------------------------------------
+      this.music = this.game.add.audio('menu_music');
+      this.music.onDecoded.add(this.startMusic, this);
+      //---------------------------------------------
        this.game.stage.backgroundColor = "#4488AA";
       var selectText = this.game.add.text(400, 100, "Select the player");
       selectText.fill = '#43d637';
@@ -42,6 +47,9 @@ var MenuScene = {
        this.cursors.right.onDown.add(this.next, this);
        this.selectButton.onDown.add(this.selectPlayer, this);
     },
+    startMusic: function(){
+      this.music.fadeIn(2000,true);
+    },
     selectPlayer: function(){
       switch (this._it){
         case 0: aux = { name: 'player_01', life: 5, jump: -750, speedPower: 1 }; // 1 aumenta la velocidad.
@@ -51,7 +59,7 @@ var MenuScene = {
         case 2: aux = { name: 'player_03', life: 5, jump: -900, speedPower: -1 }; // -1 la decrementa.
                 break; 
       }
-      this.game.state.start('level_select', true, false, aux);
+      this.game.state.start('level_select', true, false, aux,this.music);
     },
     next: function(){
       this.flechaDer.scale.set(1.25)
