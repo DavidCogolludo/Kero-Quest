@@ -392,7 +392,7 @@ var PlayScene = {
         }
         else{
         	this._player.animations.play('breath',2,true);        	
-        } 
+        }
     },
     
     destroy: function(pause){

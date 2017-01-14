@@ -214,18 +214,30 @@ function Enemy (index,game, x,y, destructor){
     var destructor = destructor || false //Booleano. Si es true, el enemigo te mata con tocarte ( de un golpe);
 		var detected = false;
 		var delay = 0;
-		  this.enemy = game.add.sprite(x, y, 'enemy_01');
+		  this.enemy = game.add.sprite(x,y,'limo_01');
+
+      //this.enemy.animations.add('breath',[0,1,2,3]);
+      this.enemy.animations.add('walkR',[1,4,5,6]);
+      this.enemy.animations.add('walkL',[10,9,8,7]);
+
       this.enemy.name= 'enemy_'+ index.toString();
       this.enemy.vel = 75;
       game.physics.arcade.enable(this.enemy);
       this.enemy.body.collideWorldBounds = true;
     //FUNCIONES
+        //ANIMACIÓN
+        this.enemy.animate = function(){
+          var self = this;
+          if (self.body.velocity.x <= 0) this.animations.play('walkL', 8, true);
+          else this.animations.play('walkR',8, true);
+        };
         //MOVIMIENTO
         this.enemy.move = function(colliders){
         	var self = this;
         	var collision;
+          //this.animate();
         	if(!detected){
-       		  this.body.velocity.x =this.vel;
+       		  this.body.velocity.x = this.vel;
        		  colliders.forEach(function(trigger){
        		  	if(self.overlap(trigger) && delay === 0){
        		  		delay++;
@@ -235,12 +247,14 @@ function Enemy (index,game, x,y, destructor){
        		  	}
        		  })
         	}
+          this.animate();
         };
         //DETECCIÓN DEL JUGADOR
         this.enemy.detected = function(target){
         	var positionTarget = target.body.position;
         	var positionEnemy= this.body.position;
         	var distance= Math.abs(positionTarget.x - positionEnemy.x);
+          //this.animate();
         	if (positionTarget.y === positionEnemy.y && distance <= 128 ){
         		detected = true;
         		if (positionTarget.x > positionEnemy.x) this.body.velocity.x = +90;
@@ -248,7 +262,6 @@ function Enemy (index,game, x,y, destructor){
         	}
         	else{
         		detected= false;
-        		this.body.velocity.x=0;
         		//this.body.position.x = this.vel/2;
         	}
         	if (this.overlap(target) && delay === 0){
@@ -259,6 +272,7 @@ function Enemy (index,game, x,y, destructor){
               }
         	  else if (!target.invincible) target.life = 0;
         	} 
+          this.animate();
         };
         return this.enemy;
 };
@@ -1005,7 +1019,7 @@ var PlayScene = {
         }
         else{
         	this._player.animations.play('breath',2,true);        	
-        } 
+        }
     },
     
     destroy: function(pause){
@@ -2371,6 +2385,7 @@ var PreloaderScene = {
        this.game.load.spritesheet('player_01', 'images/player_01.png',28,28,11);
        this.game.load.spritesheet('player_02', 'images/player_02.png',28,28,11);
        this.game.load.spritesheet('player_03', 'images/player_03.png',28,28,11);
+       this.game.load.spritesheet('limo_01', 'images/limo_01.png',28,28,11);
        this.game.load.image('player_info_01', 'images/player_info_01.png');
        this.game.load.image('player_info_02', 'images/player_info_02.png');
        this.game.load.image('player_info_03', 'images/player_info_03.png');
