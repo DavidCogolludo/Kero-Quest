@@ -5,6 +5,10 @@ var EndLevel = {
       aux = actualLevel;
     },
     create: function () {
+       //SOUND---------------------------------------
+      this.music = this.game.add.audio('menu_music');
+      this.music.onDecoded.add(this.startMusic, this);
+      //-----------------------------------------------
         console.log("Level Completed!");
         var BG = this.game.add.sprite(this.game.world.centerX, 
                                       this.game.world.centerY, 
@@ -23,8 +27,11 @@ var EndLevel = {
         button.anchor.set(0.5);
         button.addChild(text);
     },
-    
+     startMusic: function(){
+      this.music.fadeIn(2000,true);
+    },
     actionOnClick: function(){
+        this.music.destroy();
         this.game.state.start('menu');
     },
 };
@@ -926,7 +933,7 @@ var PlayScene = {
     	this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
-      this.game.state.start('menu_in_game', true, false, this.level);
+      this.game.state.start('menu_in_game', true, false, this.level, this.sound.music);
     },
     jumpCheck: function (){
     	var jump = this._player._jumpSpeed*(this.timeJump/1.5);
@@ -1344,7 +1351,7 @@ var PlayScene = {
       this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
-      this.game.state.start('menu_in_game', true, false, this.level);
+      this.game.state.start('menu_in_game', true, false, this.level,this.sound.music);
     },
     jumpCheck: function (){
       var jump = this._player._jumpSpeed*this.timeJump;
@@ -1413,8 +1420,9 @@ var PlayScene = {
           this._direction= Direction.RIGHT;
           this._player.moveRight(incrementoX);
         }
-        else{
-          this._player.animations.play('breath',2,true);          
+        else {
+          if (this._direction === Direction.RIGHT) this._player.animations.play('breath',2,true);
+          else this._player.animations.play('breath',2,true);
         } 
     },
     
@@ -1770,7 +1778,7 @@ var PlayScene = {
       this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
-      this.game.state.start('menu_in_game', true, false, this.level);
+      this.game.state.start('menu_in_game', true, false, this.level, this.sound.music);
     },
     jumpCheck: function (){
       var jump = this._player._jumpSpeed*this.timeJump;
@@ -2201,7 +2209,7 @@ var PlayScene = {
       this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
-      this.game.state.start('menu_in_game', true, false, this.level);
+      this.game.state.start('menu_in_game', true, false, this.level,this.sound.music);
     },
     jumpCheck: function (){
       var jump = this._player._jumpSpeed*this.timeJump;
@@ -2446,8 +2454,9 @@ game.state.start('boot');
 },{"./credits.js":1,"./end_level.js":2,"./gameover_scene.js":4,"./jumpTestLevel.js":5,"./level_01.js":6,"./level_02.js":7,"./level_03.js":8,"./level_04.js":9,"./menu_in_game.js":11,"./menu_level.js":12,"./menu_scene.js":13,"./select_player.js":14}],11:[function(require,module,exports){
 var MenuInGame = {
 	//METODOS
-	init: function (gameState){
+	init: function (gameState, mus){
 		this.prevState = gameState;
+    this.music = mus;
 	},
 
     create: function () {
@@ -2498,6 +2507,7 @@ var MenuInGame = {
     },
 
     actionOnClick3: function(){
+       this.music.destroy();
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
        this.game.state.start('menu');
