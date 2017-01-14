@@ -362,7 +362,7 @@
         {
          "columns":16,
          "firstgid":1,
-         "image":"K:\/Dropbox\/UCM\/2\u00ba DYDV\/PVLI - Programaci\u00f3n de Videojuegos en Lenguajes Interpretados\/Practicas\/PVLI-P3-2DPlatfrm\/PVLI-P3\/src\/images\/TileSet.png",
+         "image":"TileSet.png",
          "imageheight":512,
          "imagewidth":512,
          "margin":0,

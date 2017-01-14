@@ -24,21 +24,21 @@ var EndLevel = {
         text3.anchor.set(0.5);
 
         //BOTONES
-        var button = this.game.add.button(533, 230, 
+        var button = this.game.add.button(200, 320, 
                                           'button', 
                                           this.actionOnClick, 
                                           this, 2, 1, 0);
         button.anchor.set(0.5);
         button.addChild(text);
 
-        var button2 = this.game.add.button(533, 320, 
+        var button2 = this.game.add.button(200, 420, 
                                           'button', 
                                           this.actionOnClick2, 
                                           this, 2, 1, 0);
         button2.anchor.set(0.5);
         button2.addChild(text2);
 
-        var button3 = this.game.add.button(303, 320, 
+        var button3 = this.game.add.button(200, 520, 
                                           'button', 
                                           this.actionOnClick3, 
                                           this, 2, 1, 0);

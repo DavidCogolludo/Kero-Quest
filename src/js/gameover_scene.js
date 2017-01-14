@@ -9,7 +9,7 @@ var GameOver = {
                                       this.game.world.centerY, 
                                       'gameOverBG');
         BG.anchor.setTo(0.5, 0.5);
-        var button = this.game.add.button(510, 330, 
+        var button = this.game.add.button(130, 280, 
                                           'button', 
                                           this.actionOnClick, 
                                           this, 2, 1, 0);
@@ -24,7 +24,7 @@ var GameOver = {
         //goText.anchor.set(0.5);
         button.addChild(text);
        
-        var button2 = this.game.add.button(510, 430, 
+        var button2 = this.game.add.button(650, 280, 
                                           'button', 
                                           this.actionOnClick2, 
                                           this, 2, 1, 0);
