@@ -390,27 +390,24 @@ var PlayScene = {
         this.game.camera.follow(this._player);
     },
     //move the player
-    movement: function(incrementoX){
+     movement: function(incrementoX){
          if (this.cursors.left.isDown){
         this._player.animations.play('walkL', 8, true);
-        this._direction= Direction.LEFT;
         this._player.moveLeft(incrementoX);
          }
         else if (this.cursors.right.isDown) {
           this._player.animations.play('walkR', 8, true);
-          this._direction= Direction.RIGHT;
           this._player.moveRight(incrementoX);
         }
-        else {
-          if (this._direction === Direction.RIGHT) this._player.animations.play('breath',2,true);
-          else this._player.animations.play('breath',2,true);
-        } 
+        else if (this._player.body.onFloor()) {
+          if(this._player.direction == 1) this._player.animations.play('breathR',2,true);  
+          else this._player.animations.play('breathL',2,true); 
+        }
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(pause){
       var p = pause || false;
-      var self = this;
        if (!p) this.sound.music.destroy();
       this.enemyGroup.forEach(function(obj){
         obj.destroy();

@@ -125,14 +125,17 @@ var Direction = {'LEFT':0, 'RIGHT':1, 'TOP':2, 'LOW':3}
 function Player (game, x,y, playerInfo){
   this._player = game.add.sprite(x,y,playerInfo.name);
 
-    this._player.animations.add('breath',[0,1,2,3]);
+    this._player.animations.add('breathR',[0,1,2,3]);
+    this._player.animations.add('breathL',[13,12,11,10]);
     this._player.animations.add('walkR',[3,4,5,6]);
     this._player.animations.add('walkL',[10,9,8,7]);
+    this._player.animations.add('jumpR',[6]);
+    this._player.animations.add('jumpL',[7]);
 
     this._player.sound = {};
     this._player.sound.jump = game.add.audio('jump_fx',0.5);
     this._player.sound.slap = game.add.audio('slap_fx', 0.20);
-
+    this._player.direction = Direction.RIGHT;
   this._player.life = playerInfo.life || 4;
   this._player.invincible = false;
   this._player.timeRecover=80;
@@ -154,6 +157,8 @@ function Player (game, x,y, playerInfo){
   this._player.jump = function(y){
           this.sound.jump.play();
           if(this.body.onFloor())this.body.velocity.y = y;
+          if(this.direction == 1)this.animations.play('jumpR');
+          else this.animations.play('jumpL');
   }
     this._player.health = function(){
       this.life++;
@@ -176,9 +181,11 @@ function Player (game, x,y, playerInfo){
       this.invincible = false;
     }
     this._player.moveLeft = function(x){
+      this.direction = Direction.LEFT;
       this.body.velocity.x = this._speed*(-x); 
     }
-    this._player.moveRight = function(x){ 
+    this._player.moveRight = function(x){
+      this.direction = Direction.RIGHT;
       this.body.velocity.x = this._speed*x; 
     }
 
@@ -305,7 +312,8 @@ module.exports = {
 },{}],4:[function(require,module,exports){
 var aux;
 var GameOver = {
-    init: function (actualLeve,mute){
+    init: function (actualLevel,mute){
+      console.log(actualLevel);
       aux = actualLevel;
       this.isMute =mute; 
     },
@@ -1047,16 +1055,15 @@ var PlayScene = {
     movement: function(incrementoX){
          if (this.cursors.left.isDown){
    		 	this._player.animations.play('walkL', 8, true);
-   		 	this._direction= Direction.LEFT;
     		this._player.moveLeft(incrementoX);
          }
         else if (this.cursors.right.isDown) {
         	this._player.animations.play('walkR', 8, true);
-        	this._direction= Direction.RIGHT;
         	this._player.moveRight(incrementoX);
         }
-        else{
-        	this._player.animations.play('breath',2,true);        	
+        else if (this._player.body.onFloor()) {
+        	if(this._player.direction == 1) this._player.animations.play('breathR',2,true);  
+          else this._player.animations.play('breathL',2,true); 
         }
     },
     
@@ -1473,27 +1480,24 @@ var PlayScene = {
         this.game.camera.follow(this._player);
     },
     //move the player
-    movement: function(incrementoX){
+     movement: function(incrementoX){
          if (this.cursors.left.isDown){
         this._player.animations.play('walkL', 8, true);
-        this._direction= Direction.LEFT;
         this._player.moveLeft(incrementoX);
          }
         else if (this.cursors.right.isDown) {
           this._player.animations.play('walkR', 8, true);
-          this._direction= Direction.RIGHT;
           this._player.moveRight(incrementoX);
         }
-        else {
-          if (this._direction === Direction.RIGHT) this._player.animations.play('breath',2,true);
-          else this._player.animations.play('breath',2,true);
-        } 
+        else if (this._player.body.onFloor()) {
+          if(this._player.direction == 1) this._player.animations.play('breathR',2,true);  
+          else this._player.animations.play('breathL',2,true); 
+        }
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(pause){
       var p = pause || false;
-      var self = this;
        if (!p) this.sound.music.destroy();
       this.enemyGroup.forEach(function(obj){
         obj.destroy();
@@ -1914,20 +1918,19 @@ var PlayScene = {
         this.game.camera.follow(this._player);
     },
     //move the player
-    movement: function(incrementoX){
+     movement: function(incrementoX){
          if (this.cursors.left.isDown){
         this._player.animations.play('walkL', 8, true);
-        this._direction= Direction.LEFT;
         this._player.moveLeft(incrementoX);
          }
         else if (this.cursors.right.isDown) {
           this._player.animations.play('walkR', 8, true);
-          this._direction= Direction.RIGHT;
           this._player.moveRight(incrementoX);
         }
-        else{
-          this._player.animations.play('breath',2,true);          
-        } 
+        else if (this._player.body.onFloor()) {
+          if(this._player.direction == 1) this._player.animations.play('breathR',2,true);  
+          else this._player.animations.play('breathL',2,true); 
+        }
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
@@ -2357,20 +2360,19 @@ var PlayScene = {
         this.game.camera.follow(this._player);
     },
     //move the player
-    movement: function(incrementoX){
+     movement: function(incrementoX){
          if (this.cursors.left.isDown){
         this._player.animations.play('walkL', 8, true);
-        this._direction= Direction.LEFT;
         this._player.moveLeft(incrementoX);
          }
         else if (this.cursors.right.isDown) {
           this._player.animations.play('walkR', 8, true);
-          this._direction= Direction.RIGHT;
           this._player.moveRight(incrementoX);
         }
-        else{
-          this._player.animations.play('breath',2,true);          
-        } 
+        else if (this._player.body.onFloor()) {
+          if(this._player.direction == 1) this._player.animations.play('breathR',2,true);  
+          else this._player.animations.play('breathL',2,true); 
+        }
     },
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.

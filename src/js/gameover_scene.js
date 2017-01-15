@@ -1,6 +1,7 @@
 var aux;
 var GameOver = {
-    init: function (actualLeve,mute){
+    init: function (actualLevel,mute){
+      console.log(actualLevel);
       aux = actualLevel;
       this.isMute =mute; 
     },

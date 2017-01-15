@@ -396,16 +396,15 @@ var PlayScene = {
     movement: function(incrementoX){
          if (this.cursors.left.isDown){
    		 	this._player.animations.play('walkL', 8, true);
-   		 	this._direction= Direction.LEFT;
     		this._player.moveLeft(incrementoX);
          }
         else if (this.cursors.right.isDown) {
         	this._player.animations.play('walkR', 8, true);
-        	this._direction= Direction.RIGHT;
         	this._player.moveRight(incrementoX);
         }
-        else{
-        	this._player.animations.play('breath',2,true);        	
+        else if (this._player.body.onFloor()) {
+        	if(this._player.direction == 1) this._player.animations.play('breathR',2,true);  
+          else this._player.animations.play('breathL',2,true); 
         }
     },
     
