@@ -79,7 +79,7 @@ var MenuLevel = {
 
     initLevel: function(){
       musica.destroy();
-      this.game.state.start(aux2, true, false, false, aux);
+      this.game.state.start(aux2, true, false, false,false, aux);
     }
 
 };

@@ -7,7 +7,7 @@ function Player (game, x,y, playerInfo){
     this._player.animations.add('breath',[0,1,2,3]);
     this._player.animations.add('walkR',[3,4,5,6]);
     this._player.animations.add('walkL',[10,9,8,7]);
-    
+
     this._player.sound = {};
     this._player.sound.jump = game.add.audio('jump_fx',0.5);
     this._player.sound.slap = game.add.audio('slap_fx', 0.20);
@@ -25,6 +25,11 @@ function Player (game, x,y, playerInfo){
   this._player.hitDir = 0;
   this.jumpTimer = 0;
 
+  this._player.mute = function(){
+      for (var audio in this.sound){
+        this.sound[audio].mute = true;
+      }
+  }
   this._player.jump = function(y){
           this.sound.jump.play();
           if(this.body.onFloor())this.body.velocity.y = y;

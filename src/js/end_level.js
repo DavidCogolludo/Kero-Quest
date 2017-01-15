@@ -1,13 +1,16 @@
 var aux;
 var pInfo;
 var EndLevel = {
-    init: function (actualLevel, playerInfo){
+    init: function (actualLevel, playerInfo, mute){
       aux = actualLevel;
       pInfo = playerInfo;
+      console.log(mute);
+      this.isMute= mute;
     },
     create: function () {
       this.fx = this.game.add.audio('victory_fx');
-      this.fx.play();
+      console.log(this.isMute);
+      if(!this.isMute)this.fx.play();
         console.log("Level Completed!");
         var BG = this.game.add.sprite(this.game.world.centerX, 
                                       this.game.world.centerY, 
@@ -50,7 +53,7 @@ var EndLevel = {
     
     actionOnClick: function(){
       this.fx.destroy();
-        this.game.state.start(aux, true, false, false);
+        this.game.state.start(aux, true, false, this.isMute, false);
     },
     actionOnClick2: function(){
       this.fx.destroy();
@@ -62,9 +65,9 @@ var EndLevel = {
         this.fx.destroy();
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
-       if (aux === 'level_01') this.game.state.start('level_02',true, false, false, pInfo);
-       else if (aux === 'level_02') this.game.state.start('level_03',true, false, false, pInfo);
-       else if (aux === 'level_03') this.game.state.start('level_04',true, false, false, pInfo);
+       if (aux === 'level_01') this.game.state.start('level_02',true, false, this.isMute,false, pInfo);
+       else if (aux === 'level_02') this.game.state.start('level_03',true, false,this.isMute, false, pInfo);
+       else if (aux === 'level_03') this.game.state.start('level_04',true, false, this.isMute,false, pInfo);
        else if (aux === 'level_04') this.game.state.start('credits');
     }
 

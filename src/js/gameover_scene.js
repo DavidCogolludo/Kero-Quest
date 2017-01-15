@@ -1,11 +1,12 @@
 var aux;
 var GameOver = {
-    init: function (actualLevel){
+    init: function (actualLeve,mute){
       aux = actualLevel;
+      this.isMute =mute; 
     },
     create: function () {
         this.fx = this.game.add.audio('gameOver_fx');
-        this.fx.play();
+        if(!this.isMute)this.fx.play();
         console.log("Game Over");
         var BG = this.game.add.sprite(this.game.world.centerX, 
                                       this.game.world.centerY, 
@@ -36,7 +37,7 @@ var GameOver = {
     
     actionOnClick: function(){
         this.fx.destroy();
-        this.game.state.start(aux, true, false, false);
+        this.game.state.start(aux, true, false, this.isMute,false);
     },
     actionOnClick2: function(){
         this.fx.destroy();

@@ -79,6 +79,7 @@ var PreloaderScene = {
        this.game.load.image('winBG', 'images/win.png');
        this.game.load.image('gameOverBG', 'images/gameover.png');
        this.game.load.image('creditsBG', 'images/creditsBG.png');
+       this.game.load.spritesheet('sound', 'images/sound.png', 64,64,2);
        //SOUND-------------------------------------------------------------------------------------------
        this.game.load.audio('menu_music', ['sound/A Walk in the Park.mp3', 'sound/A_Walk_in_the_Park.ogg']);
        this.game.load.audio('outside_music', ['sound/Platform80kbps.mp3','sound/Platform80kbps.ogg']);

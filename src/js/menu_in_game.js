@@ -1,13 +1,18 @@
+var mute = false;
 var MenuInGame = {
 	//METODOS
-	init: function (gameState, mus){
+	init: function (gameState, mus, mut){
 		this.prevState = gameState;
     this.music = mus;
+    if(mut)this.numFrame = 1;
+    else this.numFrame = 0;
 	},
 
     create: function () {
+      this.game.stage.backgroundColor = "#4488AA";
+      this.muteButn = this.game.add.button(this.game.world.centerX+150,300,'sound',this.muteOnCLick,this,this.numFrame,this.numFrame);
         var button = this.game.add.button(this.game.world.centerX, 
-                                               300, 
+                                               250, 
                                                'button', 
                                                this.actionOnClick, 
                                                this, 2, 1, 0);
@@ -18,7 +23,7 @@ var MenuInGame = {
         button.addChild(text);
 
         var button2 = this.game.add.button(this.game.world.centerX, 
-                                               370, 
+                                               340, 
                                                'button', 
                                                this.actionOnClick2, 
                                                this, 2, 1, 0);
@@ -29,7 +34,7 @@ var MenuInGame = {
         button2.addChild(text2);
 
         var button3 = this.game.add.button(this.game.world.centerX, 
-                                               440, 
+                                               430, 
                                                'button', 
                                                this.actionOnClick3, 
                                                this, 2, 1, 0);
@@ -39,18 +44,29 @@ var MenuInGame = {
         text3.anchor.set(0.5);
         button3.addChild(text3);
     },
-    
+    muteOnCLick: function(){
+      if(mute){
+        mute = false;
+        this.music.mute = false;
+        this.muteButn.setFrames(0);
+      }
+      else {
+        mute = true;
+        this.music.mute = true;
+        this.muteButn.setFrames(1);
+      }
+
+    },
     actionOnClick: function(){
     	console.log('Boton RESUME pulsado');
-    	this.game.state.start(this.prevState, true, false, true);
+    	this.game.state.start(this.prevState, true, false, mute,true);
         //this.game.state.resume('play', true, false, this._sprite, this._level, this.pauseGameState, true);
     },
 
     actionOnClick2: function(){
     	console.log('Boton RESET pulsado');
       this.music.destroy();
-    	this.game.state.start(this.prevState, true, false, false);
-        //this.game.state.resume('play', true, false, this._sprite, this._level, this.pauseGameState, true);
+    	this.game.state.start(this.prevState, true, false, mute,false);
     },
 
     actionOnClick3: function(){

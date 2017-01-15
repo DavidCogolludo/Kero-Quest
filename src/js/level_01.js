@@ -17,9 +17,10 @@ var PlayScene = {
       timeRecover: 80,
       },
     _player: {}, //Refinar esto con un creador de player.//player
-    playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true },
+    playerInfo: {name: 'player_01', life: 4, jump: -700, speedPower: true},
     level: 'level_01',
     sound: {},
+    _mute: false,
     _resume: false,
     _maxYspeed: 0,
     _direction: Direction.NONE,  //dirección inicial del player. NONE es ninguna dirección.
@@ -29,9 +30,11 @@ var PlayScene = {
     _maxInputIgnore: 30,   //Tiempo que ignora el input tras ser golpeado
     _ySpeedLimit: 800,   //El jugador empieza a saltarse colisiones a partir de 1500 de velocidad
       
-  init: function (resume, playerInfo){
+  init: function (mute,resume, playerInfo){
     // Lo que se carga da igual de donde vengas...
     if (!!playerInfo) this.playerInfo = playerInfo; //Si no recibe un spritePlayer carga el básico
+    if(mute)this._mute = true;
+    else this._mute= false;
     // Y ahora si venimos de pausa...
     if (resume)this._resume = true;
      //Activara las variables almacenadas en gameState a la hora de inicializar el personaje
@@ -49,7 +52,7 @@ var PlayScene = {
         invincible: this._player.invincible,
         timeRecover: this._player.timeRecover,
       };
-
+      this.playerInfo.life = this._player.life;
     }
     else this.gameState= {  //Valores predefinidos que seran cambiados al ir a pausa y reescritos al volver
       posX: 128,
@@ -71,8 +74,7 @@ var PlayScene = {
       this.sound.pause = this.game.add.audio('pause_fx');
       this.sound.life = this.game.add.audio('life_fx');
      
-     /* // se llama a `start` cuando todos los sonidos de la lista están cargados
-     game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+     
      this.sound.music.onDecoded.add(this.startMusic, this);
     }
     //Crear mapa;
@@ -105,6 +107,7 @@ var PlayScene = {
     //Crear player:
     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
+    if(this._mute)this._player.mute();
     //Crear vida
     this.lifeGroup = this.game.add.group();
     this.lifeGroup.enableBody = true;
@@ -246,7 +249,7 @@ var PlayScene = {
         //Comprobar vida 
         this.lifeGroup.forEach(function(obj){
           if (obj.overlap(self._player)){
-            self.sound.life.play();
+            if(!self._mute)self.sound.life.play();
             self._player.health();
             obj.destroy();
           }
@@ -263,7 +266,7 @@ var PlayScene = {
         //-----------------------------------CANNONS------------------------------
           if(this.game.time.now > this.bulletTime){
           	this.cannonGroup.forEach(function(obj){
-            if (Math.abs(self._player.position.x-  obj.position.x) <= 300) self.sound.cannon.play();
+            if (!self._mute && Math.abs(self._player.position.x-  obj.position.x) <= 300) self.sound.cannon.play();
             obj.shoot(self.bulletGroup);
         })
             this.bulletTime = this.game.time.now + 2000;
@@ -276,7 +279,7 @@ var PlayScene = {
         this.checkPlayerEnd();
     },
     startMusic: function (){
-      this.sound.music.fadeIn(4000, true);
+      if(!this._mute)this.sound.music.fadeIn(4000, true);
     },
     collisionWithJumpThrough: function(){
     	var self = this;
@@ -294,7 +297,7 @@ var PlayScene = {
       var self = this;
       this.doorGroup.forEach(function(obj){
             if(self.game.physics.arcade.collide(self._player, obj)){
-            self.sound.door.play();
+            if (!self._mute)self.sound.door.play();
             obj.destroy();
             self._keys--;}
       })
@@ -325,11 +328,11 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume= true;
-      this.sound.pause.play();
+      if(!this._mute)this.sound.pause.play();
     	this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
-      this.game.state.start('menu_in_game', true, false, this.level, this.sound.music);
+      this.game.state.start('menu_in_game', true, false, this.level, this.sound.music,this._mute);
     },
     jumpCheck: function (){
     	var jump = this._player._jumpSpeed*(this.timeJump/1.5);
@@ -346,14 +349,14 @@ var PlayScene = {
         this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
-        this.game.state.start('gameOver', true, false, this.level);
+        this.game.state.start('gameOver', true, false, this.level,this._mute);
     },
 
     onPlayerEnd: function(){
         this._keys = 0;
         this.destroy();
         this.game.world.setBounds(0,0,800,600);
-        this.game.state.start('endLevel', true, false, this.level, this.playerInfo);
+        this.game.state.start('endLevel', true, false, this.level, this.playerInfo,this._mute);
     },
     
     checkPlayerDeath: function(){
