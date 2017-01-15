@@ -66,8 +66,11 @@ var PlayScene = {
     //SOUND----------------------------------------------------------------
     if(!this._resume){
       this.sound.music = this.game.add.audio('cave_music');
-      /* // se llama a `start` cuando todos los sonidos de la lista están cargados
-      game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+      this.sound.cannon = this.game.add.audio('cannon_fx', 0.20);
+      this.sound.door = this.game.add.audio('door_fx', 0.20);
+      this.sound.pause = this.game.add.audio('pause_fx');
+      this.sound.life = this.game.add.audio('life_fx');
+     
       this.sound.music.onDecoded.add(this.startMusic, this);
     }
     //Crear mapa;
@@ -269,6 +272,7 @@ var PlayScene = {
         //-----------------------------------CANNONS------------------------------
           if(this.game.time.now > this.bulletTime){
             this.cannonGroup.forEach(function(obj){
+            if (Math.abs(self._player.position.x-  obj.position.x) <= 300) self.sound.cannon.play();
             obj.shoot(self.bulletGroup);
         })
             this.bulletTime = this.game.time.now + 2000;
@@ -299,6 +303,7 @@ var PlayScene = {
       var self = this;
       this.doorGroup.forEach(function(obj){
             if(self.game.physics.arcade.collide(self._player, obj)){
+            self.sound.door.play();
             obj.destroy();
             self._keys--;}
       })
@@ -329,6 +334,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume = true;
+      this.sound.pause.play();
       this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)

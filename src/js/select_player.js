@@ -5,6 +5,7 @@ var MenuScene = {
 
       //SOUND---------------------------------------
       this.music = this.game.add.audio('menu_music');
+      this.select_fx= this.game.add.audio('select_fx');
       this.music.onDecoded.add(this.startMusic, this);
       //---------------------------------------------
        this.game.stage.backgroundColor = "#4488AA";
@@ -59,14 +60,19 @@ var MenuScene = {
         case 2: aux = { name: 'player_03', life: 5, jump: -900, speedPower: -1 }; // -1 la decrementa.
                 break; 
       }
+       this.select_fx.play();
+       var self = this;
+       setTimeout(function(){self.select_fx.destroy();},2000);
       this.game.state.start('level_select', true, false, aux,this.music);
     },
     next: function(){
+      this.select_fx.play();
       this.flechaDer.scale.set(1.25)
       this.players[this._it].visible = false;
       this._it = (this._it +1) % this.players.length;//console.log(this._it);
     },
     prev: function(){
+       this.select_fx.play();
        this.flechaIz.scale.set(1.25);
        this.players[this._it].visible = false;
        if (!!this._it) this._it--;

@@ -4,6 +4,8 @@ var GameOver = {
       aux = actualLevel;
     },
     create: function () {
+        this.fx = this.game.add.audio('gameOver_fx');
+        this.fx.play();
         console.log("Game Over");
         var BG = this.game.add.sprite(this.game.world.centerX, 
                                       this.game.world.centerY, 
@@ -33,9 +35,11 @@ var GameOver = {
     },
     
     actionOnClick: function(){
+        this.fx.destroy();
         this.game.state.start(aux, true, false, false);
     },
     actionOnClick2: function(){
+        this.fx.destroy();
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
        this.game.state.start('menu');

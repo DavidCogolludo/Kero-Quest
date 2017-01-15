@@ -48,6 +48,8 @@ var EndLevel = {
       pInfo = playerInfo;
     },
     create: function () {
+      this.fx = this.game.add.audio('victory_fx');
+      this.fx.play();
         console.log("Level Completed!");
         var BG = this.game.add.sprite(this.game.world.centerX, 
                                       this.game.world.centerY, 
@@ -89,14 +91,17 @@ var EndLevel = {
     },
     
     actionOnClick: function(){
+      this.fx.destroy();
         this.game.state.start(aux, true, false, false);
     },
     actionOnClick2: function(){
+      this.fx.destroy();
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
        this.game.state.start('menu');
     },
     actionOnClick3: function(){
+        this.fx.destroy();
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
        if (aux === 'level_01') this.game.state.start('level_02',true, false, false, pInfo);
@@ -120,6 +125,10 @@ function Player (game, x,y, playerInfo){
     this._player.animations.add('breath',[0,1,2,3]);
     this._player.animations.add('walkR',[3,4,5,6]);
     this._player.animations.add('walkL',[10,9,8,7]);
+    
+    this._player.sound = {};
+    this._player.sound.jump = game.add.audio('jump_fx',0.5);
+    this._player.sound.slap = game.add.audio('slap_fx', 0.20);
 
   this._player.life = playerInfo.life || 4;
   this._player.invincible = false;
@@ -135,12 +144,14 @@ function Player (game, x,y, playerInfo){
   this.jumpTimer = 0;
 
   this._player.jump = function(y){
+          this.sound.jump.play();
           if(this.body.onFloor())this.body.velocity.y = y;
   }
     this._player.health = function(){
       this.life++;
     }
     this._player.hit = function(){
+      this.sound.slap.play();
       if (this.body.velocity.x > 0) this.hitDir = 1;
       else if (this.body.velocity.x < 0) this.hitDir = -1;
       else this.hitDir = 0;
@@ -290,6 +301,8 @@ var GameOver = {
       aux = actualLevel;
     },
     create: function () {
+        this.fx = this.game.add.audio('gameOver_fx');
+        this.fx.play();
         console.log("Game Over");
         var BG = this.game.add.sprite(this.game.world.centerX, 
                                       this.game.world.centerY, 
@@ -319,9 +332,11 @@ var GameOver = {
     },
     
     actionOnClick: function(){
+        this.fx.destroy();
         this.game.state.start(aux, true, false, false);
     },
     actionOnClick2: function(){
+        this.fx.destroy();
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
        this.game.state.start('menu');
@@ -693,6 +708,11 @@ var PlayScene = {
     //SOUND--------------------------------------------------------
     if(!this._resume){
       this.sound.music = this.game.add.audio('outside_music');
+      this.sound.cannon = this.game.add.audio('cannon_fx', 0.20);
+      this.sound.door = this.game.add.audio('door_fx', 0.20);
+      this.sound.pause = this.game.add.audio('pause_fx');
+      this.sound.life = this.game.add.audio('life_fx');
+     
      /* // se llama a `start` cuando todos los sonidos de la lista están cargados
      game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
      this.sound.music.onDecoded.add(this.startMusic, this);
@@ -732,7 +752,7 @@ var PlayScene = {
     this.lifeGroup.enableBody = true;
     this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
     this._powerLife = [];
-    this._powerLife.push(this.game.add.sprite(4312,320,'powerLife'));
+    this._powerLife.push(this.game.add.sprite(416,320,'powerLife'));
     for (var i = 0; i < this._powerLife.length; i++){
       this.lifeGroup.add(this._powerLife[i]);
     }
@@ -868,6 +888,7 @@ var PlayScene = {
         //Comprobar vida 
         this.lifeGroup.forEach(function(obj){
           if (obj.overlap(self._player)){
+            self.sound.life.play();
             self._player.health();
             obj.destroy();
           }
@@ -884,6 +905,7 @@ var PlayScene = {
         //-----------------------------------CANNONS------------------------------
           if(this.game.time.now > this.bulletTime){
           	this.cannonGroup.forEach(function(obj){
+            if (Math.abs(self._player.position.x-  obj.position.x) <= 300) self.sound.cannon.play();
             obj.shoot(self.bulletGroup);
         })
             this.bulletTime = this.game.time.now + 2000;
@@ -914,6 +936,7 @@ var PlayScene = {
       var self = this;
       this.doorGroup.forEach(function(obj){
             if(self.game.physics.arcade.collide(self._player, obj)){
+            self.sound.door.play();
             obj.destroy();
             self._keys--;}
       })
@@ -944,6 +967,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume= true;
+      this.sound.pause.play();
     	this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
@@ -955,7 +979,9 @@ var PlayScene = {
     		this._player.body.velocity.y=0;
     		this._player.jump(this._player._maxJumpSpeed);
     	}
-    	else this._player.jump(jump);
+    	else{
+        this._player.jump(jump);
+      } 
     },
     
     onPlayerDeath: function(){
@@ -1111,8 +1137,11 @@ var PlayScene = {
     //SOUND---------------------------------------------------------------------
     if(!this._resume){
       this.sound.music = this.game.add.audio('cave_music');
-      /* // se llama a `start` cuando todos los sonidos de la lista están cargados
-      game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+      this.sound.cannon = this.game.add.audio('cannon_fx', 0.20);
+      this.sound.door = this.game.add.audio('door_fx', 0.20);
+      this.sound.pause = this.game.add.audio('pause_fx');
+      this.sound.life = this.game.add.audio('life_fx');
+
       this.sound.music.onDecoded.add(this.startMusic, this);
     }
     //Crear mapa;
@@ -1301,6 +1330,7 @@ var PlayScene = {
         //-----------------------------------CANNONS------------------------------
           if(this.game.time.now > this.bulletTime){
             this.cannonGroup.forEach(function(obj){
+            if (Math.abs(self._player.position.x-  obj.position.x) <= 300) self.sound.cannon.play();
             obj.shoot(self.bulletGroup);
         })
             this.bulletTime = this.game.time.now + 2000;
@@ -1332,6 +1362,7 @@ var PlayScene = {
       var self = this;
       this.doorGroup.forEach(function(obj){
             if(self.game.physics.arcade.collide(self._player, obj)){
+            self.sound.door.play();
             obj.destroy();
             self._keys--;}
       })
@@ -1362,6 +1393,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume = true;
+      this.sound.pause.play();
       this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
@@ -1530,8 +1562,11 @@ var PlayScene = {
     //SOUND--------------------------------------------------------
     if (!this._resume){
       this.sound.music = this.game.add.audio('outside_music');
-    /* // se llama a `start` cuando todos los sonidos de la lista están cargados
-    game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+      this.sound.cannon = this.game.add.audio('cannon_fx', 0.20);
+      this.sound.door = this.game.add.audio('door_fx', 0.20);
+      this.sound.pause = this.game.add.audio('pause_fx');
+      this.sound.life = this.game.add.audio('life_fx');
+    
     this.sound.music.onDecoded.add(this.startMusic, this);
   }
     //Crear mapa;
@@ -1729,6 +1764,7 @@ var PlayScene = {
         //-----------------------------------CANNONS------------------------------
           if(this.game.time.now > this.bulletTime){
             this.cannonGroup.forEach(function(obj){
+            if (Math.abs(self._player.position.x-  obj.position.x) <= 300) self.sound.cannon.play();
             obj.shoot(self.bulletGroup);
         })
             this.bulletTime = this.game.time.now + 2000;
@@ -1759,6 +1795,7 @@ var PlayScene = {
       var self = this;
       this.doorGroup.forEach(function(obj){
             if(self.game.physics.arcade.collide(self._player, obj)){
+            self.sound.door.play();
             obj.destroy();
             self._keys--;}
       })
@@ -1789,6 +1826,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume = true;
+      this.sound.pause.play();
       this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
@@ -1957,8 +1995,11 @@ var PlayScene = {
     //SOUND----------------------------------------------------------------
     if(!this._resume){
       this.sound.music = this.game.add.audio('cave_music');
-      /* // se llama a `start` cuando todos los sonidos de la lista están cargados
-      game.sound.setDecodedCallback([ explosion, sword ], start, this);*/
+      this.sound.cannon = this.game.add.audio('cannon_fx', 0.20);
+      this.sound.door = this.game.add.audio('door_fx', 0.20);
+      this.sound.pause = this.game.add.audio('pause_fx');
+      this.sound.life = this.game.add.audio('life_fx');
+     
       this.sound.music.onDecoded.add(this.startMusic, this);
     }
     //Crear mapa;
@@ -2160,6 +2201,7 @@ var PlayScene = {
         //-----------------------------------CANNONS------------------------------
           if(this.game.time.now > this.bulletTime){
             this.cannonGroup.forEach(function(obj){
+            if (Math.abs(self._player.position.x-  obj.position.x) <= 300) self.sound.cannon.play();
             obj.shoot(self.bulletGroup);
         })
             this.bulletTime = this.game.time.now + 2000;
@@ -2190,6 +2232,7 @@ var PlayScene = {
       var self = this;
       this.doorGroup.forEach(function(obj){
             if(self.game.physics.arcade.collide(self._player, obj)){
+            self.sound.door.play();
             obj.destroy();
             self._keys--;}
       })
@@ -2220,6 +2263,7 @@ var PlayScene = {
       this._maxYspeed = 0;
       //Cambio escena
       this._resume = true;
+      this.sound.pause.play();
       this.destroy(true);
       this.game.world.setBounds(0,0,800,600);
       //Mandamos al menu pausa los 3 parametros necesarios (sprite, mapa y datos del jugador)
@@ -2405,6 +2449,15 @@ var PreloaderScene = {
        this.game.load.audio('menu_music', ['sound/A Walk in the Park.mp3', 'sound/A_Walk_in_the_Park.ogg']);
        this.game.load.audio('outside_music', ['sound/Platform80kbps.mp3','sound/Platform80kbps.ogg']);
        this.game.load.audio('cave_music', ['sound/Craig Stern - Funky, Funky Spy.mp3','sound/Craig_Stern_-_Funky_Funky_Spy.ogg']);
+       this.game.load.audio('jump_fx',['sound/Perplexe-xk-113_hifi.mp3','sound/Perplexe-xk-113_hifi.ogg']);
+       this.game.load.audio('cannon_fx', ['sound/Swing_n-Aaron_Be-8767_hifi.mp3','sound/Swing_n-Aaron_Be-8767_hifi.ogg']);
+       this.game.load.audio('door_fx', ['sound/Wooden_D-Doogens-8721_hifi.mp3','sound/Wooden_D-Doogens-8721_hifi.ogg']);
+       this.game.load.audio('slap_fx',['sound/Slap-Michael-8688_hifi.mp3','sound/Slap-Michael-8688_hifi.ogg']);
+       this.game.load.audio('pause_fx', ['sound/BubblePo-Benjamin-8920_hifi.mp3','sound/BubblePo-Benjamin-8920_hifi.ogg']);
+       this.game.load.audio('select_fx',['sound/Switch19-intermed-5260_hifi.mp3','sound/Switch19-intermed-5260_hifi.ogg']);
+       this.game.load.audio('life_fx',['sound/EFECTOS DE SONIDO - LVL UP.mp3','sound/EFECTOS DE SONIDO - LVL UP.ogg']);
+       this.game.load.audio('gameOver_fx',['sound/Fallo- Efecto de Sonido.mp3','sound/Fallo- Efecto de Sonido.ogg']);
+       this.game.load.audio('victory_fx', ['sound/Victory-Efecto de Sonido.mp3','sound/Victory-Efecto de Sonido.ogg']);
        //this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
@@ -2517,6 +2570,7 @@ var MenuInGame = {
 
     actionOnClick2: function(){
     	console.log('Boton RESET pulsado');
+      this.music.destroy();
     	this.game.state.start(this.prevState, true, false, false);
         //this.game.state.resume('play', true, false, this._sprite, this._level, this.pauseGameState, true);
     },
@@ -2654,6 +2708,7 @@ var MenuScene = {
 
       //SOUND---------------------------------------
       this.music = this.game.add.audio('menu_music');
+      this.select_fx= this.game.add.audio('select_fx');
       this.music.onDecoded.add(this.startMusic, this);
       //---------------------------------------------
        this.game.stage.backgroundColor = "#4488AA";
@@ -2708,14 +2763,19 @@ var MenuScene = {
         case 2: aux = { name: 'player_03', life: 5, jump: -900, speedPower: -1 }; // -1 la decrementa.
                 break; 
       }
+       this.select_fx.play();
+       var self = this;
+       setTimeout(function(){self.select_fx.destroy();},2000);
       this.game.state.start('level_select', true, false, aux,this.music);
     },
     next: function(){
+      this.select_fx.play();
       this.flechaDer.scale.set(1.25)
       this.players[this._it].visible = false;
       this._it = (this._it +1) % this.players.length;//console.log(this._it);
     },
     prev: function(){
+       this.select_fx.play();
        this.flechaIz.scale.set(1.25);
        this.players[this._it].visible = false;
        if (!!this._it) this._it--;

@@ -48,6 +48,7 @@ var MenuInGame = {
 
     actionOnClick2: function(){
     	console.log('Boton RESET pulsado');
+      this.music.destroy();
     	this.game.state.start(this.prevState, true, false, false);
         //this.game.state.resume('play', true, false, this._sprite, this._level, this.pauseGameState, true);
     },

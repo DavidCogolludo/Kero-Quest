@@ -83,6 +83,15 @@ var PreloaderScene = {
        this.game.load.audio('menu_music', ['sound/A Walk in the Park.mp3', 'sound/A_Walk_in_the_Park.ogg']);
        this.game.load.audio('outside_music', ['sound/Platform80kbps.mp3','sound/Platform80kbps.ogg']);
        this.game.load.audio('cave_music', ['sound/Craig Stern - Funky, Funky Spy.mp3','sound/Craig_Stern_-_Funky_Funky_Spy.ogg']);
+       this.game.load.audio('jump_fx',['sound/Perplexe-xk-113_hifi.mp3','sound/Perplexe-xk-113_hifi.ogg']);
+       this.game.load.audio('cannon_fx', ['sound/Swing_n-Aaron_Be-8767_hifi.mp3','sound/Swing_n-Aaron_Be-8767_hifi.ogg']);
+       this.game.load.audio('door_fx', ['sound/Wooden_D-Doogens-8721_hifi.mp3','sound/Wooden_D-Doogens-8721_hifi.ogg']);
+       this.game.load.audio('slap_fx',['sound/Slap-Michael-8688_hifi.mp3','sound/Slap-Michael-8688_hifi.ogg']);
+       this.game.load.audio('pause_fx', ['sound/BubblePo-Benjamin-8920_hifi.mp3','sound/BubblePo-Benjamin-8920_hifi.ogg']);
+       this.game.load.audio('select_fx',['sound/Switch19-intermed-5260_hifi.mp3','sound/Switch19-intermed-5260_hifi.ogg']);
+       this.game.load.audio('life_fx',['sound/EFECTOS DE SONIDO - LVL UP.mp3','sound/EFECTOS DE SONIDO - LVL UP.ogg']);
+       this.game.load.audio('gameOver_fx',['sound/Fallo- Efecto de Sonido.mp3','sound/Fallo- Efecto de Sonido.ogg']);
+       this.game.load.audio('victory_fx', ['sound/Victory-Efecto de Sonido.mp3','sound/Victory-Efecto de Sonido.ogg']);
        //this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'

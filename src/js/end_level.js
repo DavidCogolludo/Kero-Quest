@@ -6,6 +6,8 @@ var EndLevel = {
       pInfo = playerInfo;
     },
     create: function () {
+      this.fx = this.game.add.audio('victory_fx');
+      this.fx.play();
         console.log("Level Completed!");
         var BG = this.game.add.sprite(this.game.world.centerX, 
                                       this.game.world.centerY, 
@@ -47,14 +49,17 @@ var EndLevel = {
     },
     
     actionOnClick: function(){
+      this.fx.destroy();
         this.game.state.start(aux, true, false, false);
     },
     actionOnClick2: function(){
+      this.fx.destroy();
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
        this.game.state.start('menu');
     },
     actionOnClick3: function(){
+        this.fx.destroy();
        this.game.world.setBounds(0,0,800,600);
        this.game.stage.backgroundColor = '#000000';
        if (aux === 'level_01') this.game.state.start('level_02',true, false, false, pInfo);
