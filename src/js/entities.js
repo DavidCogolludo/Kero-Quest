@@ -71,7 +71,7 @@ function Player (game, x,y, playerInfo){
     return this._player;
 }
 
-Enemy.prototype.constructor = Enemy;
+Player.prototype.constructor = Player;
     
 //CAÑONES--------------------------------------------------------------------- 
 function Cannon (index, game, x,y, dir){
@@ -113,6 +113,59 @@ function Cannon (index, game, x,y, dir){
   return this.cannon;
 };
 Cannon.prototype.constructor = Cannon;
+//MOSCA---------------------------------------------------------------------------------------------------
+function Fly (index,game,x,y){
+   this.fly = game.add.sprite(x,y,'powerLife');
+   this.fly.name = 'fly_'+index.toString();
+   var initY = y;
+   var initX = x;
+   var cont = 0;
+   var rnd = 0;
+
+   this.fly.sound = {};
+   this.fly.sound.health = game.add.audio('life_fx');
+   this.fly.sound.fly = game.add.audio('fly_fx',0.5,true);
+   this.fly.sound.fly.play();
+   this.fly.mute = function(){
+      for (var audio in this.sound){
+        this.sound[audio].mute = true;
+      }
+  }
+   this.fly.getLive = function(target){
+     if (this.overlap(target)){
+            this.sound.health.play();
+            target.health();
+            this.sound.fly.destroy();
+            this.destroy();
+      } 
+
+   };
+   this.fly.move = function(target){
+      if (Math.abs(this.position.x - target.body.position.x) > 80 && Math.abs(this.position.y - target.body.position.y) > 80) this.sound.fly.mute = true;
+      else this.sound.fly.mute = false;
+      if(cont === 0){
+        rnd = Math.floor((Math.random() * 4));
+      }
+      switch (rnd){
+        case 0: if ((initX +300) <= this.position.x)this.position.x --;
+                cont++;
+                break;
+        case 1: if((initX + 300) >= this.position.x)this.position.x ++;
+                cont++;
+                break;
+        case 2: if ((initY - 192)<= this.position.y) this.position.y --;
+                cont++;
+                break;
+        case 3: if ((initY +192) >= this.position.y) this.position.y++;
+                cont++;
+                break;
+      }
+      if (cont === 6) cont = 0;
+      this.getLive(target);
+   }
+   return this.fly;
+};
+Fly.prototype.constructor = Fly;
 //TOPO----------------------------------------------------------------------------------------------------
 function Mole (index,game, x,y, destructor){
     //ATRIBUTOS
@@ -121,12 +174,15 @@ function Mole (index,game, x,y, destructor){
     var initY = y;
     var delay = 0;
       this.mole = game.add.sprite(x,y,'enemy_02');
-
       this.mole.name= 'mole_'+ index.toString();
-     // this.mole.enableBody = true;
-      console.log(this.mole.position.x);
+      this.mole.sound = {};
+      this.mole.sound.pop = game.add.audio('mole_fx',0.75);
     //FUNCIONES
-        
+       this.mole.mute = function(){
+        for (var audio in this.sound){
+          this.sound[audio].mute = true;
+        }
+      }
         this.mole.hit = function(target){
           if (this.overlap(target) && delay === 0){
             delay++;
@@ -142,13 +198,16 @@ function Mole (index,game, x,y, destructor){
           var positionTarget = target.body.position;
           var positionMole= this.position;
           var distance= Math.abs(positionTarget.x - positionMole.x);
-          //console.log(distance);
           //this.animate();
           if (distance <= 130 && distance >= 65){
             if(this.position.y > (initY -30)) this.position.y--;
           }
           else if (distance < 60){
-            if(this.position.y > (initY-60)) this.position.y--;
+            if(this.position.y > (initY-58)) this.position.y--;
+            if (this.position.y === initY -58){
+             this.sound.pop.play();
+             this.position.y--;
+           }
             this.hit(target);
           }
           else {
@@ -232,4 +291,5 @@ module.exports = {
   Cannon: Cannon,
   Player: Player,
   Mole: Mole,
+  Fly: Fly,
 };

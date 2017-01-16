@@ -125,20 +125,17 @@ var PlayScene = {
     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
     if(this._mute)this._player.mute();
-//Crear vidas
-    this.lifeGroup = this.game.add.group();
-    this.lifeGroup.enableBody = true;
-    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+//Crear vidas---------------------------------------------------------------------------------------------------------------------s
+    this.flyGroup = this.game.add.group();
     this._powerLife = [];
-    this._powerLife.push(this.game.add.sprite(2080,64,'powerLife'));
-    this._powerLife.push(this.game.add.sprite(3392,384,'powerLife'));
+    this._powerLife.push(new entities.Fly(0,this.game,2080,64));
+    this._powerLife.push(new entities.Fly(1,this.game,3392,384));
     for (var i = 0; i < this._powerLife.length; i++){
-      this.lifeGroup.add(this._powerLife[i]);
+      this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.lifeGroup.forEach(function(obj){
-      obj.body.allowGravity = false;
-      obj.body.immovable = true;
+    this.flyGroup.forEach(function(obj){
+      if(self._mute)obj.mute();
     })
     //Crear cursores
     this.timeJump = 0;
@@ -269,14 +266,11 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-         //Comprobar vida 
-        this.lifeGroup.forEach(function(obj){
-          if (obj.overlap(self._player)){
-            if(!self._mute)self.sound.life.play();
-            self._player.health();
-            obj.destroy();
-          }
-        }) 
+        //-------------------------------------FLY(LIFE)-------------------------------
+         this.flyGroup.forEach(function(obj){
+            obj.move(self._player);
+        })
+         //--------------------------------------PAUSE-------------------------------
         this.pauseButton.onDown.add(this.pauseMenu, this);
          //-------------------------------------MOLES-------------------------------
          this.molesGroup.forEach(function(obj){

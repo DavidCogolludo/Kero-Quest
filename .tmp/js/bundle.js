@@ -192,7 +192,7 @@ function Player (game, x,y, playerInfo){
     return this._player;
 }
 
-Enemy.prototype.constructor = Enemy;
+Player.prototype.constructor = Player;
     
 //CAÑONES--------------------------------------------------------------------- 
 function Cannon (index, game, x,y, dir){
@@ -234,6 +234,59 @@ function Cannon (index, game, x,y, dir){
   return this.cannon;
 };
 Cannon.prototype.constructor = Cannon;
+//MOSCA---------------------------------------------------------------------------------------------------
+function Fly (index,game,x,y){
+   this.fly = game.add.sprite(x,y,'powerLife');
+   this.fly.name = 'fly_'+index.toString();
+   var initY = y;
+   var initX = x;
+   var cont = 0;
+   var rnd = 0;
+
+   this.fly.sound = {};
+   this.fly.sound.health = game.add.audio('life_fx');
+   this.fly.sound.fly = game.add.audio('fly_fx',0.5,true);
+   this.fly.sound.fly.play();
+   this.fly.mute = function(){
+      for (var audio in this.sound){
+        this.sound[audio].mute = true;
+      }
+  }
+   this.fly.getLive = function(target){
+     if (this.overlap(target)){
+            this.sound.health.play();
+            target.health();
+            this.sound.fly.destroy();
+            this.destroy();
+      } 
+
+   };
+   this.fly.move = function(target){
+      if (Math.abs(this.position.x - target.body.position.x) > 80 && Math.abs(this.position.y - target.body.position.y) > 80) this.sound.fly.mute = true;
+      else this.sound.fly.mute = false;
+      if(cont === 0){
+        rnd = Math.floor((Math.random() * 4));
+      }
+      switch (rnd){
+        case 0: if ((initX +300) <= this.position.x)this.position.x --;
+                cont++;
+                break;
+        case 1: if((initX + 300) >= this.position.x)this.position.x ++;
+                cont++;
+                break;
+        case 2: if ((initY - 192)<= this.position.y) this.position.y --;
+                cont++;
+                break;
+        case 3: if ((initY +192) >= this.position.y) this.position.y++;
+                cont++;
+                break;
+      }
+      if (cont === 6) cont = 0;
+      this.getLive(target);
+   }
+   return this.fly;
+};
+Fly.prototype.constructor = Fly;
 //TOPO----------------------------------------------------------------------------------------------------
 function Mole (index,game, x,y, destructor){
     //ATRIBUTOS
@@ -242,12 +295,15 @@ function Mole (index,game, x,y, destructor){
     var initY = y;
     var delay = 0;
       this.mole = game.add.sprite(x,y,'enemy_02');
-
       this.mole.name= 'mole_'+ index.toString();
-     // this.mole.enableBody = true;
-      console.log(this.mole.position.x);
+      this.mole.sound = {};
+      this.mole.sound.pop = game.add.audio('mole_fx',0.75);
     //FUNCIONES
-        
+       this.mole.mute = function(){
+        for (var audio in this.sound){
+          this.sound[audio].mute = true;
+        }
+      }
         this.mole.hit = function(target){
           if (this.overlap(target) && delay === 0){
             delay++;
@@ -263,13 +319,16 @@ function Mole (index,game, x,y, destructor){
           var positionTarget = target.body.position;
           var positionMole= this.position;
           var distance= Math.abs(positionTarget.x - positionMole.x);
-          //console.log(distance);
           //this.animate();
           if (distance <= 130 && distance >= 65){
             if(this.position.y > (initY -30)) this.position.y--;
           }
           else if (distance < 60){
-            if(this.position.y > (initY-60)) this.position.y--;
+            if(this.position.y > (initY-58)) this.position.y--;
+            if (this.position.y === initY -58){
+             this.sound.pop.play();
+             this.position.y--;
+           }
             this.hit(target);
           }
           else {
@@ -353,6 +412,7 @@ module.exports = {
   Cannon: Cannon,
   Player: Player,
   Mole: Mole,
+  Fly: Fly,
 };
 
 },{}],4:[function(require,module,exports){
@@ -777,7 +837,6 @@ var PlayScene = {
       this.sound.cannon = this.game.add.audio('cannon_fx', 0.20);
       this.sound.door = this.game.add.audio('door_fx', 0.20);
       this.sound.pause = this.game.add.audio('pause_fx');
-      this.sound.life = this.game.add.audio('life_fx');
      
      
      this.sound.music.onDecoded.add(this.startMusic, this);
@@ -797,7 +856,6 @@ var PlayScene = {
     for (var i = 0; i < this._moles.length; i++){
       this.molesGroup.add(this._moles[i]);
     }
-    //this.enemy_02 = new entities.Mole(1,this.game,576,542)// this.game.add.sprite(576,480,'enemy_02');
     //Crear layers-----------------------------------------------------------------------------------------------
   	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
   	this.groundLayer = this.map.createLayer('Ground');
@@ -824,19 +882,17 @@ var PlayScene = {
     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
     if(this._mute)this._player.mute();
-    //Crear vida
-    this.lifeGroup = this.game.add.group();
-    this.lifeGroup.enableBody = true;
-    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+
+    //Crear vidas---------------------------------------------------------------------------------------------------------------------s
+    this.flyGroup = this.game.add.group();
     this._powerLife = [];
-    this._powerLife.push(this.game.add.sprite(416,320,'powerLife'));
+    this._powerLife.push(new entities.Fly(1,this.game,416,320));
     for (var i = 0; i < this._powerLife.length; i++){
-      this.lifeGroup.add(this._powerLife[i]);
+      this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.lifeGroup.forEach(function(obj){
-      obj.body.allowGravity = false;
-      obj.body.immovable = true;
+    this.flyGroup.forEach(function(obj){
+      if(self._mute)obj.mute();
     })
 
   	//Crear cursores
@@ -962,15 +1018,12 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-        //Comprobar vida 
-        this.lifeGroup.forEach(function(obj){
-          if (obj.overlap(self._player)){
-            if(!self._mute)self.sound.life.play();
-            self._player.health();
-            obj.destroy();
-          }
-        }) 
-
+      
+        //-------------------------------------FLY(LIFE)-------------------------------
+         this.flyGroup.forEach(function(obj){
+            obj.move(self._player);
+        })
+         //--------------------------------------PAUSE-------------------------------
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //-------------------------------------MOLES-------------------------------
          this.molesGroup.forEach(function(obj){
@@ -1259,21 +1312,20 @@ var PlayScene = {
      this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
      if(this._mute)this._player.mute();
-   //Crear vidas
-    this.lifeGroup = this.game.add.group();
-    this.lifeGroup.enableBody = true;
-    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+
+    //Crear vidas---------------------------------------------------------------------------------------------------------------------
+    this.flyGroup = this.game.add.group();
     this._powerLife = [];
-    this._powerLife.push(this.game.add.sprite(448,480,'powerLife'));
-    this._powerLife.push(this.game.add.sprite(448,0,'powerLife'));
+    this._powerLife.push(new entities.Fly(0,this.game,448,480));
+    this._powerLife.push(new entities.Fly(0,this.game,448,0));
     for (var i = 0; i < this._powerLife.length; i++){
-      this.lifeGroup.add(this._powerLife[i]);
+      this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.lifeGroup.forEach(function(obj){
-      obj.body.allowGravity = false;
-      obj.body.immovable = true;
+    this.flyGroup.forEach(function(obj){
+      if(self._mute)obj.mute();
     })
+  
     //Crear cursores
     this.timeJump = 0;
     this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -1397,14 +1449,11 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-         //Comprobar vida 
-        this.lifeGroup.forEach(function(obj){
-          if (obj.overlap(self._player)){
-            if(!self._mute)self.sound.life.play();
-            self._player.health();
-            obj.destroy();
-          }
-        }) 
+        //-------------------------------------FLY(LIFE)-------------------------------
+         this.flyGroup.forEach(function(obj){
+            obj.move(self._player);
+        })
+         //--------------------------------------PAUSE-------------------------------
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY-------------------
         
@@ -1705,20 +1754,17 @@ var PlayScene = {
     this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
     if(this._mute)this._player.mute();
-//Crear vidas
-    this.lifeGroup = this.game.add.group();
-    this.lifeGroup.enableBody = true;
-    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+//Crear vidas---------------------------------------------------------------------------------------------------------------------s
+    this.flyGroup = this.game.add.group();
     this._powerLife = [];
-    this._powerLife.push(this.game.add.sprite(2080,64,'powerLife'));
-    this._powerLife.push(this.game.add.sprite(3392,384,'powerLife'));
+    this._powerLife.push(new entities.Fly(0,this.game,2080,64));
+    this._powerLife.push(new entities.Fly(1,this.game,3392,384));
     for (var i = 0; i < this._powerLife.length; i++){
-      this.lifeGroup.add(this._powerLife[i]);
+      this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.lifeGroup.forEach(function(obj){
-      obj.body.allowGravity = false;
-      obj.body.immovable = true;
+    this.flyGroup.forEach(function(obj){
+      if(self._mute)obj.mute();
     })
     //Crear cursores
     this.timeJump = 0;
@@ -1849,14 +1895,11 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-         //Comprobar vida 
-        this.lifeGroup.forEach(function(obj){
-          if (obj.overlap(self._player)){
-            if(!self._mute)self.sound.life.play();
-            self._player.health();
-            obj.destroy();
-          }
-        }) 
+        //-------------------------------------FLY(LIFE)-------------------------------
+         this.flyGroup.forEach(function(obj){
+            obj.move(self._player);
+        })
+         //--------------------------------------PAUSE-------------------------------
         this.pauseButton.onDown.add(this.pauseMenu, this);
          //-------------------------------------MOLES-------------------------------
          this.molesGroup.forEach(function(obj){
@@ -2144,22 +2187,20 @@ var PlayScene = {
      this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
      if(this._mute)this._player.mute();
-//Crear vidas
-    this.lifeGroup = this.game.add.group();
-    this.lifeGroup.enableBody = true;
-    this.lifeGroup.physicsBodyType = Phaser.Physics.ARCADE;
+    //Crear vidas---------------------------------------------------------------------------------------------------------------------s
+    this.flyGroup = this.game.add.group();
     this._powerLife = [];
-    this._powerLife.push(this.game.add.sprite(2144,128,'powerLife'));
-    this._powerLife.push(this.game.add.sprite(2752,160,'powerLife'));
-   this._powerLife.push(this.game.add.sprite(3616,288,'powerLife'));
+    this._powerLife.push(new entities.Fly(0,this.game,2144,128));
+    this._powerLife.push(new entities.Fly(1,this.game,2752,160));
+    this._powerLife.push(new entities.Fly(2,this.game,3616,288));
     for (var i = 0; i < this._powerLife.length; i++){
-      this.lifeGroup.add(this._powerLife[i]);
+      this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.lifeGroup.forEach(function(obj){
-      obj.body.allowGravity = false;
-      obj.body.immovable = true;
+    this.flyGroup.forEach(function(obj){
+      if(self._mute)obj.mute();
     })
+
     //Crear cursores
     this.timeJump = 0;
     this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -2295,14 +2336,11 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-         //Comprobar vida 
-        this.lifeGroup.forEach(function(obj){
-          if (obj.overlap(self._player)){
-            if(!self._mute)self.sound.life.play();
-            self._player.health();
-            obj.destroy();
-          }
-        }) 
+        //-------------------------------------FLY(LIFE)-------------------------------
+         this.flyGroup.forEach(function(obj){
+            obj.move(self._player);
+        })
+         //--------------------------------------PAUSE-------------------------------
         this.pauseButton.onDown.add(this.pauseMenu, this);
         //----------------------------------ENEMY-------------------
         
@@ -2571,6 +2609,8 @@ var PreloaderScene = {
        this.game.load.audio('life_fx',['sound/EFECTOS DE SONIDO - LVL UP.mp3','sound/EFECTOS DE SONIDO - LVL UP.ogg']);
        this.game.load.audio('gameOver_fx',['sound/Fallo- Efecto de Sonido.mp3','sound/Fallo- Efecto de Sonido.ogg']);
        this.game.load.audio('victory_fx', ['sound/Victory-Efecto de Sonido.mp3','sound/Victory-Efecto de Sonido.ogg']);
+       this.game.load.audio('fly_fx', ['sound/ANIMALFLY_6049_60.mp3','sound/ANIMALFLY_6049_60.ogg']);
+       this.game.load.audio('mole_fx', ['sound/Pop_2-Texavery-8930_hifi.mp3','sound/Pop_2-Texavery-8930_hifi.ogg']);
        //this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'

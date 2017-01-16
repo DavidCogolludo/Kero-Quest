@@ -94,6 +94,8 @@ var PreloaderScene = {
        this.game.load.audio('life_fx',['sound/EFECTOS DE SONIDO - LVL UP.mp3','sound/EFECTOS DE SONIDO - LVL UP.ogg']);
        this.game.load.audio('gameOver_fx',['sound/Fallo- Efecto de Sonido.mp3','sound/Fallo- Efecto de Sonido.ogg']);
        this.game.load.audio('victory_fx', ['sound/Victory-Efecto de Sonido.mp3','sound/Victory-Efecto de Sonido.ogg']);
+       this.game.load.audio('fly_fx', ['sound/ANIMALFLY_6049_60.mp3','sound/ANIMALFLY_6049_60.ogg']);
+       this.game.load.audio('mole_fx', ['sound/Pop_2-Texavery-8930_hifi.mp3','sound/Pop_2-Texavery-8930_hifi.ogg']);
        //this.game.load.atlasJSONHash('rush_idle01', 'images/rush_spritesheet.png', 'images/rush_spritesheet.json', Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
        
       //TODO 2.2a Escuchar el evento onLoadComplete con el método loadComplete que el state 'play'
