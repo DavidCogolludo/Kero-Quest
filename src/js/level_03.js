@@ -81,8 +81,21 @@ var PlayScene = {
     this.map = this.game.add.tilemap('map_03');
     this.map.addTilesetImage('patrones','tiles');
     
-    //Creación de layers
+    //Creación de bg
     this.backgroundLayer = this.map.createLayer('Background');
+    //Crear topos------------------------------------------------------------------------------------------------
+    this.molesGroup = this.game.add.group();
+
+    this._moles = [];
+    this._moles.push(new entities.Mole(0,this.game,353,544));
+    this._moles.push(new entities.Mole(1,this.game,769,544));
+    this._moles.push(new entities.Mole(2,this.game,1633,544));
+    this._moles.push(new entities.Mole(3,this.game,2401,544));
+    this._moles.push(new entities.Mole(4,this.game,3649,448));
+    for (var i = 0; i < this._moles.length; i++){
+      this.molesGroup.add(this._moles[i]);
+    }
+    //Crear layers-----------------------------------------------------------------------------------------------
     this.jumpThroughLayer = this.map.createLayer('JumpThrough');
     this.groundLayer = this.map.createLayer('Ground');
     this.deathLayer = this.map.createLayer('Death');
@@ -265,6 +278,10 @@ var PlayScene = {
           }
         }) 
         this.pauseButton.onDown.add(this.pauseMenu, this);
+         //-------------------------------------MOLES-------------------------------
+         this.molesGroup.forEach(function(obj){
+            obj.detect(self._player);
+        })
         //----------------------------------ENEMY-------------------
         
        this.enemyGroup.forEach(function(obj){

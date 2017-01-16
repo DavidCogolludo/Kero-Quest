@@ -113,6 +113,51 @@ function Cannon (index, game, x,y, dir){
   return this.cannon;
 };
 Cannon.prototype.constructor = Cannon;
+//TOPO----------------------------------------------------------------------------------------------------
+function Mole (index,game, x,y, destructor){
+    //ATRIBUTOS
+    var destructor = destructor || false //Booleano. Si es true, el enemigo te mata con tocarte ( de un golpe);
+    var detected = false;
+    var initY = y;
+    var delay = 0;
+      this.mole = game.add.sprite(x,y,'enemy_02');
+
+      this.mole.name= 'mole_'+ index.toString();
+     // this.mole.enableBody = true;
+      console.log(this.mole.position.x);
+    //FUNCIONES
+        
+        this.mole.hit = function(target){
+          if (this.overlap(target) && delay === 0){
+            delay++;
+            setTimeout(function(){delay = 0;}, 1000);
+            if (!destructor && !target.invincible) {
+                target.hit();
+              }
+            else if (!target.invincible) target.life = 0;
+          } 
+        }
+        //DETECCIÓN DEL JUGADOR
+        this.mole.detect = function(target){
+          var positionTarget = target.body.position;
+          var positionMole= this.position;
+          var distance= Math.abs(positionTarget.x - positionMole.x);
+          //console.log(distance);
+          //this.animate();
+          if (distance <= 130 && distance >= 65){
+            if(this.position.y > (initY -30)) this.position.y--;
+          }
+          else if (distance < 60){
+            if(this.position.y > (initY-60)) this.position.y--;
+            this.hit(target);
+          }
+          else {
+            if (this.position.y < initY) this.position.y++;
+          }
+        };
+        return this.mole;
+};
+Mole.prototype.constructor = Mole;
 //ENEMIGO------------------------------------------------------------------------------------------------
 function Enemy (index,game, x,y, destructor){
     //ATRIBUTOS
@@ -186,4 +231,5 @@ module.exports = {
   Enemy: Enemy,
   Cannon: Cannon,
   Player: Player,
+  Mole: Mole,
 };

@@ -234,6 +234,51 @@ function Cannon (index, game, x,y, dir){
   return this.cannon;
 };
 Cannon.prototype.constructor = Cannon;
+//TOPO----------------------------------------------------------------------------------------------------
+function Mole (index,game, x,y, destructor){
+    //ATRIBUTOS
+    var destructor = destructor || false //Booleano. Si es true, el enemigo te mata con tocarte ( de un golpe);
+    var detected = false;
+    var initY = y;
+    var delay = 0;
+      this.mole = game.add.sprite(x,y,'enemy_02');
+
+      this.mole.name= 'mole_'+ index.toString();
+     // this.mole.enableBody = true;
+      console.log(this.mole.position.x);
+    //FUNCIONES
+        
+        this.mole.hit = function(target){
+          if (this.overlap(target) && delay === 0){
+            delay++;
+            setTimeout(function(){delay = 0;}, 1000);
+            if (!destructor && !target.invincible) {
+                target.hit();
+              }
+            else if (!target.invincible) target.life = 0;
+          } 
+        }
+        //DETECCIÓN DEL JUGADOR
+        this.mole.detect = function(target){
+          var positionTarget = target.body.position;
+          var positionMole= this.position;
+          var distance= Math.abs(positionTarget.x - positionMole.x);
+          //console.log(distance);
+          //this.animate();
+          if (distance <= 130 && distance >= 65){
+            if(this.position.y > (initY -30)) this.position.y--;
+          }
+          else if (distance < 60){
+            if(this.position.y > (initY-60)) this.position.y--;
+            this.hit(target);
+          }
+          else {
+            if (this.position.y < initY) this.position.y++;
+          }
+        };
+        return this.mole;
+};
+Mole.prototype.constructor = Mole;
 //ENEMIGO------------------------------------------------------------------------------------------------
 function Enemy (index,game, x,y, destructor){
     //ATRIBUTOS
@@ -307,6 +352,7 @@ module.exports = {
   Enemy: Enemy,
   Cannon: Cannon,
   Player: Player,
+  Mole: Mole,
 };
 
 },{}],4:[function(require,module,exports){
@@ -739,9 +785,20 @@ var PlayScene = {
     //Crear mapa;
     this.map = this.game.add.tilemap('map_01');
   	this.map.addTilesetImage('patrones','tiles');
-  	
-    //Creación de layers
+  	 
+    //Creación de BG
     this.backgroundLayer = this.map.createLayer('Background');
+    //Crear topos------------------------------------------------------------------------------------------------
+    this.molesGroup = this.game.add.group();
+
+    this._moles = [];
+    this._moles.push(new entities.Mole(0,this.game,577,542));
+    this._moles.push(new entities.Mole(1,this.game,2017,736));
+    for (var i = 0; i < this._moles.length; i++){
+      this.molesGroup.add(this._moles[i]);
+    }
+    //this.enemy_02 = new entities.Mole(1,this.game,576,542)// this.game.add.sprite(576,480,'enemy_02');
+    //Crear layers-----------------------------------------------------------------------------------------------
   	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
   	this.groundLayer = this.map.createLayer('Ground');
   	this.deathLayer = this.map.createLayer('Death');
@@ -915,6 +972,10 @@ var PlayScene = {
         }) 
 
         this.pauseButton.onDown.add(this.pauseMenu, this);
+        //-------------------------------------MOLES-------------------------------
+         this.molesGroup.forEach(function(obj){
+            obj.detect(self._player);
+        })
         //----------------------------------ENEMY-------------------
         
        this.enemyGroup.forEach(function(obj){
@@ -1600,8 +1661,21 @@ var PlayScene = {
     this.map = this.game.add.tilemap('map_03');
     this.map.addTilesetImage('patrones','tiles');
     
-    //Creación de layers
+    //Creación de bg
     this.backgroundLayer = this.map.createLayer('Background');
+    //Crear topos------------------------------------------------------------------------------------------------
+    this.molesGroup = this.game.add.group();
+
+    this._moles = [];
+    this._moles.push(new entities.Mole(0,this.game,353,544));
+    this._moles.push(new entities.Mole(1,this.game,769,544));
+    this._moles.push(new entities.Mole(2,this.game,1633,544));
+    this._moles.push(new entities.Mole(3,this.game,2401,544));
+    this._moles.push(new entities.Mole(4,this.game,3649,448));
+    for (var i = 0; i < this._moles.length; i++){
+      this.molesGroup.add(this._moles[i]);
+    }
+    //Crear layers-----------------------------------------------------------------------------------------------
     this.jumpThroughLayer = this.map.createLayer('JumpThrough');
     this.groundLayer = this.map.createLayer('Ground');
     this.deathLayer = this.map.createLayer('Death');
@@ -1784,6 +1858,10 @@ var PlayScene = {
           }
         }) 
         this.pauseButton.onDown.add(this.pauseMenu, this);
+         //-------------------------------------MOLES-------------------------------
+         this.molesGroup.forEach(function(obj){
+            obj.detect(self._player);
+        })
         //----------------------------------ENEMY-------------------
         
        this.enemyGroup.forEach(function(obj){
@@ -2463,6 +2541,7 @@ var PreloaderScene = {
        this.game.load.spritesheet('player_02', 'images/player_02.png',28,28,11);
        this.game.load.spritesheet('player_03', 'images/player_03.png',28,28,11);
        this.game.load.spritesheet('limo_01', 'images/limo_01.png',28,28,11);
+       this.game.load.image('enemy_02', 'images/topo.png')
        this.game.load.image('player_info_01', 'images/player_info_01.png');
        this.game.load.image('player_info_02', 'images/player_info_02.png');
        this.game.load.image('player_info_03', 'images/player_info_03.png');

@@ -64,6 +64,7 @@ var PreloaderScene = {
        this.game.load.spritesheet('player_02', 'images/player_02.png',28,28,11);
        this.game.load.spritesheet('player_03', 'images/player_03.png',28,28,11);
        this.game.load.spritesheet('limo_01', 'images/limo_01.png',28,28,11);
+       this.game.load.image('enemy_02', 'images/topo.png')
        this.game.load.image('player_info_01', 'images/player_info_01.png');
        this.game.load.image('player_info_02', 'images/player_info_02.png');
        this.game.load.image('player_info_03', 'images/player_info_03.png');
