@@ -95,6 +95,9 @@ var PlayScene = {
     for (var i = 0; i < this._moles.length; i++){
       this.molesGroup.add(this._moles[i]);
     }
+    this.molesGroup.forEach(function(obj){
+      if(self._mute)obj.mute();
+    })
     //Crear layers-----------------------------------------------------------------------------------------------
     this.jumpThroughLayer = this.map.createLayer('JumpThrough');
     this.groundLayer = this.map.createLayer('Ground');

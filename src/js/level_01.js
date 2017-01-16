@@ -91,6 +91,9 @@ var PlayScene = {
     for (var i = 0; i < this._moles.length; i++){
       this.molesGroup.add(this._moles[i]);
     }
+    this.molesGroup.forEach(function(obj){
+      if(self._mute)obj.mute();
+    })
     //Crear layers-----------------------------------------------------------------------------------------------
   	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
   	this.groundLayer = this.map.createLayer('Ground');
@@ -419,6 +422,12 @@ var PlayScene = {
     destroy: function(pause){
       var p = pause || false;
       if (!p) this.sound.music.destroy();
+       this.molesGroup.forEach(function(obj){
+        obj.destroy();
+      })
+       this.flyGroup.forEach(function(obj){
+        obj.destroy();
+      })
       this.enemyGroup.forEach(function(obj){
         obj.destroy();
       })

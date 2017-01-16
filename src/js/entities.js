@@ -121,12 +121,13 @@ function Fly (index,game,x,y){
    var initX = x;
    var cont = 0;
    var rnd = 0;
-
+   var _mute = false;
    this.fly.sound = {};
    this.fly.sound.health = game.add.audio('life_fx');
    this.fly.sound.fly = game.add.audio('fly_fx',0.5,true);
    this.fly.sound.fly.play();
    this.fly.mute = function(){
+     _mute = true;
       for (var audio in this.sound){
         this.sound[audio].mute = true;
       }
@@ -141,8 +142,8 @@ function Fly (index,game,x,y){
 
    };
    this.fly.move = function(target){
-      if (Math.abs(this.position.x - target.body.position.x) > 80 && Math.abs(this.position.y - target.body.position.y) > 80) this.sound.fly.mute = true;
-      else this.sound.fly.mute = false;
+      if (Math.abs(this.position.x - target.body.position.x) > 80 && Math.abs(this.position.y - target.body.position.y) > 80 || _mute) this.sound.fly.mute = true;
+      else if (!_mute) this.sound.fly.mute = false;
       if(cont === 0){
         rnd = Math.floor((Math.random() * 4));
       }
