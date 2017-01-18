@@ -72,6 +72,7 @@ var PlayScene = {
       this.sound.cannon = this.game.add.audio('cannon_fx', 0.20);
       this.sound.door = this.game.add.audio('door_fx', 0.20);
       this.sound.pause = this.game.add.audio('pause_fx');
+      this.sound.fly = this.game.add.audio('fly_fx',0.35,true);
      
      
      this.sound.music.onDecoded.add(this.startMusic, this);
@@ -92,7 +93,7 @@ var PlayScene = {
       this.molesGroup.add(this._moles[i]);
     }
     this.molesGroup.forEach(function(obj){
-      if(self._mute)obj.mute();
+      if(self._mute)obj.mute(); 
     })
     //Crear layers-----------------------------------------------------------------------------------------------
   	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
@@ -129,15 +130,11 @@ var PlayScene = {
       this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.flyGroup.forEach(function(obj){
-      if(self._mute)obj.mute();
-    })
-
   	//Crear cursores
   	this.timeJump = 0;
   	this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
+    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 
     //Crear Llaves
     this.keyGroup = this.game.add.group();
@@ -258,7 +255,10 @@ var PlayScene = {
         }
       
         //-------------------------------------FLY(LIFE)-------------------------------
+
          this.flyGroup.forEach(function(obj){
+            if(!self._mute && Math.abs(obj.position.x - self._player.body.position.x)>80 && Math.abs(obj.position.y - self._player.body.position.y)>80) self.sound.fly.play();
+            else if (self._mute || Math.abs(obj.position.x - self._player.body.position.x)<=80 && Math.abs(obj.position.y - self._player.body.position.y)<=80)self.sound.fly.stop();
             obj.move(self._player);
         })
          //--------------------------------------PAUSE-------------------------------
@@ -421,6 +421,7 @@ var PlayScene = {
     
     destroy: function(pause){
       var p = pause || false;
+      this.sound.fly.stop();
       if (!p) this.sound.music.destroy();
        this.molesGroup.forEach(function(obj){
         obj.destroy();

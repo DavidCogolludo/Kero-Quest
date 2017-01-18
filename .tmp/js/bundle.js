@@ -1,4 +1,30 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var ControlScene = {
+    create: function () {
+
+        var BG = this.game.add.sprite(this.game.world.centerX, 
+                                      this.game.world.centerY, 
+                                      'controlesBG');
+        BG.anchor.setTo(0.5, 0.5);
+        var button = this.game.add.button(this.game.world.centerX, this.game.world.centerY+250, 
+                                          'button', 
+                                          this.actionOnClick, 
+                                          this, 2, 1, 0);
+        button.anchor.set(0.5);
+        var text = this.game.add.text(0, 0, "¡Buen Viaje!");
+        text.anchor.set(0.5);
+        button.addChild(text);
+    },
+    actionOnClick: function(){
+       this.game.world.setBounds(0,0,800,600);
+       this.game.stage.backgroundColor = '#000000';
+       this.game.state.start('menu');
+    }
+
+};
+
+module.exports = ControlScene;
+},{}],2:[function(require,module,exports){
 var aux;
 var EndLevel = {
     init: function (actualLevel){
@@ -39,7 +65,7 @@ var EndLevel = {
 module.exports = EndLevel;
 
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var aux;
 var pInfo;
 var EndLevel = {
@@ -118,7 +144,7 @@ var EndLevel = {
 module.exports = EndLevel;
 
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 'use strict';
 var Direction = {'LEFT':0, 'RIGHT':1, 'TOP':2, 'LOW':3}
 //PLAYER---------------------------------------------------------------------
@@ -245,26 +271,16 @@ function Fly (index,game,x,y){
    var _mute = false;
    this.fly.sound = {};
    this.fly.sound.health = game.add.audio('life_fx');
-   this.fly.sound.fly = game.add.audio('fly_fx',0.5,true);
-   this.fly.sound.fly.play();
-   this.fly.mute = function(){
-     _mute = true;
-      for (var audio in this.sound){
-        this.sound[audio].mute = true;
-      }
-  }
+  
    this.fly.getLive = function(target){
      if (this.overlap(target)){
             this.sound.health.play();
             target.health();
-            this.sound.fly.destroy();
             this.destroy();
       } 
 
    };
    this.fly.move = function(target){
-      if (Math.abs(this.position.x - target.body.position.x) > 80 && Math.abs(this.position.y - target.body.position.y) > 80 || _mute) this.sound.fly.mute = true;
-      else if (!_mute) this.sound.fly.mute = false;
       if(cont === 0){
         rnd = Math.floor((Math.random() * 4));
       }
@@ -416,7 +432,7 @@ module.exports = {
   Fly: Fly,
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var aux;
 var GameOver = {
     init: function (actualLevel,mute){
@@ -471,7 +487,7 @@ var GameOver = {
 module.exports = GameOver;
 
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 //Enumerados: PlayerState son los estado por los que pasa el player. Directions son las direcciones a las que se puede
@@ -763,7 +779,7 @@ var PlayScene = {
 
 module.exports = PlayScene;
 
-},{"./entities.js":3}],6:[function(require,module,exports){
+},{"./entities.js":4}],7:[function(require,module,exports){
 'use strict';
 
 //Enumerados: PlayerState son los estado por los que pasa el player. Directions son las direcciones a las que se puede
@@ -838,6 +854,7 @@ var PlayScene = {
       this.sound.cannon = this.game.add.audio('cannon_fx', 0.20);
       this.sound.door = this.game.add.audio('door_fx', 0.20);
       this.sound.pause = this.game.add.audio('pause_fx');
+      this.sound.fly = this.game.add.audio('fly_fx',0.35,true);
      
      
      this.sound.music.onDecoded.add(this.startMusic, this);
@@ -858,7 +875,7 @@ var PlayScene = {
       this.molesGroup.add(this._moles[i]);
     }
     this.molesGroup.forEach(function(obj){
-      if(self._mute)obj.mute();
+      if(self._mute)obj.mute(); 
     })
     //Crear layers-----------------------------------------------------------------------------------------------
   	this.jumpThroughLayer = this.map.createLayer('JumpThrough');
@@ -895,15 +912,11 @@ var PlayScene = {
       this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.flyGroup.forEach(function(obj){
-      if(self._mute)obj.mute();
-    })
-
   	//Crear cursores
   	this.timeJump = 0;
   	this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
+    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 
     //Crear Llaves
     this.keyGroup = this.game.add.group();
@@ -1024,7 +1037,10 @@ var PlayScene = {
         }
       
         //-------------------------------------FLY(LIFE)-------------------------------
+
          this.flyGroup.forEach(function(obj){
+            if(!self._mute && Math.abs(obj.position.x - self._player.body.position.x)>80 && Math.abs(obj.position.y - self._player.body.position.y)>80) self.sound.fly.play();
+            else if (self._mute || Math.abs(obj.position.x - self._player.body.position.x)<=80 && Math.abs(obj.position.y - self._player.body.position.y)<=80)self.sound.fly.stop();
             obj.move(self._player);
         })
          //--------------------------------------PAUSE-------------------------------
@@ -1187,6 +1203,7 @@ var PlayScene = {
     
     destroy: function(pause){
       var p = pause || false;
+      this.sound.fly.stop();
       if (!p) this.sound.music.destroy();
        this.molesGroup.forEach(function(obj){
         obj.destroy();
@@ -1211,7 +1228,7 @@ var PlayScene = {
 
 module.exports = PlayScene;
 
-},{"./entities.js":3}],7:[function(require,module,exports){
+},{"./entities.js":4}],8:[function(require,module,exports){
 'use strict';
 
 //Enumerados: PlayerState son los estado por los que pasa el player. Directions son las direcciones a las que se puede
@@ -1288,6 +1305,7 @@ var PlayScene = {
       this.sound.door = this.game.add.audio('door_fx', 0.20);
       this.sound.pause = this.game.add.audio('pause_fx');
       this.sound.life = this.game.add.audio('life_fx');
+      this.sound.fly = this.game.add.audio('fly_fx',0.35,true);
 
       this.sound.music.onDecoded.add(this.startMusic, this);
     }
@@ -1332,15 +1350,11 @@ var PlayScene = {
       this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.flyGroup.forEach(function(obj){
-      if(self._mute)obj.mute();
-    })
-  
     //Crear cursores
     this.timeJump = 0;
     this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
+    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 
     //Crear Llaves
     this.keyGroup = this.game.add.group();
@@ -1460,7 +1474,11 @@ var PlayScene = {
           this._player.recover();
         }
         //-------------------------------------FLY(LIFE)-------------------------------
+         //-------------------------------------FLY(LIFE)-------------------------------
+
          this.flyGroup.forEach(function(obj){
+            if(!self._mute && Math.abs(obj.position.x - self._player.body.position.x)>80 && Math.abs(obj.position.y - self._player.body.position.y)>80) self.sound.fly.play();
+            else if (self._mute || Math.abs(obj.position.x - self._player.body.position.x)<=80 && Math.abs(obj.position.y - self._player.body.position.y)<=80)self.sound.fly.stop();
             obj.move(self._player);
         })
          //--------------------------------------PAUSE-------------------------------
@@ -1618,6 +1636,7 @@ var PlayScene = {
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(pause){
       var p = pause || false;
+      this.sound.fly.stop();
        if (!p) this.sound.music.destroy();
       this.enemyGroup.forEach(function(obj){
         obj.destroy();
@@ -1636,7 +1655,7 @@ var PlayScene = {
 
 module.exports = PlayScene;
 
-},{"./entities.js":3}],8:[function(require,module,exports){
+},{"./entities.js":4}],9:[function(require,module,exports){
 'use strict';
 
 //Enumerados: PlayerState son los estado por los que pasa el player. Directions son las direcciones a las que se puede
@@ -1713,6 +1732,7 @@ var PlayScene = {
       this.sound.door = this.game.add.audio('door_fx', 0.20);
       this.sound.pause = this.game.add.audio('pause_fx');
       this.sound.life = this.game.add.audio('life_fx');
+      this.sound.fly = this.game.add.audio('fly_fx',0.35,true);
     
     this.sound.music.onDecoded.add(this.startMusic, this);
   }
@@ -1776,14 +1796,11 @@ var PlayScene = {
       this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.flyGroup.forEach(function(obj){
-      if(self._mute)obj.mute();
-    })
     //Crear cursores
     this.timeJump = 0;
     this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
+    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 
     //Crear Llaves
     this.keyGroup = this.game.add.group();
@@ -1909,7 +1926,10 @@ var PlayScene = {
           this._player.recover();
         }
         //-------------------------------------FLY(LIFE)-------------------------------
+
          this.flyGroup.forEach(function(obj){
+            if(!self._mute && Math.abs(obj.position.x - self._player.body.position.x)>80 && Math.abs(obj.position.y - self._player.body.position.y)>80) self.sound.fly.play();
+            else if (self._mute || Math.abs(obj.position.x - self._player.body.position.x)<=80 && Math.abs(obj.position.y - self._player.body.position.y)<=80)self.sound.fly.stop();
             obj.move(self._player);
         })
          //--------------------------------------PAUSE-------------------------------
@@ -2069,6 +2089,7 @@ var PlayScene = {
     
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(pause){
+      this.sound.fly.stop();
       var p = pause || false;
        if (!p) this.sound.music.destroy();
      this.enemyGroup.forEach(function(obj){
@@ -2088,7 +2109,7 @@ var PlayScene = {
 
 module.exports = PlayScene;
 
-},{"./entities.js":3}],9:[function(require,module,exports){
+},{"./entities.js":4}],10:[function(require,module,exports){
 'use strict';
 
 //Enumerados: PlayerState son los estado por los que pasa el player. Directions son las direcciones a las que se puede
@@ -2165,6 +2186,7 @@ var PlayScene = {
       this.sound.door = this.game.add.audio('door_fx', 0.20);
       this.sound.pause = this.game.add.audio('pause_fx');
       this.sound.life = this.game.add.audio('life_fx');
+      this.sound.fly = this.game.add.audio('fly_fx',0.35,true);
      
       this.sound.music.onDecoded.add(this.startMusic, this);
     }
@@ -2196,6 +2218,7 @@ var PlayScene = {
     this.map.setCollisionBetween(0,5000, true, 'JumpThrough');
     this.map.setCollisionBetween(0,5000, true, 'EndLvl');
 
+
     //Crear player:
      this._player = new entities.Player(this.game,this.gameState.posX, this.gameState.posY,this.playerInfo);
     this.configure();
@@ -2210,15 +2233,11 @@ var PlayScene = {
       this.flyGroup.add(this._powerLife[i]);
     }
 
-    this.flyGroup.forEach(function(obj){
-      if(self._mute)obj.mute();
-    })
-
     //Crear cursores
     this.timeJump = 0;
     this.cursors = this.game.input.keyboard.createCursorKeys();
     this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
+    this.pauseButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 
     //Crear Llaves
     this.keyGroup = this.game.add.group();
@@ -2349,8 +2368,11 @@ var PlayScene = {
           this._player.timeRecover = 0;
           this._player.recover();
         }
-        //-------------------------------------FLY(LIFE)-------------------------------
+       //-------------------------------------FLY(LIFE)-------------------------------
+
          this.flyGroup.forEach(function(obj){
+            if(!self._mute && Math.abs(obj.position.x - self._player.body.position.x)>80 && Math.abs(obj.position.y - self._player.body.position.y)>80) self.sound.fly.play();
+            else if (self._mute || Math.abs(obj.position.x - self._player.body.position.x)<=80 && Math.abs(obj.position.y - self._player.body.position.y)<=80)self.sound.fly.stop();
             obj.move(self._player);
         })
          //--------------------------------------PAUSE-------------------------------
@@ -2507,6 +2529,7 @@ var PlayScene = {
     //TODO 9 destruir los recursos tilemap, tiles y logo.
     destroy: function(pause){
       var p = pause || false;
+      this.sound.fly.stop();
        if (!p) this.sound.music.destroy();
       this.enemyGroup.forEach(function(obj){
         obj.destroy();
@@ -2525,7 +2548,7 @@ var PlayScene = {
 
 module.exports = PlayScene;
 
-},{"./entities.js":3}],10:[function(require,module,exports){
+},{"./entities.js":4}],11:[function(require,module,exports){
 'use strict';
 
 //TODO 1.1 Require de las escenas, play_scene, gameover_scene y menu_scene.
@@ -2541,12 +2564,14 @@ var MenuLevel = require('./menu_level.js')
 var MenuInGame = require('./menu_in_game.js');
 var SelectPlayer = require ('./select_player.js');
 var EndLevel = require ('./end_level.js');
+var ControlScene = require ('./controlScene.js');
 //  The Google WebFont Loader will look for this object, so create it before loading the script.
 
 var BootScene = {
   preload: function () {
     // load here assets required for the loading screen
     this.game.load.image('preloader_bar', 'images/preloader_bar.png');
+    this.game.load.image('controlesBG', 'images/controles.png');
     this.game.load.spritesheet('button', 'images/buttons.png', 168, 70);
     this.game.load.image('logo', 'images/phaser.png');
   },
@@ -2669,6 +2694,7 @@ function init (){
 //TODO 1.2 Añadir los states 'boot' BootScene, 'menu, 'preloader' PreloaderScene, 'play' PlayScene, 'gameOver' GameOver.
  game.state.add('boot', BootScene);
  game.state.add('menu', MenuScene);
+ game.state.add('controls', ControlScene);
  game.state.add('level_select', MenuLevel);
  game.state.add('preloader', PreloaderScene);
  game.state.add('select_player', SelectPlayer);
@@ -2685,7 +2711,7 @@ function init (){
 //TODO 1.3 iniciar el state 'boot'. 
 game.state.start('boot');
 }
-},{"./credits.js":1,"./end_level.js":2,"./gameover_scene.js":4,"./jumpTestLevel.js":5,"./level_01.js":6,"./level_02.js":7,"./level_03.js":8,"./level_04.js":9,"./menu_in_game.js":11,"./menu_level.js":12,"./menu_scene.js":13,"./select_player.js":14}],11:[function(require,module,exports){
+},{"./controlScene.js":1,"./credits.js":2,"./end_level.js":3,"./gameover_scene.js":5,"./jumpTestLevel.js":6,"./level_01.js":7,"./level_02.js":8,"./level_03.js":9,"./level_04.js":10,"./menu_in_game.js":12,"./menu_level.js":13,"./menu_scene.js":14,"./select_player.js":15}],12:[function(require,module,exports){
 var mute = false;
 var MenuInGame = {
 	//METODOS
@@ -2766,7 +2792,7 @@ var MenuInGame = {
 };
 
 module.exports = MenuInGame;
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var aux;
 var aux2;
 var musica;
@@ -2854,7 +2880,7 @@ var MenuLevel = {
 };
 
 module.exports = MenuLevel;
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var MenuScene = {
   perro: 98,
     create: function () {
@@ -2863,7 +2889,7 @@ var MenuScene = {
                                         this.game.world.centerY, 
                                         'logo');
         logo.anchor.setTo(0.5, 0.5);
-        var buttonStart = this.game.add.button(this.game.world.centerX, 
+        var buttonStart = this.game.add.button(this.game.world.centerX-200, 
                                                this.game.world.centerY+200, 
                                                'button', 
                                                this.actionOnClick, 
@@ -2873,16 +2899,29 @@ var MenuScene = {
         textStart.font = 'Sniglet';
         textStart.anchor.set(0.5);
         buttonStart.addChild(textStart);
+         var buttonControls = this.game.add.button(this.game.world.centerX+200, 
+                                               this.game.world.centerY+200, 
+                                               'button', 
+                                               this.actionOnClick2, 
+                                               this, 2, 1, 0);
+        buttonControls.anchor.set(0.5);
+        var textControls = this.game.add.text(0, 0, "Controles");
+        textControls.font = 'Sniglet';
+        textControls.anchor.set(0.5);
+        buttonControls.addChild(textControls);
     },
     
     actionOnClick: function(){
         this.game.state.start('preloader');
-    }
-
+    },
+    actionOnClick2: function(){
+       this.game.world.setBounds(0,0,800,600);
+       this.game.state.start('controls');
+    },
 };
 
 module.exports = MenuScene;
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var MenuScene = {
   player:'',
   cont: 0,
@@ -2966,4 +3005,4 @@ var MenuScene = {
 };
 
 module.exports = MenuScene;
-},{}]},{},[10]);
+},{}]},{},[11]);

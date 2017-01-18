@@ -13,12 +13,14 @@ var MenuLevel = require('./menu_level.js')
 var MenuInGame = require('./menu_in_game.js');
 var SelectPlayer = require ('./select_player.js');
 var EndLevel = require ('./end_level.js');
+var ControlScene = require ('./controlScene.js');
 //  The Google WebFont Loader will look for this object, so create it before loading the script.
 
 var BootScene = {
   preload: function () {
     // load here assets required for the loading screen
     this.game.load.image('preloader_bar', 'images/preloader_bar.png');
+    this.game.load.image('controlesBG', 'images/controles.png');
     this.game.load.spritesheet('button', 'images/buttons.png', 168, 70);
     this.game.load.image('logo', 'images/phaser.png');
   },
@@ -141,6 +143,7 @@ function init (){
 //TODO 1.2 Añadir los states 'boot' BootScene, 'menu, 'preloader' PreloaderScene, 'play' PlayScene, 'gameOver' GameOver.
  game.state.add('boot', BootScene);
  game.state.add('menu', MenuScene);
+ game.state.add('controls', ControlScene);
  game.state.add('level_select', MenuLevel);
  game.state.add('preloader', PreloaderScene);
  game.state.add('select_player', SelectPlayer);
